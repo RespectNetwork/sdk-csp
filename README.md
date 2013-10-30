@@ -17,6 +17,7 @@ To build all components.
 
 ### Information
 
+* [CSP Information](https://github.com/RespectNetwork/sdk-csp/wiki/CSP Information)
 * [Registering Cloud Names and Clouds](https://github.com/RespectNetwork/sdk-csp/wiki/Registering Cloud Names and Clouds)
 * [Changing the Secret Token for a Cloud Name](https://github.com/RespectNetwork/sdk-csp/wiki/Changing the Secret Token for a Cloud Name)
 
