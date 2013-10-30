@@ -21,7 +21,6 @@ import xdi2.core.xri3.XDI3Statement;
 import xdi2.messaging.Message;
 import xdi2.messaging.MessageEnvelope;
 import xdi2.messaging.MessageResult;
-import xdi2.messaging.target.contributor.impl.digest.GenerateDigestSecretTokenContributor;
 
 public class CSP {
 
@@ -149,7 +148,7 @@ public class CSP {
 		};
 
 		message.createSetOperation(Arrays.asList(targetStatementsSet).iterator());
-		message.createOperation(GenerateDigestSecretTokenContributor.XRI_S_DO_GENERATE, Arrays.asList(targetStatementsDoDigestSecretToken).iterator());
+		message.createOperation(XDI3Segment.create("$do$digest$secret<$token>"), Arrays.asList(targetStatementsDoDigestSecretToken).iterator());
 
 		xdiClientHostingEnvironmentRegistry.send(message.getMessageEnvelope(), null);
 
@@ -189,7 +188,7 @@ public class CSP {
 				XDI3Statement.fromLiteralComponents(XDI3Util.concatXris(cloudNameRegistration.getCloudNumberPeerRootXri(), XDIAuthenticationConstants.XRI_S_DIGEST_SECRET_TOKEN, XDIConstants.XRI_S_VALUE), secretToken)
 		};
 
-		message.createOperation(GenerateDigestSecretTokenContributor.XRI_S_DO_GENERATE, Arrays.asList(targetStatementsDoDigestSecretToken).iterator());
+		message.createOperation(XDI3Segment.create("$do$digest$secret<$token>"), Arrays.asList(targetStatementsDoDigestSecretToken).iterator());
 
 		xdiClientHostingEnvironmentRegistry.send(message.getMessageEnvelope(), null);
 
