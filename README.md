@@ -17,4 +17,5 @@ To build all components.
 
 ### Information
 
-TODO
+* [[Registering Cloud Names and Clouds]]
+* [[Changing the Secret Token for a Cloud Name]]
