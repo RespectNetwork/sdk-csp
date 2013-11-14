@@ -1,0 +1,21 @@
+# Use this at http://www.websequencediagrams.com/
+
+title Cloud and Cloud Name Provisioning (Future)
+
+Individual->CSP: Choose Cloud Name and Shared Secret
+CSP->Respect Network Registrar: Check if Cloud Name available
+Respect Network Registrar->Neustar Community Registry: Check if Cloud Name available
+Neustar Community Registry->Respect Network Registrar: Cloud Name available
+Respect Network Registrar->CSP: Cloud Name available
+note right of CSP: Generate Cloud Number
+CSP->Respect Network Registrar: Register Cloud Name with Cloud Number
+Respect Network Registrar->Neustar Community Registry: Register Cloud Name with Cloud Number
+Neustar Community Registry->Respect Network Registrar: Success
+Respect Network Registrar->CSP: Success
+CSP->Neustar Hosting Environment: Register Cloud with Cloud Number and Shared Secret
+Neustar Hosting Environment->CSP: Success
+CSP->Respect Network Registrar: Register Cloud XDI URL with Cloud Number
+Respect Network Registrar->Neustar Community Registry: Register Cloud XDI URL with Cloud Number
+Neustar Community Registry->Respect Network Registrar: Success
+Respect Network Registrar->CSP: Success
+CSP->Individual: Success
