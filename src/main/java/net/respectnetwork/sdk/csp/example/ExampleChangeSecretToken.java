@@ -30,7 +30,7 @@ public class ExampleChangeSecretToken {
 		// step 1: Look for registered Cloud Name
 
 		cloudNameRegistration = csp.checkCloudNameAvailable(cloudName);
-		if (cloudNameRegistration == null) throw new RuntimeException("Cloud Name " + cloudName + " could not be registered.");
+		if (cloudNameRegistration == null) throw new RuntimeException("Cloud Name " + cloudName + " does not exist.");
 
 		// step 2: Change Secret Token
 
