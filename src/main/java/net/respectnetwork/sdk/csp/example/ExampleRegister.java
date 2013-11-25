@@ -46,7 +46,7 @@ public class ExampleRegister {
 
 		// step 4: Register Cloud XDI URL with Cloud Number
 
-		csp.registerCloudXdiUrl(cloudNameRegistration, cloudRegistration);
+		csp.setCloudXdiUrl(cloudNameRegistration, cloudRegistration);
 
 		// done
 

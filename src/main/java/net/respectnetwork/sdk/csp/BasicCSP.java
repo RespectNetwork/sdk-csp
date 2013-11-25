@@ -150,7 +150,7 @@ public class BasicCSP implements CSP {
 		return new CloudRegistration(cloudXdiEndpoint);
 	}
 
-	public void registerCloudXdiUrl(CloudNameRegistration cloudNameRegistration, CloudRegistration cloudRegistration) throws Xdi2ClientException {
+	public void setCloudXdiUrl(CloudNameRegistration cloudNameRegistration, CloudRegistration cloudRegistration) throws Xdi2ClientException {
 
 		MessageEnvelope messageEnvelope = new MessageEnvelope();
 
@@ -168,7 +168,7 @@ public class BasicCSP implements CSP {
 		log.debug("Cloud XDI URL " + "registered with Cloud Number " + cloudNameRegistration.getCloudNumber() + " and Cloud XDI endpoint " + cloudRegistration.getCloudXdiEndpoint());
 	}
 
-	public void generateCloudSecretToken(CloudNameRegistration cloudNameRegistration, String secretToken) throws Xdi2ClientException {
+	public void setCloudSecretToken(CloudNameRegistration cloudNameRegistration, String secretToken) throws Xdi2ClientException {
 
 		MessageEnvelope messageEnvelope = new MessageEnvelope();
 

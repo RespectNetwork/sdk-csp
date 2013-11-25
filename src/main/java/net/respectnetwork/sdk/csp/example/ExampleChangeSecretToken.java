@@ -34,7 +34,7 @@ public class ExampleChangeSecretToken {
 
 		// step 2: Change Secret Token
 
-		csp.generateCloudSecretToken(cloudNameRegistration, secretToken);
+		csp.setCloudSecretToken(cloudNameRegistration, secretToken);
 
 		// done
 

@@ -13,6 +13,6 @@ public interface CSP {
 	public CloudNameRegistration checkCloudNameAvailable(XDI3Segment cloudName) throws Xdi2ClientException;
 	public CloudNameRegistration registerCloudName(XDI3Segment cloudName) throws Xdi2ClientException;
 	public CloudRegistration registerCloud(CloudNameRegistration cloudNameRegistration, String secretToken) throws Xdi2ClientException;
-	public void registerCloudXdiUrl(CloudNameRegistration cloudNameRegistration, CloudRegistration cloudRegistration) throws Xdi2ClientException;
-	public void generateCloudSecretToken(CloudNameRegistration cloudNameRegistration, String secretToken) throws Xdi2ClientException;
+	public void setCloudXdiUrl(CloudNameRegistration cloudNameRegistration, CloudRegistration cloudRegistration) throws Xdi2ClientException;
+	public void setCloudSecretToken(CloudNameRegistration cloudNameRegistration, String secretToken) throws Xdi2ClientException;
 }
