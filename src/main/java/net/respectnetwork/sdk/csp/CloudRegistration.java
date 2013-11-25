@@ -1,6 +1,10 @@
 package net.respectnetwork.sdk.csp;
 
-public class CloudRegistration {
+import java.io.Serializable;
+
+public class CloudRegistration implements Serializable {
+
+	private static final long serialVersionUID = 1277934180298856390L;
 
 	private String cloudXdiEndpoint;
 

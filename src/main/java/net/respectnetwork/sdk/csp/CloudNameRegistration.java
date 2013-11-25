@@ -1,8 +1,12 @@
 package net.respectnetwork.sdk.csp;
 
+import java.io.Serializable;
+
 import xdi2.core.xri3.XDI3Segment;
 
-public class CloudNameRegistration {
+public class CloudNameRegistration implements Serializable {
+
+	private static final long serialVersionUID = -6265117819130674674L;
 
 	private XDI3Segment cloudName;
 	private XDI3Segment cloudNamePeerRootXri;
