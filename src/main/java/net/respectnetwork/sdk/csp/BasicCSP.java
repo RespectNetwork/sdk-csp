@@ -50,7 +50,7 @@ public class BasicCSP implements CSP {
 		MessageEnvelope messageEnvelope = new MessageEnvelope();
 
 		Message message = messageEnvelope.getMessage(this.getCspInformation().getCspCloudNumber(), true);
-		message.setToAddress(XDI3Segment.fromComponent(XdiPeerRoot.createPeerRootArcXri(this.getCspInformation().getRespectNetworkCloudNumber())));
+		message.setToAuthority(XDI3Segment.fromComponent(XdiPeerRoot.createPeerRootArcXri(this.getCspInformation().getRespectNetworkCloudNumber())));
 		message.setLinkContractXri(REGISTRAR_LINK_CONTRACT);
 		message.getContextNode().setDeepLiteral(XDI3Util.concatXris(XDIAuthenticationConstants.XRI_S_SECRET_TOKEN, XDIConstants.XRI_S_VALUE), this.getCspInformation().getCspSecretToken());
 
@@ -89,7 +89,7 @@ public class BasicCSP implements CSP {
 		MessageEnvelope messageEnvelope = new MessageEnvelope();
 
 		Message message = messageEnvelope.getMessage(this.getCspInformation().getCspCloudNumber(), true);
-		message.setToAddress(XDI3Segment.fromComponent(XdiPeerRoot.createPeerRootArcXri(this.getCspInformation().getRespectNetworkCloudNumber())));
+		message.setToAuthority(XDI3Segment.fromComponent(XdiPeerRoot.createPeerRootArcXri(this.getCspInformation().getRespectNetworkCloudNumber())));
 		message.setLinkContractXri(REGISTRAR_LINK_CONTRACT);
 		message.getContextNode().setDeepLiteral(XDI3Util.concatXris(XDIAuthenticationConstants.XRI_S_SECRET_TOKEN, XDIConstants.XRI_S_VALUE), this.getCspInformation().getCspSecretToken());
 
@@ -119,7 +119,7 @@ public class BasicCSP implements CSP {
 		MessageEnvelope messageEnvelope = new MessageEnvelope();
 
 		Message message = messageEnvelope.getMessage(this.getCspInformation().getCspCloudNumber(), true);
-		message.setToAddress(XDI3Segment.fromComponent(XdiPeerRoot.createPeerRootArcXri(this.getCspInformation().getCspCloudNumber())));
+		message.setToAuthority(XDI3Segment.fromComponent(XdiPeerRoot.createPeerRootArcXri(this.getCspInformation().getCspCloudNumber())));
 		message.setLinkContractXri(XDI3Segment.create("$do"));
 		message.getContextNode().setDeepLiteral(XDI3Util.concatXris(XDIAuthenticationConstants.XRI_S_SECRET_TOKEN, XDIConstants.XRI_S_VALUE), this.getCspInformation().getCspSecretToken());
 
@@ -155,7 +155,7 @@ public class BasicCSP implements CSP {
 		MessageEnvelope messageEnvelope = new MessageEnvelope();
 
 		Message message = messageEnvelope.getMessage(this.getCspInformation().getCspCloudNumber(), true);
-		message.setToAddress(XDI3Segment.fromComponent(XdiPeerRoot.createPeerRootArcXri(this.getCspInformation().getRespectNetworkCloudNumber())));
+		message.setToAuthority(XDI3Segment.fromComponent(XdiPeerRoot.createPeerRootArcXri(this.getCspInformation().getRespectNetworkCloudNumber())));
 		message.setLinkContractXri(REGISTRAR_LINK_CONTRACT);
 		message.getContextNode().setDeepLiteral(XDI3Util.concatXris(XDIAuthenticationConstants.XRI_S_SECRET_TOKEN, XDIConstants.XRI_S_VALUE), this.getCspInformation().getCspSecretToken());
 
@@ -173,7 +173,7 @@ public class BasicCSP implements CSP {
 		MessageEnvelope messageEnvelope = new MessageEnvelope();
 
 		Message message = messageEnvelope.getMessage(this.getCspInformation().getCspCloudNumber(), true);
-		message.setToAddress(XDI3Segment.fromComponent(XdiPeerRoot.createPeerRootArcXri(this.getCspInformation().getCspCloudNumber())));
+		message.setToAuthority(XDI3Segment.fromComponent(XdiPeerRoot.createPeerRootArcXri(this.getCspInformation().getCspCloudNumber())));
 		message.setLinkContractXri(XDI3Segment.create("$do"));
 		message.getContextNode().setDeepLiteral(XDI3Util.concatXris(XDIAuthenticationConstants.XRI_S_SECRET_TOKEN, XDIConstants.XRI_S_VALUE), this.getCspInformation().getCspSecretToken());
 
