@@ -1,7 +1,8 @@
 package net.respectnetwork.sdk.csp;
 
 import xdi2.client.exceptions.Xdi2ClientException;
-import xdi2.core.xri3.XDI3Segment;
+import xdi2.core.xri3.CloudName;
+import xdi2.core.xri3.CloudNumber;
 
 /**
  * This interface represents CSP-related functionality of this SDK to communicate with
@@ -10,9 +11,11 @@ import xdi2.core.xri3.XDI3Segment;
  */
 public interface CSP {
 
-	public CloudNameRegistration checkCloudNameAvailable(XDI3Segment cloudName) throws Xdi2ClientException;
-	public CloudNameRegistration registerCloudName(XDI3Segment cloudName) throws Xdi2ClientException;
-	public CloudRegistration registerCloud(CloudNameRegistration cloudNameRegistration, String secretToken) throws Xdi2ClientException;
-	public void setCloudXdiUrl(CloudNameRegistration cloudNameRegistration, CloudRegistration cloudRegistration) throws Xdi2ClientException;
-	public void setCloudSecretToken(CloudNameRegistration cloudNameRegistration, String secretToken) throws Xdi2ClientException;
+	public void registerCloud(CloudNumber cloudNumber, String secretToken) throws Xdi2ClientException;
+	public CloudNumber checkCloudNameAvailable(CloudName cloudName) throws Xdi2ClientException;
+	public CloudNumber registerCloudName(CloudName cloudName) throws Xdi2ClientException;
+	public void registerCloudName(CloudName cloudName, CloudNumber cloudNumber) throws Xdi2ClientException;
+	public void setCloudXdiEndpoint(CloudNumber cloudNumber) throws Xdi2ClientException;
+	public void setCloudXdiEndpoint(CloudNumber cloudNumber, String cloudXdiEndpoint) throws Xdi2ClientException;
+	public void setCloudSecretToken(CloudNumber cloudNumber, String secretToken) throws Xdi2ClientException;
 }
