@@ -8,7 +8,7 @@ public class BasicCSPInformation implements CSPInformation, Serializable {
 
 	private static final long serialVersionUID = 4621748646529792450L;
 
-	public static final String DEFAULT_RESPECT_NETWORK_REGISTRATION_SERVICE_XDI_ENDPOINT = "http://registration.respectnetwork.net/registration";
+	public static final String DEFAULT_RESPECT_NETWORK_REGISTRATION_SERVICE_XDI_ENDPOINT = "http://registration-dev.respectnetwork.net/registration";
 	public static final CloudNumber DEFAULT_RESPECT_NETWORK_CLOUD_NUMBER = CloudNumber.create("[@]!:uuid:299089fd-9d81-3c59-2990-89fd9d813c59");
 
 	private CloudNumber cspCloudNumber;
