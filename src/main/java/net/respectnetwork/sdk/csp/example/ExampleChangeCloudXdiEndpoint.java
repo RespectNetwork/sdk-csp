@@ -7,13 +7,13 @@ import xdi2.client.exceptions.Xdi2ClientException;
 import xdi2.core.xri3.CloudName;
 import xdi2.core.xri3.CloudNumber;
 
-public class ExampleChangeSecretToken {
+public class ExampleChangeCloudXdiEndpoint {
 
 	/* CHOOSE THE INDIVIDUAL's CLOUD NAME HERE */
 	private static CloudName cloudName = CloudName.create("=dev.test.525");
 
-	/* CHOOSE THE INDIVIDUAL's SECRET TOKEN HERE */
-	private static String secretToken = "mynewsecret";
+	/* CHOOSE THE INDIVIDUAL's XDI ENDPOINT HERE */
+	private static String cloudXdiEndpoint = "http://xdi.mycsp.com/myendpoint";
 
 	public static void main(String[] args) throws Xdi2ClientException {
 
@@ -33,12 +33,12 @@ public class ExampleChangeSecretToken {
 
 		if (cloudNumber == null) throw new RuntimeException("Cloud Name " + cloudName + " does not exist.");
 
-		// Step 2: Change Secret Token
+		// Step 2: Change XDI endpoint
 
-		csp.setCloudSecretToken(cloudNumber, secretToken);
+		csp.setCloudXdiEndpoint(cloudNumber, cloudXdiEndpoint);
 
 		// done
 
-		System.out.println("Done setting secret token for Cloud Name " + cloudName);
+		System.out.println("Done setting XDI endpoint for Cloud Name " + cloudName);
 	}
 }
