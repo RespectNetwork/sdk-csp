@@ -14,7 +14,7 @@ public class ExampleRegister {
 	private static CloudNumber cloudNumber = CloudNumber.createRandom(XDIConstants.CS_EQUALS);
 
 	/* CHOOSE THE INDIVIDUAL's CLOUD NAME HERE */
-	private static CloudName cloudName = CloudName.create("=dev.test.6");
+	private static CloudName cloudName = CloudName.create("=dev.test.22");
 
 	/* CHOOSE THE INDIVIDUAL's SECRET TOKEN HERE */
 	private static String secretToken = "mysecret";
@@ -41,10 +41,6 @@ public class ExampleRegister {
 		// step 3: Register Cloud Name
 
 		csp.registerCloudName(cloudName, cloudNumber);
-
-		// step 4: Register Cloud XDI endpoint with Cloud Number
-
-		csp.setCloudXdiEndpoint(cloudNumber);
 
 		// done
 
