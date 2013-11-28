@@ -13,8 +13,9 @@ public interface CSP {
 
 	public void registerCloud(CloudNumber cloudNumber, String secretToken) throws Xdi2ClientException;
 	public CloudNumber checkCloudNameAvailable(CloudName cloudName) throws Xdi2ClientException;
-	public CloudNumber registerCloudName(CloudName cloudName) throws Xdi2ClientException;
 	public void registerCloudName(CloudName cloudName, CloudNumber cloudNumber) throws Xdi2ClientException;
+	public CloudNumber registerCloudName(CloudName cloudName) throws Xdi2ClientException;
+
 	public void setCloudXdiEndpoint(CloudNumber cloudNumber) throws Xdi2ClientException;
 	public void setCloudXdiEndpoint(CloudNumber cloudNumber, String cloudXdiEndpoint) throws Xdi2ClientException;
 	public void setCloudSecretToken(CloudNumber cloudNumber, String secretToken) throws Xdi2ClientException;
