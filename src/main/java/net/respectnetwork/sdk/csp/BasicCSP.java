@@ -14,7 +14,6 @@ import xdi2.core.Relation;
 import xdi2.core.constants.XDIAuthenticationConstants;
 import xdi2.core.constants.XDIConstants;
 import xdi2.core.constants.XDIDictionaryConstants;
-import xdi2.core.features.nodetypes.XdiPeerRoot;
 import xdi2.core.util.XDI3Util;
 import xdi2.core.xri3.CloudName;
 import xdi2.core.xri3.CloudNumber;
@@ -102,7 +101,7 @@ public class BasicCSP implements CSP {
 			return null;
 		}
 
-		cloudNumber = CloudNumber.fromXri(XdiPeerRoot.getXriOfPeerRootArcXri(relation.getTargetContextNodeXri().getFirstSubSegment()));
+		cloudNumber = CloudNumber.fromPeerRootXri(relation.getTargetContextNodeXri());
 
 		// done
 
@@ -135,7 +134,7 @@ public class BasicCSP implements CSP {
 		Relation relation = messageResult.getGraph().getDeepRelation(cloudName.getPeerRootXri(), XDIDictionaryConstants.XRI_S_REF);
 		if (relation == null) throw new RuntimeException("Cloud Number not registered.");
 
-		cloudNumber = CloudNumber.fromXri(XdiPeerRoot.getXriOfPeerRootArcXri(relation.getTargetContextNodeXri().getFirstSubSegment()));
+		cloudNumber = CloudNumber.fromPeerRootXri(relation.getTargetContextNodeXri());
 
 		// done
 
@@ -166,7 +165,7 @@ public class BasicCSP implements CSP {
 		Relation relation = messageResult.getGraph().getDeepRelation(cloudName.getPeerRootXri(), XDIDictionaryConstants.XRI_S_REF);
 		if (relation == null) throw new RuntimeException("Cloud Number not registered.");
 
-		cloudNumber = CloudNumber.fromXri(XdiPeerRoot.getXriOfPeerRootArcXri(relation.getTargetContextNodeXri().getFirstSubSegment()));
+		cloudNumber = CloudNumber.fromPeerRootXri(relation.getTargetContextNodeXri());
 
 		// done
 
