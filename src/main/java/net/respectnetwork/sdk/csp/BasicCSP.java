@@ -47,7 +47,7 @@ public class BasicCSP implements CSP {
 
 		String cloudXdiEndpoint;
 
-		// prepare message envelope to HE
+		// prepare message to HE
 
 		MessageEnvelope messageEnvelope = new MessageEnvelope();
 
@@ -82,7 +82,7 @@ public class BasicCSP implements CSP {
 
 		CloudNumber cloudNumber;
 
-		// prepare message envelope to RN
+		// prepare message to RN
 
 		MessageEnvelope messageEnvelope = new MessageEnvelope();
 
@@ -121,7 +121,7 @@ public class BasicCSP implements CSP {
 
 		CloudNumber cloudNumber;
 
-		// prepare message envelope to RN
+		// prepare message to RN
 
 		MessageEnvelope messageEnvelope = new MessageEnvelope();
 
@@ -154,7 +154,7 @@ public class BasicCSP implements CSP {
 
 		String cloudXdiEndpoint;
 
-		// prepare message envelope to RN
+		// prepare message 1 to RN
 
 		MessageEnvelope messageEnvelope1 = new MessageEnvelope();
 
@@ -189,7 +189,7 @@ public class BasicCSP implements CSP {
 
 		if (! cloudNumber.getPeerRootXri().equals(relation.getTargetContextNodeXri())) throw new RuntimeException("Registered Cloud Number " + XdiPeerRoot.getXriOfPeerRootArcXri(relation.getTargetContextNodeXri().getFirstSubSegment()) + " does not match requested Cloud Number " + cloudNumber);
 
-		// prepare message envelope to HE
+		// prepare message to HE
 
 		MessageEnvelope messageEnvelope2 = new MessageEnvelope();
 
@@ -201,7 +201,7 @@ public class BasicCSP implements CSP {
 		cloudXdiEndpoint = makeCloudXdiEndpoint(this.getCspInformation(), cloudNumber);
 
 		XDI3Statement[] targetStatementsSet = new XDI3Statement[] {
-				XDI3Statement.fromRelationComponents(cloudName.getPeerRootXri(), XDIDictionaryConstants.XRI_S_REF, cloudName.getPeerRootXri())
+				XDI3Statement.fromRelationComponents(cloudName.getPeerRootXri(), XDIDictionaryConstants.XRI_S_REF, cloudNumber.getPeerRootXri())
 		};
 
 		message.createSetOperation(Arrays.asList(targetStatementsSet).iterator());
@@ -217,7 +217,7 @@ public class BasicCSP implements CSP {
 
 	public void setCloudXdiEndpoint(CloudNumber cloudNumber, String cloudXdiEndpoint) throws Xdi2ClientException {
 
-		// prepare message envelope to RN
+		// prepare message to RN
 
 		MessageEnvelope messageEnvelope = new MessageEnvelope();
 
@@ -248,7 +248,7 @@ public class BasicCSP implements CSP {
 
 	public void setCloudSecretToken(CloudNumber cloudNumber, String secretToken) throws Xdi2ClientException {
 
-		// prepare message envelope to HE
+		// prepare message to HE
 
 		MessageEnvelope messageEnvelope = new MessageEnvelope();
 
