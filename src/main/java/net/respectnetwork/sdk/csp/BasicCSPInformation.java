@@ -13,29 +13,32 @@ public class BasicCSPInformation implements CSPInformation, Serializable {
 
 	private CloudNumber cspCloudNumber;
 	private String cspSecretToken;
-	private String hostingEnvironmentRegistryXdiEndpoint;
-	private String hostingEnvironmentCloudBaseXdiEndpoint;
-	private String respectNetworkRegistrationServiceXdiEndpoint;
-	private CloudNumber respectNetworkCloudNumber;
+	private String cspRegistryXdiEndpoint;
+	private String cspCloudBaseXdiEndpoint;
 
-	public BasicCSPInformation(CloudNumber cspCloudNumber, String cspSecretToken, String hostingEnvironmentRegistryXdiEndpoint, String hostingEnvironmentCloudBaseXdiEndpoint, String respectNetworkRegistrationServiceXdiEndpoint, CloudNumber respectNetworkCloudNumber) {
+	private CloudNumber rnCloudNumber;
+	private String rnRegistrationServiceXdiEndpoint;
+
+	public BasicCSPInformation(CloudNumber cspCloudNumber, String cspSecretToken, String cspRegistryXdiEndpoint, String cspCloudBaseXdiEndpoint, CloudNumber rnCloudNumber, String rnRegistrationServiceXdiEndpoint) {
 
 		this.cspCloudNumber = cspCloudNumber;
 		this.cspSecretToken = cspSecretToken;
-		this.hostingEnvironmentRegistryXdiEndpoint = hostingEnvironmentRegistryXdiEndpoint;
-		this.hostingEnvironmentCloudBaseXdiEndpoint = hostingEnvironmentCloudBaseXdiEndpoint;
-		this.respectNetworkRegistrationServiceXdiEndpoint = respectNetworkRegistrationServiceXdiEndpoint;
-		this.respectNetworkCloudNumber = respectNetworkCloudNumber;
+		this.cspRegistryXdiEndpoint = cspRegistryXdiEndpoint;
+		this.cspCloudBaseXdiEndpoint = cspCloudBaseXdiEndpoint;
+
+		this.rnCloudNumber = rnCloudNumber;
+		this.rnRegistrationServiceXdiEndpoint = rnRegistrationServiceXdiEndpoint;
 	}
 
-	public BasicCSPInformation(CloudNumber cspCloudNumber, String cspSecretToken, String hostingEnvironmentRegistryXdiEndpoint, String hostingEnvironmentCloudBaseXdiEndpoint) {
+	public BasicCSPInformation(CloudNumber cspCloudNumber, String cspSecretToken, String cspRegistryXdiEndpoint, String cspCloudBaseXdiEndpoint) {
 
 		this.cspCloudNumber = cspCloudNumber;
 		this.cspSecretToken = cspSecretToken;
-		this.hostingEnvironmentRegistryXdiEndpoint = hostingEnvironmentRegistryXdiEndpoint;
-		this.hostingEnvironmentCloudBaseXdiEndpoint = hostingEnvironmentCloudBaseXdiEndpoint;
-		this.respectNetworkRegistrationServiceXdiEndpoint = DEFAULT_RESPECT_NETWORK_REGISTRATION_SERVICE_XDI_ENDPOINT;
-		this.respectNetworkCloudNumber = DEFAULT_RESPECT_NETWORK_CLOUD_NUMBER;
+		this.cspRegistryXdiEndpoint = cspRegistryXdiEndpoint;
+		this.cspCloudBaseXdiEndpoint = cspCloudBaseXdiEndpoint;
+
+		this.rnCloudNumber = DEFAULT_RESPECT_NETWORK_CLOUD_NUMBER;
+		this.rnRegistrationServiceXdiEndpoint = DEFAULT_RESPECT_NETWORK_REGISTRATION_SERVICE_XDI_ENDPOINT;
 	}
 
 	/*
@@ -62,43 +65,43 @@ public class BasicCSPInformation implements CSPInformation, Serializable {
 		this.cspSecretToken = cspSecretToken;
 	}
 
-	public String getHostingEnvironmentRegistryXdiEndpoint() {
+	public String getCspRegistryXdiEndpoint() {
 
-		return this.hostingEnvironmentRegistryXdiEndpoint;
+		return this.cspRegistryXdiEndpoint;
 	}
 
-	public void setHostingEnvironmentRegistryXdiEndpoint(String hostingEnvironmentRegistryXdiEndpoint) {
+	public void setCspRegistryXdiEndpoint(String cspRegistryXdiEndpoint) {
 
-		this.hostingEnvironmentRegistryXdiEndpoint = hostingEnvironmentRegistryXdiEndpoint;
+		this.cspRegistryXdiEndpoint = cspRegistryXdiEndpoint;
 	}
 
-	public String getHostingEnvironmentCloudBaseXdiEndpoint() {
+	public String getCspCloudBaseXdiEndpoint() {
 
-		return this.hostingEnvironmentCloudBaseXdiEndpoint;
+		return this.cspCloudBaseXdiEndpoint;
 	}
 
-	public void setHostingEnvironmentCloudBaseXdiEndpoint(String hostingEnvironmentCloudBaseXdiEndpoint) {
+	public void setCspCloudBaseXdiEndpoint(String cspCloudBaseXdiEndpoint) {
 
-		this.hostingEnvironmentCloudBaseXdiEndpoint = hostingEnvironmentCloudBaseXdiEndpoint;
+		this.cspCloudBaseXdiEndpoint = cspCloudBaseXdiEndpoint;
 	}
 
-	public String getRespectNetworkRegistrationServiceXdiEndpoint() {
+	public String getRnRegistrationServiceXdiEndpoint() {
 
-		return this.respectNetworkRegistrationServiceXdiEndpoint;
+		return this.rnRegistrationServiceXdiEndpoint;
 	}
 
-	public void setRespectNetworkRegistrationServiceXdiEndpoint(String respectNetworkRegistrationServiceXdiEndpoint) {
+	public void setRnRegistrationServiceXdiEndpoint(String rnRegistrationServiceXdiEndpoint) {
 
-		this.respectNetworkRegistrationServiceXdiEndpoint = respectNetworkRegistrationServiceXdiEndpoint;
+		this.rnRegistrationServiceXdiEndpoint = rnRegistrationServiceXdiEndpoint;
 	}
 
-	public CloudNumber getRespectNetworkCloudNumber() {
+	public CloudNumber getRnCloudNumber() {
 
-		return this.respectNetworkCloudNumber;
+		return this.rnCloudNumber;
 	}
 
-	public void setRespectNetworkCloudNumber(CloudNumber respectNetworkCloudNumber) {
+	public void setRnCloudNumber(CloudNumber rnCloudNumber) {
 
-		this.respectNetworkCloudNumber = respectNetworkCloudNumber;
+		this.rnCloudNumber = rnCloudNumber;
 	}
 }

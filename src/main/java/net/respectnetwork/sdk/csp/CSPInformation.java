@@ -7,10 +7,19 @@ import xdi2.core.xri3.CloudNumber;
  */
 public interface CSPInformation {
 
+	/*
+	 * Information about the CSP
+	 */
+
 	public CloudNumber getCspCloudNumber();
 	public String getCspSecretToken();
-	public String getHostingEnvironmentRegistryXdiEndpoint();
-	public String getHostingEnvironmentCloudBaseXdiEndpoint();
-	public String getRespectNetworkRegistrationServiceXdiEndpoint();
-	public CloudNumber getRespectNetworkCloudNumber();
+	public String getCspRegistryXdiEndpoint();
+	public String getCspCloudBaseXdiEndpoint();
+
+	/*
+	 * Information about RN
+	 */
+
+	public CloudNumber getRnCloudNumber();
+	public String getRnRegistrationServiceXdiEndpoint();
 }

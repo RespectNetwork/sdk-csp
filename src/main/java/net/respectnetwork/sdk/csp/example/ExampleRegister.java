@@ -14,7 +14,7 @@ public class ExampleRegister {
 	private static CloudNumber cloudNumber = CloudNumber.createRandom(XDIConstants.CS_EQUALS);
 
 	/* CHOOSE THE INDIVIDUAL's CLOUD NAME HERE */
-	private static CloudName cloudName = CloudName.create("=dev.test.22");
+	private static CloudName cloudName = CloudName.create("=dev.test.27");
 
 	/* CHOOSE THE INDIVIDUAL's SECRET TOKEN HERE */
 	private static String secretToken = "mysecret";
@@ -30,17 +30,17 @@ public class ExampleRegister {
 
 		// Step 1: Register Cloud with Cloud Number and Shared Secret
 
-		csp.registerCloud(cloudNumber, secretToken);
+		csp.registerCloudInCSP(cloudNumber, secretToken);
 
 		// step 2: Check if Cloud Name exists already
 
-		CloudNumber existingCloudNumber = csp.checkCloudNameAvailable(cloudName);
+		CloudNumber existingCloudNumber = csp.checkCloudNameAvailableInRN(cloudName);
 
 		if (existingCloudNumber != null) throw new RuntimeException("Cloud Name " + cloudName + " is already registered with Cloud Number " + existingCloudNumber + ".");
 
 		// step 3: Register Cloud Name
 
-		csp.registerCloudName(cloudName, cloudNumber);
+		csp.registerCloudNameInRN(cloudName, cloudNumber);
 
 		// done
 
