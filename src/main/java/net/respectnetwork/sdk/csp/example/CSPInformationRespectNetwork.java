@@ -13,7 +13,9 @@ public class CSPInformationRespectNetwork extends BasicCSPInformation {
 				CloudNumber.create("[@]!:uuid:299089fd-9d81-3c59-2990-89fd9d813c59"),
 				"s3cr3t",
 				"http://mycloud-ote.neustar.biz:14440/registry",
-				"http://mycloud-ote.neustar.biz:14440/users/"
+				"http://mycloud-ote.neustar.biz:14440/users/",
+				CloudNumber.create("[@]!:uuid:299089fd-9d81-3c59-2990-89fd9d813c59"),
+				"http://registration-dev.respectnetwork.net/registration"
 				);
 	}
 }

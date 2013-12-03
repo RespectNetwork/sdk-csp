@@ -13,7 +13,9 @@ public class CSPInformationTTCC extends BasicCSPInformation {
 				CloudNumber.create("[@]!:uuid:f34559e4-6b2b-d962-f345-59e46b2bd962"),
 				"ofniruoynwo",
 				"http://clouds.ownyourinfo.com:14440/ownyourinfo-registry",
-				"http://clouds.ownyourinfo.com:14440/ownyourinfo-users/"
+				"http://clouds.ownyourinfo.com:14440/ownyourinfo-users/",
+				CloudNumber.create("[@]!:uuid:299089fd-9d81-3c59-2990-89fd9d813c59"),
+				"http://registration-dev.respectnetwork.net/registration"
 				);
 	}
 }

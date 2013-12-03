@@ -1,12 +1,16 @@
 package net.respectnetwork.sdk.csp.example;
 
+import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Map;
+
 import net.respectnetwork.sdk.csp.BasicCSP;
 import net.respectnetwork.sdk.csp.CSP;
 import net.respectnetwork.sdk.csp.CSPInformation;
-import xdi2.client.exceptions.Xdi2ClientException;
 import xdi2.core.constants.XDIConstants;
 import xdi2.core.xri3.CloudName;
 import xdi2.core.xri3.CloudNumber;
+import xdi2.core.xri3.XDI3Segment;
 
 public class ExampleRegister {
 
@@ -14,12 +18,12 @@ public class ExampleRegister {
 	private static CloudNumber cloudNumber = CloudNumber.createRandom(XDIConstants.CS_EQUALS);
 
 	/* CHOOSE THE INDIVIDUAL's CLOUD NAME HERE */
-	private static CloudName cloudName = CloudName.create("=dev.test.27");
+	private static CloudName cloudName = CloudName.create("=dev.test.53");
 
 	/* CHOOSE THE INDIVIDUAL's SECRET TOKEN HERE */
 	private static String secretToken = "mysecret";
 
-	public static void main(String[] args) throws Xdi2ClientException {
+	public static void main(String[] args) throws Exception {
 
 		// Step 0: Set up CSP
 
@@ -41,6 +45,14 @@ public class ExampleRegister {
 		// step 3: Register Cloud Name
 
 		csp.registerCloudNameInRN(cloudName, cloudNumber);
+
+		// step 4: Set services in Cloud
+
+		Map<XDI3Segment, String> services = new HashMap<XDI3Segment, String> ();
+
+		services.put(XDI3Segment.create("<$https><$connect><$xdi>"), "http://mycloud-ote.neustar.biz:8085/personalclouds/" + URLEncoder.encode(cloudNumber.toString(), "UTF-8") + "/connect/request");
+
+		csp.setServicesInCloud(cloudNumber, services);
 
 		// done
 
