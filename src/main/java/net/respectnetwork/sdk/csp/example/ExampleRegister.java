@@ -36,23 +36,23 @@ public class ExampleRegister {
 
 		csp.registerCloudInCSP(cloudNumber, secretToken);
 
-		// step 2: Check if Cloud Name exists already
-
-		CloudNumber existingCloudNumber = csp.checkCloudNameAvailableInRN(cloudName);
-
-		if (existingCloudNumber != null) throw new RuntimeException("Cloud Name " + cloudName + " is already registered with Cloud Number " + existingCloudNumber + ".");
-
-		// step 3: Register Cloud Name
-
-		csp.registerCloudNameInRN(cloudName, cloudNumber);
-
-		// step 4: Set services in Cloud
+		// step 2: Set services in Cloud
 
 		Map<XDI3Segment, String> services = new HashMap<XDI3Segment, String> ();
 
 		services.put(XDI3Segment.create("<$https><$connect><$xdi>"), "http://mycloud-ote.neustar.biz:8085/personalclouds/" + URLEncoder.encode(cloudNumber.toString(), "UTF-8") + "/connect/request");
 
 		csp.setServicesInCloud(cloudNumber, secretToken, services);
+
+		// step 3: Check if Cloud Name exists already
+
+		CloudNumber existingCloudNumber = csp.checkCloudNameAvailableInRN(cloudName);
+
+		if (existingCloudNumber != null) throw new RuntimeException("Cloud Name " + cloudName + " is already registered with Cloud Number " + existingCloudNumber + ".");
+
+		// step 4: Register Cloud Name
+
+		csp.registerCloudNameInRN(cloudName, cloudNumber);
 
 		// done
 
