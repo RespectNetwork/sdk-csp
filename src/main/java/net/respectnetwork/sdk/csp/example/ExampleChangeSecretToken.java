@@ -10,7 +10,7 @@ import xdi2.core.xri3.CloudNumber;
 public class ExampleChangeSecretToken {
 
 	/* CHOOSE THE INDIVIDUAL's CLOUD NAME HERE */
-	private static CloudName cloudName = CloudName.create("=dev.test.525");
+	private static CloudName cloudName = CloudName.create("=dev.test.66");
 
 	/* CHOOSE THE INDIVIDUAL's SECRET TOKEN HERE */
 	private static String secretToken = "mynewsecret";

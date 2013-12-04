@@ -18,7 +18,7 @@ public class ExampleRegister {
 	private static CloudNumber cloudNumber = CloudNumber.createRandom(XDIConstants.CS_EQUALS);
 
 	/* CHOOSE THE INDIVIDUAL's CLOUD NAME HERE */
-	private static CloudName cloudName = CloudName.create("=dev.test.53");
+	private static CloudName cloudName = CloudName.create("=dev.test.66");
 
 	/* CHOOSE THE INDIVIDUAL's SECRET TOKEN HERE */
 	private static String secretToken = "mysecret";
@@ -52,10 +52,10 @@ public class ExampleRegister {
 
 		services.put(XDI3Segment.create("<$https><$connect><$xdi>"), "http://mycloud-ote.neustar.biz:8085/personalclouds/" + URLEncoder.encode(cloudNumber.toString(), "UTF-8") + "/connect/request");
 
-		csp.setServicesInCloud(cloudNumber, services);
+		csp.setServicesInCloud(cloudNumber, secretToken, services);
 
 		// done
 
-		System.out.println("Done registering Cloud Name " + cloudName + " with Cloud Number " + cloudNumber);
+		System.out.println("Done registering Cloud Name " + cloudName + " with Cloud Number " + cloudNumber + " and " + services.size() + " services.");
 	}
 }
