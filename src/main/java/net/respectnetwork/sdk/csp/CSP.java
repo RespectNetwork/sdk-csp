@@ -23,7 +23,7 @@ public interface CSP {
 	public boolean checkVerifiedContactInformationInRN(String email, String phone) throws Xdi2ClientException;
 	public void setVerifiedContactInformationInRN(CloudNumber cloudNumber, String email, String phone) throws Xdi2ClientException;
 
-	public void setServicesInCloud(CloudNumber cloudNumber, Map<XDI3Segment, String> services) throws Xdi2ClientException;
+	public void setServicesInCloud(CloudNumber cloudNumber, String secretToken, Map<XDI3Segment, String> services) throws Xdi2ClientException;
 
 	public void setCloudXdiEndpointInRN(CloudNumber cloudNumber, String cloudXdiEndpoint) throws Xdi2ClientException;
 	public void setCloudXdiEndpointInCSP(CloudNumber cloudNumber, String cloudXdiEndpoint) throws Xdi2ClientException;
