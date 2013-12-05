@@ -15,10 +15,10 @@ import xdi2.core.xri3.XDI3Segment;
 public class ExampleRegister {
 
 	/* CHOOSE THE INDIVIDUAL's CLOUD NUMBER HERE */
-	private static CloudNumber cloudNumber = CloudNumber.createRandom(XDIConstants.CS_EQUALS);
+	private static CloudNumber cloudNumber = CloudNumber.createRandom(XDIConstants.CS_AT);
 
 	/* CHOOSE THE INDIVIDUAL's CLOUD NAME HERE */
-	private static CloudName cloudName = CloudName.create("=dev.test.66");
+	private static CloudName cloudName = CloudName.create("@dev.test.at.15");
 
 	/* CHOOSE THE INDIVIDUAL's SECRET TOKEN HERE */
 	private static String secretToken = "mysecret";
@@ -36,13 +36,13 @@ public class ExampleRegister {
 
 		csp.registerCloudInCSP(cloudNumber, secretToken);
 
-		// step 2: Set services in Cloud
+		// step 2: Set Cloud Services in Cloud
 
 		Map<XDI3Segment, String> services = new HashMap<XDI3Segment, String> ();
 
 		services.put(XDI3Segment.create("<$https><$connect><$xdi>"), "http://mycloud-ote.neustar.biz:8085/personalclouds/" + URLEncoder.encode(cloudNumber.toString(), "UTF-8") + "/connect/request");
 
-		csp.setServicesInCloud(cloudNumber, secretToken, services);
+		csp.setCloudServicesInCloud(cloudNumber, secretToken, services);
 
 		// step 3: Check if Cloud Name exists already
 
@@ -53,6 +53,8 @@ public class ExampleRegister {
 		// step 4: Register Cloud Name
 
 		csp.registerCloudNameInRN(cloudName, cloudNumber);
+		csp.registerCloudNameInCSP(cloudName, cloudNumber);
+		csp.registerCloudNameInCloud(cloudName, cloudNumber, secretToken);
 
 		// done
 

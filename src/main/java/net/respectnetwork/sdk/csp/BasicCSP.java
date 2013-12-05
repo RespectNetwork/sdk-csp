@@ -260,17 +260,7 @@ public class BasicCSP implements CSP {
 		log.debug("In CSP: Cloud Name " + cloudName + " registered with Cloud Number " + cloudNumber);
 	}
 
-	public boolean checkVerifiedContactInformationInRN(String email, String phone) throws Xdi2ClientException {
-
-		throw new RuntimeException("Not implemented");
-	}
-
-	public void setVerifiedContactInformationInRN(CloudNumber cloudNumber, String email, String phone) throws Xdi2ClientException {
-
-		throw new RuntimeException("Not implemented");
-	}
-
-	public void setServicesInCloud(CloudNumber cloudNumber, String secretToken, Map<XDI3Segment, String> services) throws Xdi2ClientException {
+	public void registerCloudNameInCloud(CloudName cloudName, CloudNumber cloudNumber, String secretToken) throws Xdi2ClientException {
 
 		// prepare message to Cloud
 
@@ -281,21 +271,28 @@ public class BasicCSP implements CSP {
 		message.setLinkContractXri(XDILinkContractConstants.XRI_S_DO);
 		message.setSecretToken(secretToken);
 
-		List<XDI3Statement> targetStatementsSet = new ArrayList<XDI3Statement> (services.size() * 2);
+		XDI3Statement[] targetStatementsSet = new XDI3Statement[] {
+				XDI3Statement.fromRelationComponents(
+						cloudName.getPeerRootXri(), 
+						XDIDictionaryConstants.XRI_S_REF, 
+						cloudNumber.getPeerRootXri()
+						),
+				XDI3Statement.fromRelationComponents(
+						cloudName.getXri(), 
+						XDIDictionaryConstants.XRI_S_REF, 
+						cloudNumber.getXri()
+						),
+				XDI3Statement.fromRelationComponents(
+						cloudNumber.getXri(), 
+						XDIDictionaryConstants.XRI_S_IS_REF, 
+						cloudName.getXri()),
+				XDI3Statement.fromRelationComponents(
+						XDILinkContractConstants.XRI_S_PUBLIC_DO,
+						XDILinkContractConstants.XRI_S_GET,
+						XDI3Segment.create("(" + cloudNumber.getXri() + "/" + XDIDictionaryConstants.XRI_S_IS_REF + "/" + XDIConstants.XRI_S_VARIABLE + ")"))
+		};
 
-		for (Entry<XDI3Segment, String> entry : services.entrySet()) {
-
-			targetStatementsSet.add(XDI3Statement.fromLiteralComponents(
-					XDI3Util.concatXris(entry.getKey(), XDIClientConstants.XRI_S_URI, XDIConstants.XRI_S_VALUE),
-					entry.getValue()));
-
-			targetStatementsSet.add(XDI3Statement.fromRelationComponents(
-					XDILinkContractConstants.XRI_S_PUBLIC_DO,
-					XDILinkContractConstants.XRI_S_GET,
-					XDI3Util.concatXris(entry.getKey(), XDIClientConstants.XRI_S_URI)));
-		}
-
-		message.createSetOperation(targetStatementsSet.iterator());
+		message.createSetOperation(Arrays.asList(targetStatementsSet).iterator());
 
 		// send message
 
@@ -307,7 +304,17 @@ public class BasicCSP implements CSP {
 
 		// done
 
-		log.debug("In Cloud: For Cloud Number " + cloudNumber + " registered services " + services);
+		log.debug("In Cloud: Cloud Name " + cloudName + " registered with Cloud Number " + cloudNumber);
+	}
+
+	public boolean checkVerifiedContactInformationInRN(String email, String phone) throws Xdi2ClientException {
+
+		throw new RuntimeException("Not implemented");
+	}
+
+	public void setVerifiedContactInformationInRN(CloudNumber cloudNumber, String email, String phone) throws Xdi2ClientException {
+
+		throw new RuntimeException("Not implemented");
 	}
 
 	public void setCloudXdiEndpointInRN(CloudNumber cloudNumber, String cloudXdiEndpoint) throws Xdi2ClientException {
@@ -402,6 +409,46 @@ public class BasicCSP implements CSP {
 		// done
 
 		log.debug("In CSP: Secret token set for Cloud Number " + cloudNumber);
+	}
+
+	public void setCloudServicesInCloud(CloudNumber cloudNumber, String secretToken, Map<XDI3Segment, String> services) throws Xdi2ClientException {
+
+		// prepare message to Cloud
+
+		MessageEnvelope messageEnvelope = new MessageEnvelope();
+
+		Message message = messageEnvelope.createMessage(cloudNumber.getXri());
+		message.setToPeerRootXri(cloudNumber.getPeerRootXri());
+		message.setLinkContractXri(XDILinkContractConstants.XRI_S_DO);
+		message.setSecretToken(secretToken);
+
+		List<XDI3Statement> targetStatementsSet = new ArrayList<XDI3Statement> (services.size() * 2);
+
+		for (Entry<XDI3Segment, String> entry : services.entrySet()) {
+
+			targetStatementsSet.add(XDI3Statement.fromLiteralComponents(
+					XDI3Util.concatXris(entry.getKey(), XDIClientConstants.XRI_S_URI, XDIConstants.XRI_S_VALUE),
+					entry.getValue()));
+
+			targetStatementsSet.add(XDI3Statement.fromRelationComponents(
+					XDILinkContractConstants.XRI_S_PUBLIC_DO,
+					XDILinkContractConstants.XRI_S_GET,
+					XDI3Util.concatXris(entry.getKey(), XDIClientConstants.XRI_S_URI)));
+		}
+
+		message.createSetOperation(targetStatementsSet.iterator());
+
+		// send message
+
+		String cloudXdiEndpoint = makeCloudXdiEndpoint(this.getCspInformation(), cloudNumber);
+
+		XDIClient xdiClientCloud = new XDIHttpClient(cloudXdiEndpoint);
+
+		xdiClientCloud.send(message.getMessageEnvelope(), null);
+
+		// done
+
+		log.debug("In Cloud: For Cloud Number " + cloudNumber + " registered services " + services);
 	}
 
 	/*
