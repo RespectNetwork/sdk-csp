@@ -10,11 +10,11 @@ public class CSPInformationTTCC extends BasicCSPInformation {
 	public CSPInformationTTCC() {
 
 		super(
-				CloudNumber.create("[@]!:uuid:f34559e4-6b2b-d962-f345-59e46b2bd962"),
+				CloudNumber.create("[@]!:uuid:e9449d30-b032-4ad0-89a3-b7498fbc731e"),
 				"ofniruoynwo",
 				"http://clouds.ownyourinfo.com:14440/ownyourinfo-registry",
 				"http://clouds.ownyourinfo.com:14440/ownyourinfo-users/",
-				CloudNumber.create("[@]!:uuid:299089fd-9d81-3c59-2990-89fd9d813c59"),
+				CloudNumber.create("[@]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa"),
 				"http://registration-dev.respectnetwork.net/registration"
 				);
 	}
