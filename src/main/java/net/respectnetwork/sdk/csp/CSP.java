@@ -11,6 +11,7 @@ import xdi2.core.xri3.XDI3Segment;
  * This interface represents CSP-related functionality of this SDK to communicate with
  * - the Respect Network Registration Service (RN)
  * - a CSP Environment (CSP)
+ * - a Cloud
  */
 public interface CSP {
 
