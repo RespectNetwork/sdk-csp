@@ -68,7 +68,7 @@ public class BasicCSP implements CSP {
 
 		XDI3Statement[] targetStatementsDoDigestSecretToken = new XDI3Statement[] {
 				XDI3Statement.fromLiteralComponents(
-						XDI3Util.concatXris(cloudNumber.getPeerRootXri(), XDIAuthenticationConstants.XRI_S_DIGEST_SECRET_TOKEN, XDIConstants.XRI_S_VALUE), 
+						XDI3Util.concatXris(XDI3Segment.fromComponent(cloudNumber.getPeerRootXri()), XDIAuthenticationConstants.XRI_S_DIGEST_SECRET_TOKEN, XDIConstants.XRI_S_VALUE), 
 						secretToken)
 		};
 
@@ -103,7 +103,7 @@ public class BasicCSP implements CSP {
 		message.setLinkContractXri(REGISTRAR_LINK_CONTRACT);
 		message.setSecretToken(this.getCspInformation().getCspSecretToken());
 
-		XDI3Segment targetAddress = cloudName.getPeerRootXri();
+		XDI3Segment targetAddress = XDI3Segment.fromComponent(cloudName.getPeerRootXri());
 
 		message.createGetOperation(targetAddress);
 
@@ -111,7 +111,7 @@ public class BasicCSP implements CSP {
 
 		MessageResult messageResult = this.getXdiClientRNRegistrationService().send(message.getMessageEnvelope(), null);
 
-		Relation relation = messageResult.getGraph().getDeepRelation(cloudName.getPeerRootXri(), XDIDictionaryConstants.XRI_S_REF);
+		Relation relation = messageResult.getGraph().getDeepRelation(XDI3Segment.fromComponent(cloudName.getPeerRootXri()), XDIDictionaryConstants.XRI_S_REF);
 
 		if (relation == null) {
 
@@ -120,7 +120,7 @@ public class BasicCSP implements CSP {
 			return null;
 		}
 
-		cloudNumber = CloudNumber.fromPeerRootXri(relation.getTargetContextNodeXri());
+		cloudNumber = CloudNumber.fromPeerRootXri(relation.getTargetContextNodeXri().getFirstSubSegment());
 
 		// done
 
@@ -141,7 +141,7 @@ public class BasicCSP implements CSP {
 		message1.setSecretToken(this.getCspInformation().getCspSecretToken());
 
 		XDI3Statement targetStatementSet1 = XDI3Statement.fromRelationComponents(
-				cloudName.getPeerRootXri(), 
+				XDI3Segment.fromComponent(cloudName.getPeerRootXri()), 
 				XDIDictionaryConstants.XRI_S_REF, 
 				XDIConstants.XRI_S_VARIABLE);
 
@@ -151,10 +151,10 @@ public class BasicCSP implements CSP {
 
 		MessageResult messageResult = this.getXdiClientRNRegistrationService().send(message1.getMessageEnvelope(), null);
 
-		Relation relation = messageResult.getGraph().getDeepRelation(cloudName.getPeerRootXri(), XDIDictionaryConstants.XRI_S_REF);
+		Relation relation = messageResult.getGraph().getDeepRelation(XDI3Segment.fromComponent(cloudName.getPeerRootXri()), XDIDictionaryConstants.XRI_S_REF);
 		if (relation == null) throw new RuntimeException("Cloud Number not registered.");
 
-		CloudNumber cloudNumber = CloudNumber.fromPeerRootXri(relation.getTargetContextNodeXri());
+		CloudNumber cloudNumber = CloudNumber.fromPeerRootXri(relation.getTargetContextNodeXri().getFirstSubSegment());
 
 		// prepare message 2 to RN
 
@@ -196,9 +196,9 @@ public class BasicCSP implements CSP {
 		message1.setSecretToken(this.getCspInformation().getCspSecretToken());
 
 		XDI3Statement targetStatementSet1 = XDI3Statement.fromRelationComponents(
-				cloudName.getPeerRootXri(), 
+				XDI3Segment.fromComponent(cloudName.getPeerRootXri()), 
 				XDIDictionaryConstants.XRI_S_REF, 
-				cloudNumber.getPeerRootXri());
+				XDI3Segment.fromComponent(cloudNumber.getPeerRootXri()));
 
 		message1.createSetOperation(targetStatementSet1);
 
@@ -221,10 +221,10 @@ public class BasicCSP implements CSP {
 
 		MessageResult messageResult = this.getXdiClientRNRegistrationService().send(message1.getMessageEnvelope(), null);
 
-		Relation relation = messageResult.getGraph().getDeepRelation(cloudName.getPeerRootXri(), XDIDictionaryConstants.XRI_S_REF);
+		Relation relation = messageResult.getGraph().getDeepRelation(XDI3Segment.fromComponent(cloudName.getPeerRootXri()), XDIDictionaryConstants.XRI_S_REF);
 		if (relation == null) throw new RuntimeException("Cloud Name not registered.");
 
-		if (! cloudNumber.equals(CloudNumber.fromPeerRootXri(relation.getTargetContextNodeXri()))) throw new RuntimeException("Registered Cloud Number " + XdiPeerRoot.getXriOfPeerRootArcXri(relation.getTargetContextNodeXri().getFirstSubSegment()) + " does not match requested Cloud Number " + cloudNumber);
+		if (! cloudNumber.equals(CloudNumber.fromPeerRootXri(relation.getTargetContextNodeXri().getFirstSubSegment()))) throw new RuntimeException("Registered Cloud Number " + XdiPeerRoot.getXriOfPeerRootArcXri(relation.getTargetContextNodeXri().getFirstSubSegment()) + " does not match requested Cloud Number " + cloudNumber);
 
 		// done
 
@@ -244,9 +244,9 @@ public class BasicCSP implements CSP {
 
 		XDI3Statement[] targetStatementsSet = new XDI3Statement[] {
 				XDI3Statement.fromRelationComponents(
-						cloudName.getPeerRootXri(), 
+						XDI3Segment.fromComponent(cloudName.getPeerRootXri()), 
 						XDIDictionaryConstants.XRI_S_REF, 
-						cloudNumber.getPeerRootXri())
+						XDI3Segment.fromComponent(cloudNumber.getPeerRootXri()))
 		};
 
 		message.createSetOperation(Arrays.asList(targetStatementsSet).iterator());
@@ -273,23 +273,23 @@ public class BasicCSP implements CSP {
 
 		XDI3Statement[] targetStatementsSet = new XDI3Statement[] {
 				XDI3Statement.fromRelationComponents(
-						cloudName.getPeerRootXri(), 
+						XDI3Segment.fromComponent(cloudName.getPeerRootXri()), 
 						XDIDictionaryConstants.XRI_S_REF, 
-						cloudNumber.getPeerRootXri()
+						XDI3Segment.fromComponent(cloudNumber.getPeerRootXri())
 						),
-				XDI3Statement.fromRelationComponents(
-						cloudName.getXri(), 
-						XDIDictionaryConstants.XRI_S_REF, 
-						cloudNumber.getXri()
-						),
-				XDI3Statement.fromRelationComponents(
-						cloudNumber.getXri(), 
-						XDIDictionaryConstants.XRI_S_IS_REF, 
-						cloudName.getXri()),
-				XDI3Statement.fromRelationComponents(
-						XDILinkContractConstants.XRI_S_PUBLIC_DO,
-						XDILinkContractConstants.XRI_S_GET,
-						XDI3Segment.create("(" + cloudNumber.getXri() + "/" + XDIDictionaryConstants.XRI_S_IS_REF + "/" + XDIConstants.XRI_S_VARIABLE + ")"))
+						XDI3Statement.fromRelationComponents(
+								cloudName.getXri(), 
+								XDIDictionaryConstants.XRI_S_REF, 
+								cloudNumber.getXri()
+								),
+								XDI3Statement.fromRelationComponents(
+										cloudNumber.getXri(), 
+										XDIDictionaryConstants.XRI_S_IS_REF, 
+										cloudName.getXri()),
+										XDI3Statement.fromRelationComponents(
+												XDILinkContractConstants.XRI_S_PUBLIC_DO,
+												XDILinkContractConstants.XRI_S_GET,
+												XDI3Segment.create("(" + cloudNumber.getXri() + "/" + XDIDictionaryConstants.XRI_S_IS_REF + "/" + XDIConstants.XRI_S_VARIABLE + ")"))
 		};
 
 		message.createSetOperation(Arrays.asList(targetStatementsSet).iterator());
@@ -397,7 +397,7 @@ public class BasicCSP implements CSP {
 		message.setSecretToken(this.getCspInformation().getCspSecretToken());
 
 		XDI3Statement[] targetStatementsDoDigestSecretToken = new XDI3Statement[] {
-				XDI3Statement.fromLiteralComponents(XDI3Util.concatXris(cloudNumber.getPeerRootXri(), XDIAuthenticationConstants.XRI_S_DIGEST_SECRET_TOKEN, XDIConstants.XRI_S_VALUE), secretToken)
+				XDI3Statement.fromLiteralComponents(XDI3Util.concatXris(XDI3Segment.fromComponent(cloudNumber.getPeerRootXri()), XDIAuthenticationConstants.XRI_S_DIGEST_SECRET_TOKEN, XDIConstants.XRI_S_VALUE), secretToken)
 		};
 
 		message.createOperation(XDI3Segment.create("$do<$digest><$secret><$token>"), Arrays.asList(targetStatementsDoDigestSecretToken).iterator());
