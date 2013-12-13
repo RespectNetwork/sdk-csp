@@ -52,7 +52,7 @@ public class ExampleRegister {
 
 		// step 4: Register Cloud Name
 
-		csp.registerCloudNameInRN(cloudName, cloudNumber);
+		csp.registerCloudNameInRN(cloudName, cloudNumber, null, null);
 		csp.registerCloudNameInCSP(cloudName, cloudNumber);
 		csp.registerCloudNameInCloud(cloudName, cloudNumber, secretToken);
 
