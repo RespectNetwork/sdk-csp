@@ -94,7 +94,7 @@ public interface CSP {
 	 * Normally, it is not necessary to call this, since it is automatically done by the registerCloudNameInRN() method.
 	 * Used in:
 	 *   [A] Not used
-	 *   [B] Not used
+	 *   [B] 5.1.2
 	 */
 	public void setCloudXdiEndpointInRN(CloudNumber cloudNumber, String cloudXdiEndpoint) throws Xdi2ClientException;
 
