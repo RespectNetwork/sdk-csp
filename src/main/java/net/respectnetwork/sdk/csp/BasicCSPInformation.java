@@ -3,6 +3,7 @@ package net.respectnetwork.sdk.csp;
 import java.io.Serializable;
 
 import xdi2.core.xri3.CloudNumber;
+import xdi2.core.xri3.XDI3Segment;
 
 public class BasicCSPInformation implements CSPInformation, Serializable {
 
@@ -14,12 +15,13 @@ public class BasicCSPInformation implements CSPInformation, Serializable {
 	private String cspCloudBaseXdiEndpoint;
 	private CloudNumber rnCloudNumber;
 	private String rnRegistrationServiceXdiEndpoint;
+	private XDI3Segment rnCspLinkContract;
 
 	public BasicCSPInformation() {
 
 	}
 
-	public BasicCSPInformation(CloudNumber cspCloudNumber, String cspSecretToken, String cspRegistryXdiEndpoint, String cspCloudBaseXdiEndpoint, CloudNumber rnCloudNumber, String rnRegistrationServiceXdiEndpoint) {
+	public BasicCSPInformation(CloudNumber cspCloudNumber, String cspSecretToken, String cspRegistryXdiEndpoint, String cspCloudBaseXdiEndpoint, CloudNumber rnCloudNumber, String rnRegistrationServiceXdiEndpoint, XDI3Segment rnCspLinkContract) {
 
 		this.cspCloudNumber = cspCloudNumber;
 		this.cspSecretToken = cspSecretToken;
@@ -27,6 +29,7 @@ public class BasicCSPInformation implements CSPInformation, Serializable {
 		this.cspCloudBaseXdiEndpoint = cspCloudBaseXdiEndpoint;
 		this.rnCloudNumber = rnCloudNumber;
 		this.rnRegistrationServiceXdiEndpoint = rnRegistrationServiceXdiEndpoint;
+		this.rnCspLinkContract = rnCspLinkContract;
 	}
 
 	/*
@@ -91,5 +94,15 @@ public class BasicCSPInformation implements CSPInformation, Serializable {
 	public void setRnRegistrationServiceXdiEndpoint(String rnRegistrationServiceXdiEndpoint) {
 
 		this.rnRegistrationServiceXdiEndpoint = rnRegistrationServiceXdiEndpoint;
+	}
+
+	public XDI3Segment getRnCspLinkContract() {
+
+		return this.rnCspLinkContract;
+	}
+
+	public void setRnCspLinkContract(XDI3Segment rnCspLinkContract) {
+
+		this.rnCspLinkContract = rnCspLinkContract;
 	}
 }
