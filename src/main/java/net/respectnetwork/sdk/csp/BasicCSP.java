@@ -336,16 +336,6 @@ public class BasicCSP implements CSP {
 		log.debug("In Cloud: Cloud Name " + cloudName + " registered with Cloud Number " + cloudNumber);
 	}
 
-	public boolean checkVerifiedContactInformationInRN(String email, String phone) throws Xdi2ClientException {
-
-		throw new RuntimeException("Not implemented");
-	}
-
-	public void setVerifiedContactInformationInRN(CloudNumber cloudNumber, String email, String phone) throws Xdi2ClientException {
-
-		throw new RuntimeException("Not implemented");
-	}
-
 	/*
 	 * Methods for updating User Clouds or Cloud Names after they have been registered  
 	 */
