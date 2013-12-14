@@ -15,13 +15,19 @@ import xdi2.core.xri3.XDI3Segment;
 public class ExampleRegister {
 
 	/* CHOOSE THE INDIVIDUAL's CLOUD NUMBER HERE */
-	private static CloudNumber cloudNumber = CloudNumber.createRandom(XDIConstants.CS_AT);
+	private static CloudNumber cloudNumber = CloudNumber.createRandom(XDIConstants.CS_EQUALS);
 
 	/* CHOOSE THE INDIVIDUAL's CLOUD NAME HERE */
-	private static CloudName cloudName = CloudName.create("@dev.test.at.15");
+	private static CloudName cloudName = CloudName.create("=dev.test.81");
 
 	/* CHOOSE THE INDIVIDUAL's SECRET TOKEN HERE */
 	private static String secretToken = "mysecret";
+
+	/* CHOOSE THE INDIVIDUAL's VERIFIED PHONE NUMBER HERE */
+	private static String verifiedPhone = "123456";
+
+	/* CHOOSE THE INDIVIDUAL's VERIFIED EMAIL HERE */
+	private static String verifiedEmail = "test@test.com";
 
 	public static void main(String[] args) throws Exception {
 
@@ -44,7 +50,7 @@ public class ExampleRegister {
 
 		csp.setCloudServicesInCloud(cloudNumber, secretToken, services);
 
-		// step 3: Check if Cloud Name exists already
+		// step 3: Check if the Cloud Name is available
 
 		CloudNumber existingCloudNumber = csp.checkCloudNameAvailableInRN(cloudName);
 
@@ -52,7 +58,7 @@ public class ExampleRegister {
 
 		// step 4: Register Cloud Name
 
-		csp.registerCloudNameInRN(cloudName, cloudNumber, null, null);
+		csp.registerCloudNameInRN(cloudName, cloudNumber, verifiedPhone, verifiedEmail);
 		csp.registerCloudNameInCSP(cloudName, cloudNumber);
 		csp.registerCloudNameInCloud(cloudName, cloudNumber, secretToken);
 

@@ -1,0 +1,31 @@
+package net.respectnetwork.sdk.csp.example;
+
+import net.respectnetwork.sdk.csp.BasicCSP;
+import net.respectnetwork.sdk.csp.CSP;
+import net.respectnetwork.sdk.csp.CSPInformation;
+import xdi2.core.xri3.CloudName;
+import xdi2.core.xri3.CloudNumber;
+
+public class ExampleCheckCloudNameAvailable {
+
+	/* CHOOSE THE INDIVIDUAL's CLOUD NAME HERE */
+	private static CloudName cloudName = CloudName.create("=dev.test.81");
+
+	public static void main(String[] args) throws Exception {
+
+		// Step 0: Set up CSP
+
+		CSPInformation cspInformation = new CSPInformationRespectNetwork();
+		//CSPInformation cspInformation = new CSPInformationTTCC();
+
+		CSP csp = new BasicCSP(cspInformation);
+
+		// step 3: Check if the Cloud Name is available
+
+		CloudNumber existingCloudNumber = csp.checkCloudNameAvailableInRN(cloudName);
+
+		// done
+
+		System.out.println("For Cloud Name " + cloudName + " found Cloud Number: " + existingCloudNumber);
+	}
+}

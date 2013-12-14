@@ -20,6 +20,7 @@ import xdi2.core.constants.XDIAuthenticationConstants;
 import xdi2.core.constants.XDIConstants;
 import xdi2.core.constants.XDIDictionaryConstants;
 import xdi2.core.constants.XDILinkContractConstants;
+import xdi2.core.features.nodetypes.XdiAttributeMemberUnordered;
 import xdi2.core.features.nodetypes.XdiPeerRoot;
 import xdi2.core.util.XDI3Util;
 import xdi2.core.xri3.CloudName;
@@ -38,8 +39,10 @@ public class BasicCSP implements CSP {
 
 	public static final XDI3Segment REGISTRAR_LINK_CONTRACT = XDI3Segment.create("+registrar$do");
 
-	public static final XDI3Segment XRI_S_VERIFIED_DIGEST_PHONE = XDI3Segment.create("<+verified><$digest><+phone>&");
-	public static final XDI3Segment XRI_S_VERIFIED_DIGEST_EMAIL = XDI3Segment.create("<+verified><$digest><+email>&");
+	public static final XDI3Segment XRI_S_VERIFIED_DIGEST_PHONE = XDI3Segment.create("<+verified><$digest>[<+phone>]");
+	public static final XDI3Segment XRI_S_VERIFIED_DIGEST_EMAIL = XDI3Segment.create("<+verified><$digest>[<+email>]");
+	public static final XDI3Segment XRI_S_IS_PHONE = XDI3Segment.create("$is+phone");
+	public static final XDI3Segment XRI_S_IS_EMAIL = XDI3Segment.create("$is+email");
 
 	private CSPInformation cspInformation;
 
@@ -105,7 +108,7 @@ public class BasicCSP implements CSP {
 
 	public CloudNumber checkCloudNameAvailableInRN(CloudName cloudName) throws Xdi2ClientException {
 
-		CloudNumber cloudNumber;
+		CloudNumber cloudNumber = null;
 
 		// prepare message to RN
 
@@ -126,25 +129,57 @@ public class BasicCSP implements CSP {
 
 		Relation relation = messageResult.getGraph().getDeepRelation(XDI3Segment.fromComponent(cloudName.getPeerRootXri()), XDIDictionaryConstants.XRI_S_REF);
 
-		if (relation == null) {
+		if (relation != null) {
 
-			log.debug("In RN: Cloud Name " + cloudName + " is available");
-
-			return null;
+			cloudNumber = CloudNumber.fromPeerRootXri(relation.getTargetContextNodeXri().getFirstSubSegment());
 		}
-
-		cloudNumber = CloudNumber.fromPeerRootXri(relation.getTargetContextNodeXri().getFirstSubSegment());
 
 		// done
 
-		log.debug("In RN: Cloud Name " + cloudName + " is already registered with Cloud Number " + cloudNumber);
-
+		log.debug("In RN: For Cloud Name " + cloudName + " found Cloud Number " + cloudNumber);
 		return cloudNumber;
 	}
 
 	public CloudNumber[] checkPhoneAndEmailAvailableInRN(String verifiedPhone, String verifiedEmail) throws Xdi2ClientException {
 
-		throw new RuntimeException("Not implemented");
+		CloudNumber[] cloudNumbers = new CloudNumber[2];
+
+		// prepare message to RN
+
+		MessageEnvelope messageEnvelope = new MessageEnvelope();
+
+		Message message = messageEnvelope.createMessage(this.getCspInformation().getCspCloudNumber().getXri());
+		message.setToPeerRootXri(this.getCspInformation().getRnCloudNumber().getPeerRootXri());
+		message.setLinkContractXri(REGISTRAR_LINK_CONTRACT);
+		message.setSecretToken(this.getCspInformation().getCspSecretToken());
+
+		XDI3Segment targetAddress1 = verifiedPhone == null ? null : XDI3Util.concatXris(XRI_S_VERIFIED_DIGEST_PHONE, XdiAttributeMemberUnordered.createDigestArcXri(verifiedPhone, true));
+		XDI3Segment targetAddress2 = verifiedEmail == null ? null : XDI3Util.concatXris(XRI_S_VERIFIED_DIGEST_EMAIL, XdiAttributeMemberUnordered.createDigestArcXri(verifiedEmail, true));
+
+		if (targetAddress1 != null) message.createGetOperation(targetAddress1);
+		if (targetAddress2 != null) message.createGetOperation(targetAddress2);
+
+		// send message
+
+		MessageResult messageResult = this.getXdiClientRNRegistrationService().send(message.getMessageEnvelope(), null);
+
+		Relation relation1 = targetAddress1 == null ? null : messageResult.getGraph().getDeepRelation(targetAddress1, XRI_S_IS_PHONE);
+		Relation relation2 = targetAddress2 == null ? null : messageResult.getGraph().getDeepRelation(targetAddress2, XRI_S_IS_EMAIL);
+
+		if (relation1 != null) {
+
+			cloudNumbers[0] = CloudNumber.fromXri(relation1.getTargetContextNodeXri());
+		}
+
+		if (relation2 != null) {
+
+			cloudNumbers[1] = CloudNumber.fromXri(relation2.getTargetContextNodeXri());
+		}
+
+		// done
+
+		log.debug("In RN: For verified phone " + verifiedPhone + " and verified email " + verifiedEmail + " found Cloud Numbers " + cloudNumbers);
+		return cloudNumbers;
 	}
 
 	@Deprecated
@@ -237,16 +272,18 @@ public class BasicCSP implements CSP {
 
 		if (verifiedPhone != null) {
 
-			targetStatementsSet2.add(XDI3Statement.fromLiteralComponents(
-					XDI3Util.concatXris(cloudNumber.getPeerRootXri(), XRI_S_VERIFIED_DIGEST_PHONE), 
-					verifiedPhone));
+			targetStatementsSet2.add(XDI3Statement.fromRelationComponents(
+					XDI3Util.concatXris(XRI_S_VERIFIED_DIGEST_PHONE, XdiAttributeMemberUnordered.createDigestArcXri(verifiedPhone, true)),
+					XRI_S_IS_PHONE,
+					cloudNumber.getXri()));
 		}
 
 		if (verifiedEmail != null) {
 
-			targetStatementsSet2.add(XDI3Statement.fromLiteralComponents(
-					XDI3Util.concatXris(cloudNumber.getPeerRootXri(), XRI_S_VERIFIED_DIGEST_EMAIL), 
-					verifiedEmail));
+			targetStatementsSet2.add(XDI3Statement.fromRelationComponents(
+					XDI3Util.concatXris(XRI_S_VERIFIED_DIGEST_EMAIL, XdiAttributeMemberUnordered.createDigestArcXri(verifiedEmail, true)),
+					XRI_S_IS_EMAIL,
+					cloudNumber.getXri()));
 		}
 
 		message2.createSetOperation(targetStatementsSet2.iterator());
@@ -375,7 +412,42 @@ public class BasicCSP implements CSP {
 
 	public void setPhoneAndEmailInRN(CloudNumber cloudNumber, String verifiedPhone, String verifiedEmail) throws Xdi2ClientException {
 
-		throw new RuntimeException("Not implemented");
+		// prepare message to RN
+
+		MessageEnvelope messageEnvelope = new MessageEnvelope();
+
+		Message message = messageEnvelope.getMessageCollection(this.getCspInformation().getCspCloudNumber().getXri(), true).createMessage(-1);
+		message.setToPeerRootXri(this.getCspInformation().getRnCloudNumber().getPeerRootXri());
+		message.setLinkContractXri(REGISTRAR_LINK_CONTRACT);
+		message.setSecretToken(this.getCspInformation().getCspSecretToken());
+
+		List<XDI3Statement> targetStatementsSet = new ArrayList<XDI3Statement> ();
+
+		if (verifiedPhone != null) {
+
+			targetStatementsSet.add(XDI3Statement.fromRelationComponents(
+					XDI3Util.concatXris(XRI_S_VERIFIED_DIGEST_PHONE, XdiAttributeMemberUnordered.createDigestArcXri(verifiedPhone, true)),
+					XRI_S_IS_PHONE,
+					cloudNumber.getXri()));
+		}
+
+		if (verifiedEmail != null) {
+
+			targetStatementsSet.add(XDI3Statement.fromRelationComponents(
+					XDI3Util.concatXris(XRI_S_VERIFIED_DIGEST_EMAIL, XdiAttributeMemberUnordered.createDigestArcXri(verifiedEmail, true)),
+					XRI_S_IS_EMAIL,
+					cloudNumber.getXri()));
+		}
+
+		message.createSetOperation(targetStatementsSet.iterator());
+
+		// send message
+
+		this.getXdiClientRNRegistrationService().send(message.getMessageEnvelope(), null);
+
+		// done
+
+		log.debug("In RN: Verified phone " + verifiedPhone + " and verified e-mail " + verifiedEmail + " set for Cloud Number " + cloudNumber);
 	}
 
 	public void setCloudXdiEndpointInCSP(CloudNumber cloudNumber, String cloudXdiEndpoint) throws Xdi2ClientException {
