@@ -18,7 +18,7 @@ public class ExampleRegister {
 	private static CloudNumber cloudNumber = CloudNumber.createRandom(XDIConstants.CS_EQUALS);
 
 	/* CHOOSE THE INDIVIDUAL's CLOUD NAME HERE */
-	private static CloudName cloudName = CloudName.create("=dev.test.87");
+	private static CloudName cloudName = CloudName.create("=dev.test.71");
 
 	/* CHOOSE THE INDIVIDUAL's SECRET TOKEN HERE */
 	private static String secretToken = "mysecret";
@@ -56,7 +56,14 @@ public class ExampleRegister {
 
 		if (existingCloudNumber != null) throw new RuntimeException("Cloud Name " + cloudName + " is already registered with Cloud Number " + existingCloudNumber + ".");
 
-		// step 4: Register Cloud Name
+		// Step 4: Check if the phone number and e-mail address are available
+
+		CloudNumber[] existingCloudNumbers = csp.checkPhoneAndEmailAvailableInRN(verifiedPhone, verifiedEmail);
+
+		if (existingCloudNumbers[0] != null) throw new RuntimeException("This verified phone number is already registered with Cloud Number " + existingCloudNumbers[0] + ".");
+		if (existingCloudNumbers[1] != null) throw new RuntimeException("This verified e-mail address is already registered with Cloud Number " + existingCloudNumbers[1] + ".");
+
+		// step 5: Register Cloud Name
 
 		csp.registerCloudNameInRN(cloudName, cloudNumber, verifiedPhone, verifiedEmail);
 		csp.registerCloudNameInCSP(cloudName, cloudNumber);

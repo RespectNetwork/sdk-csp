@@ -175,7 +175,7 @@ public class BasicCSP implements CSP {
 
 		// done
 
-		log.debug("In RN: For verified phone " + verifiedPhone + " and verified email " + verifiedEmail + " found Cloud Numbers " + cloudNumbers);
+		log.debug("In RN: For verified phone " + verifiedPhone + " and verified email " + verifiedEmail + " found Cloud Numbers " + Arrays.asList(cloudNumbers));
 		return cloudNumbers;
 	}
 

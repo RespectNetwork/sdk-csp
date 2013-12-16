@@ -20,7 +20,7 @@ public class ExampleCheckCloudNameAvailable {
 
 		CSP csp = new BasicCSP(cspInformation);
 
-		// step 3: Check if the Cloud Name is available
+		// step 1: Check if the Cloud Name is available
 
 		CloudNumber existingCloudNumber = csp.checkCloudNameAvailableInRN(cloudName);
 
