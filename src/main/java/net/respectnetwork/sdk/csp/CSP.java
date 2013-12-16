@@ -15,7 +15,7 @@ import xdi2.core.xri3.XDI3Segment;
  * 
  * The comments on individual methods reference the following diagrams:
  * [A] Initial Sign-Up: https://wiki.respectnetwork.net/wiki/Alice_Signs_Up
- * [B] Inline Provisioning: https://docs.google.com/a/respectnetwork.net/file/d/0B76sKV7mFhHNeEkyN3JTOGVabEk/
+ * [B] Inline Provisioning: https://wiki.respectnetwork.net/wiki/Inline_Provisioning
  */
 public interface CSP {
 
@@ -29,8 +29,8 @@ public interface CSP {
 	 *   - this registers the User Cloud's XDI endpoint in the CSP Cloud.
 	 *   - this optionally registers the User Cloud's secret token in the CSP Cloud.
 	 * Used in:
-	 *   [A] Step 2.1.1.2 
-	 *   [B] Step 5.1.2
+	 *   [A] 2.1.1.2 
+	 *   [B] 3.1.1.2
 	 */
 	public void registerCloudInCSP(CloudNumber cloudNumber, String secretToken) throws Xdi2ClientException;
 
@@ -53,7 +53,7 @@ public interface CSP {
 	 * Each one of the two Cloud Numbers may be null, if the phone number or e-mail address have not been registered.
 	 * Used in:
 	 *   [A] 3.1.1.5.1
-	 *   [B] Not used
+	 *   [B] 4.1.1.5.1
 	 */
 	public CloudNumber[] checkPhoneAndEmailAvailableInRN(String verifiedPhone, String verifiedEmail) throws Xdi2ClientException;
 
@@ -94,7 +94,7 @@ public interface CSP {
 	 * Normally, it is not necessary to call this, since it is automatically done by the registerCloudNameInRN() method.
 	 * Used in:
 	 *   [A] Not used
-	 *   [B] 5.1.2
+	 *   [B] 5.1.3.3
 	 */
 	public void setCloudXdiEndpointInRN(CloudNumber cloudNumber, String cloudXdiEndpoint) throws Xdi2ClientException;
 
@@ -103,7 +103,7 @@ public interface CSP {
 	 * Normally, it is not necessary to call this, since it is automatically done by the registerCloudNameInRN() method.
 	 * Used in:
 	 *   [A] Not used
-	 *   [B] 5.1.2
+	 *   [B] 5.1.3.3
 	 */
 	public void setPhoneAndEmailInRN(CloudNumber cloudNumber, String verifiedPhone, String verifiedEmail) throws Xdi2ClientException;
 
@@ -129,7 +129,7 @@ public interface CSP {
 	 * This method updates additional services in a User Cloud.
 	 * Used in:
 	 *   [A] 2.1.1.4
-	 *   [B] Not used
+	 *   [B] 3.1.1.4
 	 */
 	public void setCloudServicesInCloud(CloudNumber cloudNumber, String secretToken, Map<XDI3Segment, String> services) throws Xdi2ClientException;
 
@@ -137,7 +137,7 @@ public interface CSP {
 	 * This methods updates a verified phone number and verified e-mail address in the User's Cloud.
 	 * Used in:
 	 *   [A] 3.1.1.3
-	 *   [B] Not used
+	 *   [B] 4.1.1.2
 	 */
 	public void setPhoneAndEmailInCloud(CloudNumber cloudNumber, String verifiedPhone, String verifiedEmail) throws Xdi2ClientException;
 }
