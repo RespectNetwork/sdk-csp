@@ -21,7 +21,6 @@ import xdi2.core.constants.XDIConstants;
 import xdi2.core.constants.XDIDictionaryConstants;
 import xdi2.core.constants.XDILinkContractConstants;
 import xdi2.core.features.nodetypes.XdiAttributeMemberUnordered;
-import xdi2.core.features.nodetypes.XdiPeerRoot;
 import xdi2.core.util.XDI3Util;
 import xdi2.core.xri3.CloudName;
 import xdi2.core.xri3.CloudNumber;
@@ -129,7 +128,7 @@ public class BasicCSP implements CSP {
 
 		if (relation != null) {
 
-			cloudNumber = CloudNumber.fromPeerRootXri(relation.getTargetContextNodeXri().getFirstSubSegment());
+			cloudNumber = CloudNumber.fromPeerRootXri(relation.getTargetContextNodeXri());
 		}
 
 		// done
@@ -206,7 +205,7 @@ public class BasicCSP implements CSP {
 		Relation relation = messageResult.getGraph().getDeepRelation(XDI3Segment.fromComponent(cloudName.getPeerRootXri()), XDIDictionaryConstants.XRI_S_REF);
 		if (relation == null) throw new RuntimeException("Cloud Number not registered.");
 
-		CloudNumber cloudNumber = CloudNumber.fromPeerRootXri(relation.getTargetContextNodeXri().getFirstSubSegment());
+		CloudNumber cloudNumber = CloudNumber.fromPeerRootXri(relation.getTargetContextNodeXri());
 
 		// prepare message 2 to RN
 
@@ -293,7 +292,8 @@ public class BasicCSP implements CSP {
 		Relation relation = messageResult.getGraph().getDeepRelation(XDI3Segment.fromComponent(cloudName.getPeerRootXri()), XDIDictionaryConstants.XRI_S_REF);
 		if (relation == null) throw new RuntimeException("Cloud Name not registered.");
 
-		if (! cloudNumber.equals(CloudNumber.fromPeerRootXri(relation.getTargetContextNodeXri().getFirstSubSegment()))) throw new RuntimeException("Registered Cloud Number " + XdiPeerRoot.getXriOfPeerRootArcXri(relation.getTargetContextNodeXri().getFirstSubSegment()) + " does not match requested Cloud Number " + cloudNumber);
+		CloudNumber registeredCloudNumber = CloudNumber.fromPeerRootXri(relation.getTargetContextNodeXri());
+		if (! registeredCloudNumber.equals(cloudNumber)) throw new RuntimeException("Registered Cloud Number " + registeredCloudNumber + " does not match requested Cloud Number " + cloudNumber);
 
 		// done
 
