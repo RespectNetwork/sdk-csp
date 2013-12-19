@@ -20,6 +20,8 @@ import xdi2.core.constants.XDIAuthenticationConstants;
 import xdi2.core.constants.XDIConstants;
 import xdi2.core.constants.XDIDictionaryConstants;
 import xdi2.core.constants.XDILinkContractConstants;
+import xdi2.core.features.linkcontracts.PublicLinkContract;
+import xdi2.core.features.linkcontracts.RootLinkContract;
 import xdi2.core.features.nodetypes.XdiAttributeMemberUnordered;
 import xdi2.core.util.XDI3Util;
 import xdi2.core.xri3.CloudName;
@@ -335,7 +337,7 @@ public class BasicCSP implements CSP {
 
 		Message message = messageEnvelope.createMessage(cloudNumber.getXri());
 		message.setToPeerRootXri(cloudNumber.getPeerRootXri());
-		message.setLinkContractXri(XDILinkContractConstants.XRI_S_DO);
+		message.setLinkContractXri(RootLinkContract.createLinkContractXri(cloudNumber.getXri()));
 		message.setSecretToken(secretToken);
 
 		List<XDI3Statement> targetStatementsSet = new ArrayList<XDI3Statement> ();
@@ -517,7 +519,7 @@ public class BasicCSP implements CSP {
 
 		Message message = messageEnvelope.createMessage(cloudNumber.getXri());
 		message.setToPeerRootXri(cloudNumber.getPeerRootXri());
-		message.setLinkContractXri(XDILinkContractConstants.XRI_S_DO);
+		message.setLinkContractXri(RootLinkContract.createLinkContractXri(cloudNumber.getXri()));
 		message.setSecretToken(secretToken);
 
 		List<XDI3Statement> targetStatementsSet = new ArrayList<XDI3Statement> (services.size() * 2);
@@ -525,11 +527,11 @@ public class BasicCSP implements CSP {
 		for (Entry<XDI3Segment, String> entry : services.entrySet()) {
 
 			targetStatementsSet.add(XDI3Statement.fromLiteralComponents(
-					XDI3Util.concatXris(entry.getKey(), XDIClientConstants.XRI_S_URI, XDIConstants.XRI_S_VALUE),
+					XDI3Util.concatXris(cloudNumber.getXri(), entry.getKey(), XDIClientConstants.XRI_S_URI, XDIConstants.XRI_S_VALUE),
 					entry.getValue()));
 
 			targetStatementsSet.add(XDI3Statement.fromRelationComponents(
-					XDILinkContractConstants.XRI_S_PUBLIC_DO,
+					PublicLinkContract.createLinkContractXri(cloudNumber.getXri()),
 					XDILinkContractConstants.XRI_S_GET,
 					XDI3Util.concatXris(entry.getKey(), XDIClientConstants.XRI_S_URI)));
 		}
