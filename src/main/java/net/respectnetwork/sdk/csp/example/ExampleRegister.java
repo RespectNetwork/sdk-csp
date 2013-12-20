@@ -3,6 +3,7 @@ package net.respectnetwork.sdk.csp.example;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import net.respectnetwork.sdk.csp.BasicCSP;
 import net.respectnetwork.sdk.csp.CSP;
@@ -24,10 +25,10 @@ public class ExampleRegister {
 	private static String secretToken = "mysecret";
 
 	/* CHOOSE THE INDIVIDUAL's VERIFIED PHONE NUMBER HERE */
-	private static String verifiedPhone = "123456";
+	private static String verifiedPhone = "myphone-" + UUID.randomUUID().toString();
 
 	/* CHOOSE THE INDIVIDUAL's VERIFIED EMAIL HERE */
-	private static String verifiedEmail = "test@test.com";
+	private static String verifiedEmail = "test" + UUID.randomUUID().toString() + "@test.com";
 
 	public static void main(String[] args) throws Exception {
 
