@@ -43,6 +43,9 @@ public class BasicCSP implements CSP {
 	public static final XDI3Segment XRI_S_IS_PHONE = XDI3Segment.create("$is+phone");
 	public static final XDI3Segment XRI_S_IS_EMAIL = XDI3Segment.create("$is+email");
 
+	public static final XDI3Segment XRI_S_MEMBER = XDI3Segment.create("+member");
+	public static final XDI3Segment XRI_S_IS_MEMBER = XDI3Segment.create("$is+member");
+
 	private CSPInformation cspInformation;
 
 	private XDIClient xdiClientRNRegistrationService;
@@ -337,7 +340,7 @@ public class BasicCSP implements CSP {
 
 		Message message = messageEnvelope.createMessage(cloudNumber.getXri());
 		message.setToPeerRootXri(cloudNumber.getPeerRootXri());
-		message.setLinkContractXri(RootLinkContract.createLinkContractXri(cloudNumber.getXri()));
+		message.setLinkContractXri(RootLinkContract.createRootLinkContractXri(cloudNumber.getXri()));
 		message.setSecretToken(secretToken);
 
 		List<XDI3Statement> targetStatementsSet = new ArrayList<XDI3Statement> ();
@@ -450,6 +453,88 @@ public class BasicCSP implements CSP {
 		log.debug("In RN: Verified phone " + verifiedPhone + " and verified e-mail " + verifiedEmail + " set for Cloud Number " + cloudNumber);
 	}
 
+
+	public void setRespectNetworkMembershipInRN(CloudNumber cloudNumber, boolean member)  throws Xdi2ClientException {
+
+		// prepare message to RN
+
+		MessageEnvelope messageEnvelope = new MessageEnvelope();
+
+		Message message = messageEnvelope.getMessageCollection(this.getCspInformation().getCspCloudNumber().getXri(), true).createMessage(-1);
+		message.setToPeerRootXri(this.getCspInformation().getRnCloudNumber().getPeerRootXri());
+		message.setLinkContractXri(this.getCspInformation().getRnCspLinkContract());
+		message.setSecretToken(this.getCspInformation().getCspSecretToken());
+
+		List<XDI3Statement> targetStatements = new ArrayList<XDI3Statement> ();
+
+		targetStatements.add(XDI3Statement.fromRelationComponents(
+				this.getCspInformation().getRnCloudNumber().getXri(),
+				XRI_S_MEMBER,
+				cloudNumber.getXri()));
+
+		targetStatements.add(XDI3Statement.fromRelationComponents(
+				cloudNumber.getXri(),
+				XRI_S_IS_MEMBER,
+				this.getCspInformation().getRnCloudNumber().getXri()));
+
+		if (member) {
+
+			message.createSetOperation(targetStatements.iterator());
+		} else {
+
+			message.createDelOperation(targetStatements.iterator());
+		}
+
+		// send message
+
+		this.getXdiClientRNRegistrationService().send(message.getMessageEnvelope(), null);
+
+		// done
+
+		log.debug("In RN: Respect Network membership " + member + " set for Cloud Number " + cloudNumber);
+	}
+
+	public boolean isRespectNetworkMembershipInRN(CloudNumber cloudNumber) throws Xdi2ClientException {
+
+		// prepare message to RN
+
+		MessageEnvelope messageEnvelope = new MessageEnvelope();
+
+		Message message = messageEnvelope.getMessageCollection(this.getCspInformation().getCspCloudNumber().getXri(), true).createMessage(-1);
+		message.setToPeerRootXri(this.getCspInformation().getRnCloudNumber().getPeerRootXri());
+		message.setLinkContractXri(this.getCspInformation().getRnCspLinkContract());
+		message.setSecretToken(this.getCspInformation().getCspSecretToken());
+
+		XDI3Statement targetStatement = XDI3Statement.fromRelationComponents(
+				this.getCspInformation().getRnCloudNumber().getXri(),
+				XRI_S_MEMBER,
+				cloudNumber.getXri());
+
+		message.createGetOperation(targetStatement);
+
+		// send message and read result
+
+		MessageResult messageResult = this.getXdiClientRNRegistrationService().send(message.getMessageEnvelope(), null);
+
+		boolean member = messageResult.getGraph().containsStatement(targetStatement);
+
+		// done
+
+		log.debug("In RN: Respect Network membership " + member + " retrieved for Cloud Number " + cloudNumber);
+
+		return member;
+	}
+
+	public void setRespectFirstMembershipInRN(CloudNumber cloudNumber, boolean member)  throws Xdi2ClientException {
+
+		throw new RuntimeException("Not implemented");
+	}
+
+	public boolean isRespectFirstMembershipInRN(CloudNumber cloudNumber) throws Xdi2ClientException {
+
+		throw new RuntimeException("Not implemented");
+	}
+
 	public void setCloudXdiEndpointInCSP(CloudNumber cloudNumber, String cloudXdiEndpoint) throws Xdi2ClientException {
 
 		// auto-generate XDI endpoint
@@ -519,7 +604,7 @@ public class BasicCSP implements CSP {
 
 		Message message = messageEnvelope.createMessage(cloudNumber.getXri());
 		message.setToPeerRootXri(cloudNumber.getPeerRootXri());
-		message.setLinkContractXri(RootLinkContract.createLinkContractXri(cloudNumber.getXri()));
+		message.setLinkContractXri(RootLinkContract.createRootLinkContractXri(cloudNumber.getXri()));
 		message.setSecretToken(secretToken);
 
 		List<XDI3Statement> targetStatementsSet = new ArrayList<XDI3Statement> (services.size() * 2);
@@ -531,9 +616,9 @@ public class BasicCSP implements CSP {
 					entry.getValue()));
 
 			targetStatementsSet.add(XDI3Statement.fromRelationComponents(
-					PublicLinkContract.createLinkContractXri(cloudNumber.getXri()),
+					PublicLinkContract.createPublicLinkContractXri(cloudNumber.getXri()),
 					XDILinkContractConstants.XRI_S_GET,
-					XDI3Util.concatXris(entry.getKey(), XDIClientConstants.XRI_S_URI)));
+					XDI3Util.concatXris(cloudNumber.getXri(), entry.getKey(), XDIClientConstants.XRI_S_URI)));
 		}
 
 		message.createSetOperation(targetStatementsSet.iterator());
