@@ -123,7 +123,7 @@ public interface CSP {
 	 *   [A] Not used
 	 *   [B] Not used
 	 */
-	public boolean isRespectNetworkMembershipInRN(CloudNumber cloudNumber) throws Xdi2ClientException;
+	public boolean checkRespectNetworkMembershipInRN(CloudNumber cloudNumber) throws Xdi2ClientException;
 	
 	/**
 	 * This method sets or removes a flag for a Cloud Number to indicate whether it is a member of
@@ -141,7 +141,7 @@ public interface CSP {
 	 *   [A] Not used
 	 *   [B] Not used
 	 */
-	public boolean isRespectFirstMembershipInRN(CloudNumber cloudNumber) throws Xdi2ClientException;
+	public boolean checkRespectFirstMembershipInRN(CloudNumber cloudNumber) throws Xdi2ClientException;
 
 	/*
 	 * Methods for updating CSP information for existing Cloud Numbers and Clouds.
