@@ -674,13 +674,13 @@ public class BasicCSP implements CSP {
 		for (Entry<XDI3Segment, String> entry : services.entrySet()) {
 
 			targetStatementsSet.add(XDI3Statement.fromLiteralComponents(
-					XDI3Util.concatXris(cloudNumber.getXri(), entry.getKey(), XDIClientConstants.XRI_S_URI, XDIConstants.XRI_S_VALUE),
+					XDI3Util.concatXris(cloudNumber.getXri(), entry.getKey(), XDIClientConstants.XRI_S_AS_URI, XDIConstants.XRI_S_VALUE),
 					entry.getValue()));
 
 			targetStatementsSet.add(XDI3Statement.fromRelationComponents(
 					PublicLinkContract.createPublicLinkContractXri(cloudNumber.getXri()),
 					XDILinkContractConstants.XRI_S_GET,
-					XDI3Util.concatXris(cloudNumber.getXri(), entry.getKey(), XDIClientConstants.XRI_S_URI)));
+					XDI3Util.concatXris(cloudNumber.getXri(), entry.getKey(), XDIClientConstants.XRI_S_AS_URI)));
 		}
 
 		message.createSetOperation(targetStatementsSet.iterator());
