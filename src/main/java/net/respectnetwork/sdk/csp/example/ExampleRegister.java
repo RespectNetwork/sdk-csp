@@ -1,5 +1,8 @@
 package net.respectnetwork.sdk.csp.example;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,7 +22,7 @@ public class ExampleRegister {
 	private static CloudNumber cloudNumber = CloudNumber.createRandom(XDIConstants.CS_EQUALS);
 
 	/* CHOOSE THE INDIVIDUAL's CLOUD NAME HERE */
-	private static CloudName cloudName = CloudName.create("=dev.test.74");
+	private static CloudName cloudName;
 
 	/* CHOOSE THE INDIVIDUAL's SECRET TOKEN HERE */
 	private static String secretToken = "mysecret";
@@ -29,6 +32,18 @@ public class ExampleRegister {
 
 	/* CHOOSE THE INDIVIDUAL's VERIFIED EMAIL HERE */
 	private static String verifiedEmail = "test" + UUID.randomUUID().toString() + "@test.com";
+
+	static {
+
+		try {
+
+			System.out.print("Enter Cloud Name: ");
+			cloudName = CloudName.create(new BufferedReader(new InputStreamReader(System.in)).readLine());
+		} catch (IOException ex) {
+
+			throw new RuntimeException(ex.getMessage(), ex);
+		}
+	}
 
 	public static void main(String[] args) throws Exception {
 
