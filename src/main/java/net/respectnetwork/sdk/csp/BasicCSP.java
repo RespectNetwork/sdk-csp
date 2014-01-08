@@ -178,8 +178,8 @@ public class BasicCSP implements CSP {
 		message.setLinkContractXri(this.getCspInformation().getRnCspLinkContract());
 		message.setSecretToken(this.getCspInformation().getCspSecretToken());
 
-		XDI3Segment targetAddress1 = verifiedPhone == null ? null : XDI3Util.concatXris(XRI_S_VERIFIED_DIGEST_PHONE, XdiAttributeMemberUnordered.createDigestArcXri(verifiedPhone, true));
-		XDI3Segment targetAddress2 = verifiedEmail == null ? null : XDI3Util.concatXris(XRI_S_VERIFIED_DIGEST_EMAIL, XdiAttributeMemberUnordered.createDigestArcXri(verifiedEmail, true));
+		XDI3Segment targetAddress1 = verifiedPhone == null ? null : XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_VERIFIED_DIGEST_PHONE, XDI3Segment.fromComponent(XdiAttributeMemberUnordered.createDigestArcXri(verifiedPhone, true)));
+		XDI3Segment targetAddress2 = verifiedEmail == null ? null : XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_VERIFIED_DIGEST_EMAIL, XDI3Segment.fromComponent(XdiAttributeMemberUnordered.createDigestArcXri(verifiedEmail, true)));
 
 		if (targetAddress1 != null) message.createGetOperation(targetAddress1);
 		if (targetAddress2 != null) message.createGetOperation(targetAddress2);
@@ -298,7 +298,7 @@ public class BasicCSP implements CSP {
 		if (verifiedPhone != null) {
 
 			targetStatementsSet2.add(XDI3Statement.fromRelationComponents(
-					XDI3Util.concatXris(XRI_S_VERIFIED_DIGEST_PHONE, XdiAttributeMemberUnordered.createDigestArcXri(verifiedPhone, true)),
+					XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_VERIFIED_DIGEST_PHONE, XDI3Segment.fromComponent(XdiAttributeMemberUnordered.createDigestArcXri(verifiedPhone, true))),
 					XRI_S_IS_PHONE,
 					cloudNumber.getXri()));
 		}
@@ -306,7 +306,7 @@ public class BasicCSP implements CSP {
 		if (verifiedEmail != null) {
 
 			targetStatementsSet2.add(XDI3Statement.fromRelationComponents(
-					XDI3Util.concatXris(XRI_S_VERIFIED_DIGEST_EMAIL, XdiAttributeMemberUnordered.createDigestArcXri(verifiedEmail, true)),
+					XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_VERIFIED_DIGEST_EMAIL, XDI3Segment.fromComponent(XdiAttributeMemberUnordered.createDigestArcXri(verifiedEmail, true))),
 					XRI_S_IS_EMAIL,
 					cloudNumber.getXri()));
 		}
@@ -449,7 +449,7 @@ public class BasicCSP implements CSP {
 		if (verifiedPhone != null) {
 
 			targetStatementsSet.add(XDI3Statement.fromRelationComponents(
-					XDI3Util.concatXris(XRI_S_VERIFIED_DIGEST_PHONE, XdiAttributeMemberUnordered.createDigestArcXri(verifiedPhone, true)),
+					XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_VERIFIED_DIGEST_PHONE, XDI3Segment.fromComponent(XdiAttributeMemberUnordered.createDigestArcXri(verifiedPhone, true))),
 					XRI_S_IS_PHONE,
 					cloudNumber.getXri()));
 		}
@@ -457,7 +457,7 @@ public class BasicCSP implements CSP {
 		if (verifiedEmail != null) {
 
 			targetStatementsSet.add(XDI3Statement.fromRelationComponents(
-					XDI3Util.concatXris(XRI_S_VERIFIED_DIGEST_EMAIL, XdiAttributeMemberUnordered.createDigestArcXri(verifiedEmail, true)),
+					XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_VERIFIED_DIGEST_EMAIL, XDI3Segment.fromComponent(XdiAttributeMemberUnordered.createDigestArcXri(verifiedEmail, true))),
 					XRI_S_IS_EMAIL,
 					cloudNumber.getXri()));
 		}
@@ -513,7 +513,7 @@ public class BasicCSP implements CSP {
 		message2.setSecretToken(this.getCspInformation().getCspSecretToken());
 
 		message2.getContextNode().setDeepLiteralString(XRI_S_MEMBER_LOCK, lock);
-		
+
 		PolicyRoot policyRoot = message2.getPolicyRoot(true);
 		EqualsCondition equalsCondition = EqualsCondition.fromSubjectAndObject(
 				XDI3Util.concatXris(MessagePolicyEvaluationContext.XRI_S_MSG_VARIABLE, XRI_S_MEMBER_LOCK), 
@@ -559,7 +559,7 @@ public class BasicCSP implements CSP {
 		message2.createSetOperation(targetStatements.iterator());
 
 		// send message
-		
+
 		this.getXdiClientRNRegistrationService().send(messageEnvelope2, null);
 
 		// done
@@ -703,7 +703,7 @@ public class BasicCSP implements CSP {
 
 		String lock = literal2 == null ? null : literal2.getLiteralDataString();
 		if (lock == null) throw new RuntimeException("Cannot find string literal at " + targetAddress2);
-		
+
 		// prepare message 2 to RN
 
 		MessageEnvelope messageEnvelope2 = new MessageEnvelope();
