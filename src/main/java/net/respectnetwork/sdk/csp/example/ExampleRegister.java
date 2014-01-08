@@ -85,6 +85,10 @@ public class ExampleRegister {
 		csp.registerCloudNameInCSP(cloudName, cloudNumber);
 		csp.registerCloudNameInCloud(cloudName, cloudNumber, secretToken);
 
+		// step 6: Set RN/RF/RFL membership
+
+		csp.setRespectNetworkMembershipInRN(cloudNumber);
+
 		// done
 
 		System.out.println("Done registering Cloud Name " + cloudName + " with Cloud Number " + cloudNumber + " and " + services.size() + " services.");

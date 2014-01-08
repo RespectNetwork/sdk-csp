@@ -3,6 +3,7 @@ package net.respectnetwork.sdk.csp.example;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Date;
 
 import net.respectnetwork.sdk.csp.BasicCSP;
 import net.respectnetwork.sdk.csp.CSP;
@@ -17,10 +18,16 @@ public class ExampleChangeMembership {
 	private static CloudName cloudName;
 
 	/* CHOOSE WHETHER THE INDIVIDUAL IS A MEMBER OF RESPECT NETWORK */
-	private static boolean rnMember = false;
+	private static boolean rnMember = true;
 
 	/* CHOOSE WHETHER THE INDIVIDUAL IS A MEMBER OF RESPECT FIRST */
 	private static boolean rfMember = true;
+
+	/* CHOOSE WHETHER THE INDIVIDUAL IS A MEMBER OF RESPECT FIRST LIFETIME */
+	private static boolean rflMember = true;
+
+	/* CHOOSE THE EXPIRATION DATE OF THE RESPECT FIRST MEMBERSHIP */
+	private static Date rfExpirationDate = new Date();
 
 	static {
 
@@ -54,8 +61,9 @@ public class ExampleChangeMembership {
 
 		// Step 2: Change Membership
 
-		csp.setRespectNetworkMembershipInRN(cloudNumber, rnMember);
-		csp.setRespectFirstMembershipInRN(cloudNumber, rfMember);
+		if (rnMember) csp.setRespectNetworkMembershipInRN(cloudNumber);
+		if (rfMember) csp.setRespectFirstMembershipInRN(cloudNumber, rfExpirationDate);
+		if (rflMember) csp.setRespectFirstLifetimeMembershipInRN(cloudNumber);
 
 		// done
 
