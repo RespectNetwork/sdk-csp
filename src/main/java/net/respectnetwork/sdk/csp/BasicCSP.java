@@ -30,6 +30,7 @@ import xdi2.core.features.linkcontracts.operator.TrueOperator;
 import xdi2.core.features.linkcontracts.policy.PolicyRoot;
 import xdi2.core.features.nodetypes.XdiAbstractMemberOrdered;
 import xdi2.core.features.nodetypes.XdiAttributeMemberUnordered;
+import xdi2.core.features.timestamps.Timestamps;
 import xdi2.core.util.XDI3Util;
 import xdi2.core.xri3.CloudName;
 import xdi2.core.xri3.CloudNumber;
@@ -52,17 +53,16 @@ public class BasicCSP implements CSP {
 	public static final XDI3Segment XRI_S_IS_EMAIL = XDI3Segment.create("$is+email");
 
 	public static final XDI3Segment XRI_S_MEMBER = XDI3Segment.create("+member");
+	public static final XDI3Segment XRI_S_IS_MEMBER = XDI3Segment.create("$is+member");
 	public static final XDI3Segment XRI_S_EC_MEMBER = XDI3Segment.create("[+member]");
 	public static final XDI3Segment XRI_S_AS_MEMBER = XDI3Segment.create("<+member>");
-	public static final XDI3Segment XRI_S_IS_MEMBER = XDI3Segment.create("$is+member");
 	public static final XDI3Segment XRI_S_FIRST_MEMBER = XDI3Segment.create("+first+member");
-	public static final XDI3Segment XRI_S_EC_FIRST_MEMBER = XDI3Segment.create("+first[+member]");
-	public static final XDI3Segment XRI_S_AS_FIRST_MEMBER = XDI3Segment.create("<+first><+member>");
 	public static final XDI3Segment XRI_S_IS_FIRST_MEMBER = XDI3Segment.create("$is+first+member");
+	public static final XDI3Segment XRI_S_AS_FIRST_MEMBER_EXPIRATION_TIME = XDI3Segment.create("<+first><+member><+expiration><$t>");
 	public static final XDI3Segment XRI_S_FIRST_LIFETIME_MEMBER = XDI3Segment.create("+first+lifetime+member");
+	public static final XDI3Segment XRI_S_IS_FIRST_LIFETIME_MEMBER = XDI3Segment.create("$is+first+lifetime+member");
 	public static final XDI3Segment XRI_S_EC_FIRST_LIFETIME_MEMBER = XDI3Segment.create("+first+lifetime[+member]");
 	public static final XDI3Segment XRI_S_AS_FIRST_LIFETIME_MEMBER = XDI3Segment.create("<+first><+lifetime><+member>");
-	public static final XDI3Segment XRI_S_IS_FIRST_LIFETIME_MEMBER = XDI3Segment.create("$is+first+lifetime+member");
 
 	public static final XDI3Segment XRI_S_MEMBER_NEXT = XDI3Segment.create("[+member]<+next>&");
 	public static final XDI3Segment XRI_S_MEMBER_LOCK = XDI3Segment.create("[+member]<+lock>&");
@@ -598,7 +598,7 @@ public class BasicCSP implements CSP {
 		return member;
 	}
 
-	public void setRespectFirstMembershipInRN(CloudNumber cloudNumber, Date expirationDate)  throws Xdi2ClientException {
+	public void setRespectFirstMembershipInRN(CloudNumber cloudNumber, Date expirationTime)  throws Xdi2ClientException {
 
 		// prepare message to RN
 
@@ -620,6 +620,17 @@ public class BasicCSP implements CSP {
 				cloudNumber.getXri(),
 				XRI_S_IS_FIRST_MEMBER,
 				this.getCspInformation().getRnCloudNumber().getXri()));
+
+		targetStatements.add(XDI3Statement.fromComponents(
+				this.getCspInformation().getRnCloudNumber().getXri(),
+				XRI_S_FIRST_MEMBER,
+				XDI3Segment.fromComponent(
+						XDI3SubSegment.fromComponents(null, false, false, null, 
+								XDI3XRef.fromComponents(XDIConstants.XS_ROOT, null, 
+										XDI3Statement.fromLiteralComponents(
+												XDI3Util.concatXris(cloudNumber.getXri(), XRI_S_AS_FIRST_MEMBER_EXPIRATION_TIME, XDIConstants.XRI_S_VALUE), 
+												Timestamps.timestampToString(expirationTime)), 
+												null, null, null, null)))));
 
 		message.createSetOperation(targetStatements.iterator());
 

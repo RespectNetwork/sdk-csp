@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URLEncoder;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -88,6 +89,8 @@ public class ExampleRegister {
 		// step 6: Set RN/RF/RFL membership
 
 		csp.setRespectNetworkMembershipInRN(cloudNumber);
+		csp.setRespectFirstMembershipInRN(cloudNumber, new Date());
+		csp.setRespectFirstLifetimeMembershipInRN(cloudNumber);
 
 		// done
 

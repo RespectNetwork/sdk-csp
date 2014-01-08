@@ -133,7 +133,7 @@ public interface CSP {
 	 *   [A] Not used
 	 *   [B] Not used
 	 */
-	public void setRespectFirstMembershipInRN(CloudNumber cloudNumber, Date expirationDate)  throws Xdi2ClientException;
+	public void setRespectFirstMembershipInRN(CloudNumber cloudNumber, Date expirationTime)  throws Xdi2ClientException;
 
 	/**
 	 * This method retrieves a flag for a Cloud Number to indicate whether it is a member of
