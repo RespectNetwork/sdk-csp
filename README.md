@@ -18,4 +18,4 @@ To build all components.
 ### Information
 
 * [CSP Information](https://github.com/RespectNetwork/sdk-csp/wiki/CSP Information)
-* [Examples](sdk-csp/tree/master/src/main/java/net/respectnetwork/sdk/csp)
+* [Examples](src/main/java/net/respectnetwork/sdk/csp/example)
