@@ -8,7 +8,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +16,6 @@ import xdi2.client.XDIClient;
 import xdi2.client.constants.XDIClientConstants;
 import xdi2.client.exceptions.Xdi2ClientException;
 import xdi2.client.http.XDIHttpClient;
-import xdi2.core.Literal;
 import xdi2.core.Relation;
 import xdi2.core.constants.XDIAuthenticationConstants;
 import xdi2.core.constants.XDIConstants;
@@ -25,10 +23,6 @@ import xdi2.core.constants.XDIDictionaryConstants;
 import xdi2.core.constants.XDILinkContractConstants;
 import xdi2.core.features.linkcontracts.PublicLinkContract;
 import xdi2.core.features.linkcontracts.RootLinkContract;
-import xdi2.core.features.linkcontracts.condition.EqualsCondition;
-import xdi2.core.features.linkcontracts.operator.TrueOperator;
-import xdi2.core.features.linkcontracts.policy.PolicyRoot;
-import xdi2.core.features.nodetypes.XdiAbstractMemberOrdered;
 import xdi2.core.features.nodetypes.XdiAttributeMemberUnordered;
 import xdi2.core.features.timestamps.Timestamps;
 import xdi2.core.util.XDI3Util;
@@ -41,7 +35,6 @@ import xdi2.core.xri3.XDI3XRef;
 import xdi2.messaging.Message;
 import xdi2.messaging.MessageEnvelope;
 import xdi2.messaging.MessageResult;
-import xdi2.messaging.target.interceptor.impl.util.MessagePolicyEvaluationContext;
 
 public class BasicCSP implements CSP {
 
@@ -53,16 +46,9 @@ public class BasicCSP implements CSP {
 	public static final XDI3Segment XRI_S_IS_EMAIL = XDI3Segment.create("$is+email");
 
 	public static final XDI3Segment XRI_S_MEMBER = XDI3Segment.create("+member");
-	public static final XDI3Segment XRI_S_IS_MEMBER = XDI3Segment.create("$is+member");
-	public static final XDI3Segment XRI_S_EC_MEMBER = XDI3Segment.create("[+member]");
-	public static final XDI3Segment XRI_S_AS_MEMBER = XDI3Segment.create("<+member>");
 	public static final XDI3Segment XRI_S_FIRST_MEMBER = XDI3Segment.create("+first+member");
-	public static final XDI3Segment XRI_S_IS_FIRST_MEMBER = XDI3Segment.create("$is+first+member");
 	public static final XDI3Segment XRI_S_AS_FIRST_MEMBER_EXPIRATION_TIME = XDI3Segment.create("<+first><+member><+expiration><$t>");
 	public static final XDI3Segment XRI_S_FIRST_LIFETIME_MEMBER = XDI3Segment.create("+first+lifetime+member");
-	public static final XDI3Segment XRI_S_IS_FIRST_LIFETIME_MEMBER = XDI3Segment.create("$is+first+lifetime+member");
-	public static final XDI3Segment XRI_S_EC_FIRST_LIFETIME_MEMBER = XDI3Segment.create("+first+lifetime[+member]");
-	public static final XDI3Segment XRI_S_AS_FIRST_LIFETIME_MEMBER = XDI3Segment.create("<+first><+lifetime><+member>");
 
 	public static final XDI3Segment XRI_S_MEMBER_NEXT = XDI3Segment.create("[+member]<+next>&");
 	public static final XDI3Segment XRI_S_MEMBER_LOCK = XDI3Segment.create("[+member]<+lock>&");
@@ -339,12 +325,19 @@ public class BasicCSP implements CSP {
 		message.setLinkContractXri(XDILinkContractConstants.XRI_S_DO);
 		message.setSecretToken(this.getCspInformation().getCspSecretToken());
 
-		XDI3Statement targetStatementSet = XDI3Statement.fromRelationComponents(
+		List<XDI3Statement> targetStatementsSet = new ArrayList<XDI3Statement> ();
+
+		targetStatementsSet.add(XDI3Statement.fromRelationComponents(
 				XDI3Segment.fromComponent(cloudName.getPeerRootXri()), 
 				XDIDictionaryConstants.XRI_S_REF, 
-				XDI3Segment.fromComponent(cloudNumber.getPeerRootXri()));
+				XDI3Segment.fromComponent(cloudNumber.getPeerRootXri())));
 
-		message.createSetOperation(targetStatementSet);
+		targetStatementsSet.add(XDI3Statement.fromRelationComponents(
+				XDI3Segment.fromComponent(cloudNumber.getPeerRootXri()),
+				XDIDictionaryConstants.XRI_S_IS_REF, 
+				XDI3Segment.fromComponent(cloudName.getPeerRootXri())));
+
+		message.createSetOperation(targetStatementsSet.iterator());
 
 		// send message
 
@@ -475,7 +468,7 @@ public class BasicCSP implements CSP {
 
 	public void setRespectNetworkMembershipInRN(CloudNumber cloudNumber)  throws Xdi2ClientException {
 
-		// prepare message 1 to RN
+/*		// prepare message 1 to RN
 
 		MessageEnvelope messageEnvelope1 = new MessageEnvelope();
 
@@ -564,7 +557,33 @@ public class BasicCSP implements CSP {
 
 		// done
 
-		log.debug("In RN: Respect Network membership with number " + next + " set for Cloud Number " + cloudNumber);
+		log.debug("In RN: Respect Network membership with number " + next + " set for Cloud Number " + cloudNumber);*/
+
+		// prepare message to RN
+
+		MessageEnvelope messageEnvelope = new MessageEnvelope();
+
+		Message message = messageEnvelope.getMessageCollection(this.getCspInformation().getCspCloudNumber().getXri(), true).createMessage();
+		message.setToPeerRootXri(this.getCspInformation().getRnCloudNumber().getPeerRootXri());
+		message.setLinkContractXri(this.getCspInformation().getRnCspLinkContract());
+		message.setSecretToken(this.getCspInformation().getCspSecretToken());
+
+		List<XDI3Statement> targetStatements = new ArrayList<XDI3Statement> ();
+
+		targetStatements.add(XDI3Statement.fromRelationComponents(
+				this.getCspInformation().getRnCloudNumber().getXri(),
+				XRI_S_MEMBER,
+				cloudNumber.getXri()));
+
+		message.createSetOperation(targetStatements.iterator());
+
+		// send message
+
+		this.getXdiClientRNRegistrationService().send(messageEnvelope, null);
+
+		// done
+
+		log.debug("In RN: Respect Network membership set for Cloud Number " + cloudNumber);
 	}
 
 	public boolean checkRespectNetworkMembershipInRN(CloudNumber cloudNumber) throws Xdi2ClientException {
@@ -615,11 +634,6 @@ public class BasicCSP implements CSP {
 				this.getCspInformation().getRnCloudNumber().getXri(),
 				XRI_S_FIRST_MEMBER,
 				cloudNumber.getXri()));
-
-		targetStatements.add(XDI3Statement.fromRelationComponents(
-				cloudNumber.getXri(),
-				XRI_S_IS_FIRST_MEMBER,
-				this.getCspInformation().getRnCloudNumber().getXri()));
 
 		targetStatements.add(XDI3Statement.fromComponents(
 				this.getCspInformation().getRnCloudNumber().getXri(),
@@ -676,7 +690,7 @@ public class BasicCSP implements CSP {
 
 	public void setRespectFirstLifetimeMembershipInRN(CloudNumber cloudNumber)  throws Xdi2ClientException {
 
-		// prepare message 1 to RN
+/*		// prepare message 1 to RN
 
 		MessageEnvelope messageEnvelope1 = new MessageEnvelope();
 
@@ -765,7 +779,33 @@ public class BasicCSP implements CSP {
 
 		// done
 
-		log.debug("In RN: Respect First Lifetime membership with number " + next + " set for Cloud Number " + cloudNumber);
+		log.debug("In RN: Respect First Lifetime membership with number " + next + " set for Cloud Number " + cloudNumber);*/
+
+		// prepare message to RN
+
+		MessageEnvelope messageEnvelope = new MessageEnvelope();
+
+		Message message = messageEnvelope.getMessageCollection(this.getCspInformation().getCspCloudNumber().getXri(), true).createMessage();
+		message.setToPeerRootXri(this.getCspInformation().getRnCloudNumber().getPeerRootXri());
+		message.setLinkContractXri(this.getCspInformation().getRnCspLinkContract());
+		message.setSecretToken(this.getCspInformation().getCspSecretToken());
+
+		List<XDI3Statement> targetStatements = new ArrayList<XDI3Statement> ();
+
+		targetStatements.add(XDI3Statement.fromRelationComponents(
+				this.getCspInformation().getRnCloudNumber().getXri(),
+				XRI_S_FIRST_LIFETIME_MEMBER,
+				cloudNumber.getXri()));
+
+		message.createSetOperation(targetStatements.iterator());
+
+		// send message
+
+		this.getXdiClientRNRegistrationService().send(messageEnvelope, null);
+
+		// done
+
+		log.debug("In RN: Respect First Lifetime membership set for Cloud Number " + cloudNumber);
 	}
 
 	public boolean checkRespectFirstLifetimeMembershipInRN(CloudNumber cloudNumber) throws Xdi2ClientException {
@@ -918,11 +958,6 @@ public class BasicCSP implements CSP {
 
 			throw new RuntimeException(ex.getMessage(), ex);
 		}
-	}
-
-	private static String makeOptimisticLockCode() {
-
-		return UUID.randomUUID().toString().substring(0, 8);
 	}
 
 	/*
