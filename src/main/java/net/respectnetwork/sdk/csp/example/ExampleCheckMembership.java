@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import net.respectnetwork.sdk.csp.BasicCSP;
 import net.respectnetwork.sdk.csp.CSP;
 import net.respectnetwork.sdk.csp.CSPInformation;
+import net.respectnetwork.sdk.csp.TrustAllTrustManager;
 import xdi2.client.exceptions.Xdi2ClientException;
 import xdi2.core.xri3.CloudName;
 import xdi2.core.xri3.CloudNumber;
@@ -29,6 +30,8 @@ public class ExampleCheckMembership {
 	}
 
 	public static void main(String[] args) throws Xdi2ClientException {
+
+		TrustAllTrustManager.trustAll();
 
 		CloudNumber cloudNumber;
 
