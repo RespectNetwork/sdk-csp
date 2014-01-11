@@ -59,10 +59,10 @@ public interface CSP {
 	public CloudNumber[] checkPhoneAndEmailAvailableInRN(String verifiedPhone, String verifiedEmail) throws Xdi2ClientException;
 
 	/**
-	 * This method registers a new Cloud Name and Cloud Number in the RN Registration Service.
+	 * This method registers a new Cloud Name and Cloud Number in the RN Registration Service and
+	 * RN Member Graph Service.
 	 * In addition:
-	 *   - this registers the Cloud Name and Cloud Number in the RN Member Graph Service.
-	 *   - this registers the User Cloud's XDI endpoint in the RN Registration Service.
+	 *   - this registers the User Cloud's XDI endpoint in the RN Registration Service and RN Member Graph Service.
 	 *   - this optionally registers a verified phone number and verified e-mail address in the RN Member Graph Service.
 	 * Used in:
 	 *   [A] 5.1.1.3
@@ -91,7 +91,7 @@ public interface CSP {
 	 */
 
 	/**
-	 * This method updates a User Cloud's XDI endpoint in the RN Registration Service.
+	 * This method registers or updates a User Cloud's XDI endpoint in the RN Registration Service and RN Member Graph Service.
 	 * Normally, it is not necessary to call this, since it is automatically done by the registerCloudNameInRN() method.
 	 * Used in:
 	 *   [A] Not used
@@ -100,7 +100,7 @@ public interface CSP {
 	public void setCloudXdiEndpointInRN(CloudNumber cloudNumber, String cloudXdiEndpoint) throws Xdi2ClientException;
 
 	/**
-	 * This methods updates a verified phone number and verified e-mail address in the RN Member Graph Service.
+	 * This methods registers or updates a verified phone number and verified e-mail address in the RN Member Graph Service.
 	 * Normally, it is not necessary to call this, since it is automatically done by the registerCloudNameInRN() method.
 	 * Used in:
 	 *   [A] Not used
@@ -167,7 +167,7 @@ public interface CSP {
 	 */
 
 	/**
-	 * This method updates a User Cloud's XDI endpoint in the CSP Cloud.
+	 * This method registers or updates a User Cloud's XDI endpoint in the CSP Cloud.
 	 * Normally, it is not necessary to call this, since it is automatically done by the registerCloudInCSP() method.
 	 * Used in:
 	 *   [A] Not used
@@ -176,7 +176,7 @@ public interface CSP {
 	public void setCloudXdiEndpointInCSP(CloudNumber cloudNumber, String cloudXdiEndpoint) throws Xdi2ClientException;
 
 	/**
-	 * This method updates a User Cloud's secret token in the CSP Cloud.
+	 * This method registers or updates a User Cloud's secret token in the CSP Cloud.
 	 * Normally, it is not necessary to call this, since it is automatically done by the registerCloudInCSP() method.
 	 * Used in:
 	 *   [A] 5.1.1.1
@@ -189,7 +189,7 @@ public interface CSP {
 	 */
 
 	/**
-	 * This method updates additional services in a User Cloud.
+	 * This method registers or updates additional services in a User Cloud.
 	 * Used in:
 	 *   [A] 2.1.1.4
 	 *   [B] 3.1.1.4
@@ -197,7 +197,7 @@ public interface CSP {
 	public void setCloudServicesInCloud(CloudNumber cloudNumber, String secretToken, Map<XDI3Segment, String> services) throws Xdi2ClientException;
 
 	/**
-	 * This methods updates a verified phone number and verified e-mail address in the User's Cloud.
+	 * This methods registers or updates a verified phone number and verified e-mail address in the User's Cloud.
 	 * Used in:
 	 *   [A] 3.1.1.3
 	 *   [B] 4.1.1.2
