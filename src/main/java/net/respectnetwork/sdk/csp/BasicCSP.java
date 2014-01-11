@@ -26,6 +26,11 @@ import xdi2.core.features.linkcontracts.RootLinkContract;
 import xdi2.core.features.nodetypes.XdiAttributeMemberUnordered;
 import xdi2.core.features.timestamps.Timestamps;
 import xdi2.core.util.XDI3Util;
+import xdi2.core.util.iterators.IteratorArrayMaker;
+import xdi2.core.util.iterators.MappingCloudNameIterator;
+import xdi2.core.util.iterators.MappingRelationTargetContextNodeXriIterator;
+import xdi2.core.util.iterators.NotNullIterator;
+import xdi2.core.util.iterators.ReadOnlyIterator;
 import xdi2.core.xri3.CloudName;
 import xdi2.core.xri3.CloudNumber;
 import xdi2.core.xri3.XDI3Segment;
@@ -74,10 +79,6 @@ public class BasicCSP implements CSP {
 		this.xdiClientRNRegistrationService = new XDIHttpClient(cspInformation.getRnRegistrationServiceXdiEndpoint());
 	}
 
-	/*
-	 * Methods for registering User Clouds
-	 */
-
 	public void registerCloudInCSP(CloudNumber cloudNumber, String secretToken) throws Xdi2ClientException {
 
 		// prepare message to CSP
@@ -115,10 +116,6 @@ public class BasicCSP implements CSP {
 		log.debug("In CSP: Cloud registered with Cloud Number " + cloudNumber + " and Secret Token and Cloud XDI endpoint " + cloudXdiEndpoint);
 	}
 
-	/*
-	 * Methods for registering Cloud Names
-	 */
-
 	public CloudNumber checkCloudNameAvailableInRN(CloudName cloudName) throws Xdi2ClientException {
 
 		CloudNumber cloudNumber = null;
@@ -136,7 +133,7 @@ public class BasicCSP implements CSP {
 
 		message.createGetOperation(targetAddress);
 
-		// send message
+		// send message and read result
 
 		MessageResult messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope, null);
 
@@ -413,10 +410,6 @@ public class BasicCSP implements CSP {
 		log.debug("In Cloud: Cloud Name " + cloudName + " registered with Cloud Number " + cloudNumber);
 	}
 
-	/*
-	 * Methods for updating User Clouds or Cloud Names after they have been registered  
-	 */
-
 	public void setCloudXdiEndpointInRN(CloudNumber cloudNumber, String cloudXdiEndpoint) throws Xdi2ClientException {
 
 		// auto-generate XDI endpoint
@@ -488,97 +481,6 @@ public class BasicCSP implements CSP {
 	}
 
 	public void setRespectNetworkMembershipInRN(CloudNumber cloudNumber)  throws Xdi2ClientException {
-
-		/*		// prepare message 1 to RN
-
-		MessageEnvelope messageEnvelope1 = new MessageEnvelope();
-
-		Message message1 = messageEnvelope1.getMessageCollection(this.getCspInformation().getCspCloudNumber().getXri(), true).createMessage();
-		message1.setToPeerRootXri(this.getCspInformation().getRnCloudNumber().getPeerRootXri());
-		message1.setLinkContractXri(this.getCspInformation().getRnCspLinkContract());
-		message1.setSecretToken(this.getCspInformation().getCspSecretToken());
-
-		XDI3Segment targetAddress1 = XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_MEMBER_NEXT);
-		XDI3Segment targetAddress2 = XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_MEMBER_LOCK);
-
-		message1.createGetOperation(targetAddress1);
-		message1.createGetOperation(targetAddress2);
-
-		// send message and read result
-
-		MessageResult messageResult1 = this.getXdiClientRNRegistrationService().send(messageEnvelope1, null);
-
-		Literal literal1 = messageResult1.getGraph().getDeepLiteral(targetAddress1);
-		Literal literal2 = messageResult1.getGraph().getDeepLiteral(targetAddress2);
-
-		Double next = literal1 == null ? null : literal1.getLiteralDataNumber();
-		if (next == null) throw new RuntimeException("Cannot find number literal at " + targetAddress1);
-
-		String lock = literal2 == null ? null : literal2.getLiteralDataString();
-		if (lock == null) throw new RuntimeException("Cannot find string literal at " + targetAddress2);
-
-		// prepare message 2 to RN
-
-		MessageEnvelope messageEnvelope2 = new MessageEnvelope();
-
-		Message message2 = messageEnvelope2.getMessageCollection(this.getCspInformation().getCspCloudNumber().getXri(), true).createMessage();
-		message2.setToPeerRootXri(this.getCspInformation().getRnCloudNumber().getPeerRootXri());
-		message2.setLinkContractXri(this.getCspInformation().getRnCspLinkContract());
-		message2.setSecretToken(this.getCspInformation().getCspSecretToken());
-
-		message2.getContextNode().setDeepLiteralString(XRI_S_MEMBER_LOCK, lock);
-
-		PolicyRoot policyRoot = message2.getPolicyRoot(true);
-		EqualsCondition equalsCondition = EqualsCondition.fromSubjectAndObject(
-				XDI3Util.concatXris(MessagePolicyEvaluationContext.XRI_S_MSG_VARIABLE, XRI_S_MEMBER_LOCK), 
-				targetAddress2);
-		TrueOperator.createTrueOperator(policyRoot, equalsCondition);
-
-		List<XDI3Statement> targetStatements = new ArrayList<XDI3Statement> ();
-
-		targetStatements.add(XDI3Statement.fromRelationComponents(
-				this.getCspInformation().getRnCloudNumber().getXri(),
-				XRI_S_MEMBER,
-				cloudNumber.getXri()));
-
-		targetStatements.add(XDI3Statement.fromRelationComponents(
-				cloudNumber.getXri(),
-				XRI_S_IS_MEMBER,
-				this.getCspInformation().getRnCloudNumber().getXri()));
-
-		targetStatements.add(XDI3Statement.fromComponents(
-				this.getCspInformation().getRnCloudNumber().getXri(),
-				XRI_S_MEMBER,
-				XDI3Segment.fromComponent(
-						XDI3SubSegment.fromComponents(null, false, false, null, 
-								XDI3XRef.fromComponents(XDIConstants.XS_ROOT, null, 
-										XDI3Statement.fromLiteralComponents(
-												XDI3Util.concatXris(cloudNumber.getXri(), XRI_S_AS_MEMBER, XDIConstants.XRI_S_VALUE), 
-												next), 
-												null, null, null, null)))));
-
-		targetStatements.add(XDI3Statement.fromRelationComponents(
-				XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_EC_MEMBER, XDI3Segment.fromComponent(XdiAbstractMemberOrdered.createArcXri(Integer.toString(next.intValue()), false))),
-				XDIDictionaryConstants.XRI_S_IS,
-				cloudNumber.getXri()));
-
-		targetStatements.add(XDI3Statement.fromLiteralComponents(
-				XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_MEMBER_NEXT), 
-				next + 1));
-
-		targetStatements.add(XDI3Statement.fromLiteralComponents(
-				XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_MEMBER_LOCK), 
-				makeOptimisticLockCode()));
-
-		message2.createSetOperation(targetStatements.iterator());
-
-		// send message
-
-		this.getXdiClientRNRegistrationService().send(messageEnvelope2, null);
-
-		// done
-
-		log.debug("In RN: Respect Network membership with number " + next + " set for Cloud Number " + cloudNumber);*/
 
 		// prepare message to RN
 
@@ -711,97 +613,6 @@ public class BasicCSP implements CSP {
 
 	public void setRespectFirstLifetimeMembershipInRN(CloudNumber cloudNumber)  throws Xdi2ClientException {
 
-		/*		// prepare message 1 to RN
-
-		MessageEnvelope messageEnvelope1 = new MessageEnvelope();
-
-		Message message1 = messageEnvelope1.getMessageCollection(this.getCspInformation().getCspCloudNumber().getXri(), true).createMessage();
-		message1.setToPeerRootXri(this.getCspInformation().getRnCloudNumber().getPeerRootXri());
-		message1.setLinkContractXri(this.getCspInformation().getRnCspLinkContract());
-		message1.setSecretToken(this.getCspInformation().getCspSecretToken());
-
-		XDI3Segment targetAddress1 = XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_FIRST_LIFETIME_MEMBER_NEXT);
-		XDI3Segment targetAddress2 = XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_FIRST_LIFETIME_MEMBER_LOCK);
-
-		message1.createGetOperation(targetAddress1);
-		message1.createGetOperation(targetAddress2);
-
-		// send message and read result
-
-		MessageResult messageResult1 = this.getXdiClientRNRegistrationService().send(messageEnvelope1, null);
-
-		Literal literal1 = messageResult1.getGraph().getDeepLiteral(targetAddress1);
-		Literal literal2 = messageResult1.getGraph().getDeepLiteral(targetAddress2);
-
-		Double next = literal1 == null ? null : literal1.getLiteralDataNumber();
-		if (next == null) throw new RuntimeException("Cannot find number literal at " + targetAddress1);
-
-		String lock = literal2 == null ? null : literal2.getLiteralDataString();
-		if (lock == null) throw new RuntimeException("Cannot find string literal at " + targetAddress2);
-
-		// prepare message 2 to RN
-
-		MessageEnvelope messageEnvelope2 = new MessageEnvelope();
-
-		Message message2 = messageEnvelope2.getMessageCollection(this.getCspInformation().getCspCloudNumber().getXri(), true).createMessage();
-		message2.setToPeerRootXri(this.getCspInformation().getRnCloudNumber().getPeerRootXri());
-		message2.setLinkContractXri(this.getCspInformation().getRnCspLinkContract());
-		message2.setSecretToken(this.getCspInformation().getCspSecretToken());
-
-		message2.getContextNode().setDeepLiteralString(XRI_S_FIRST_LIFETIME_MEMBER_LOCK, lock);
-
-		PolicyRoot policyRoot = message2.getPolicyRoot(true);
-		EqualsCondition equalsCondition = EqualsCondition.fromSubjectAndObject(
-				XDI3Util.concatXris(MessagePolicyEvaluationContext.XRI_S_MSG_VARIABLE, XRI_S_FIRST_LIFETIME_MEMBER_LOCK), 
-				targetAddress2);
-		TrueOperator.createTrueOperator(policyRoot, equalsCondition);
-
-		List<XDI3Statement> targetStatements = new ArrayList<XDI3Statement> ();
-
-		targetStatements.add(XDI3Statement.fromRelationComponents(
-				this.getCspInformation().getRnCloudNumber().getXri(),
-				XRI_S_FIRST_LIFETIME_MEMBER,
-				cloudNumber.getXri()));
-
-		targetStatements.add(XDI3Statement.fromRelationComponents(
-				cloudNumber.getXri(),
-				XRI_S_IS_FIRST_LIFETIME_MEMBER,
-				this.getCspInformation().getRnCloudNumber().getXri()));
-
-		targetStatements.add(XDI3Statement.fromComponents(
-				this.getCspInformation().getRnCloudNumber().getXri(),
-				XRI_S_FIRST_LIFETIME_MEMBER,
-				XDI3Segment.fromComponent(
-						XDI3SubSegment.fromComponents(null, false, false, null, 
-								XDI3XRef.fromComponents(XDIConstants.XS_ROOT, null, 
-										XDI3Statement.fromLiteralComponents(
-												XDI3Util.concatXris(cloudNumber.getXri(), XRI_S_AS_FIRST_LIFETIME_MEMBER, XDIConstants.XRI_S_VALUE), 
-												next), 
-												null, null, null, null)))));
-
-		targetStatements.add(XDI3Statement.fromRelationComponents(
-				XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_EC_FIRST_LIFETIME_MEMBER, XDI3Segment.fromComponent(XdiAbstractMemberOrdered.createArcXri(Integer.toString(next.intValue()), false))),
-				XDIDictionaryConstants.XRI_S_IS,
-				cloudNumber.getXri()));
-
-		targetStatements.add(XDI3Statement.fromLiteralComponents(
-				XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_FIRST_LIFETIME_MEMBER_NEXT), 
-				next + 1));
-
-		targetStatements.add(XDI3Statement.fromLiteralComponents(
-				XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_FIRST_LIFETIME_MEMBER_LOCK), 
-				makeOptimisticLockCode()));
-
-		message2.createSetOperation(targetStatements.iterator());
-
-		// send message
-
-		this.getXdiClientRNRegistrationService().send(messageEnvelope2, null);
-
-		// done
-
-		log.debug("In RN: Respect First Lifetime membership with number " + next + " set for Cloud Number " + cloudNumber);*/
-
 		// prepare message to RN
 
 		MessageEnvelope messageEnvelope = new MessageEnvelope();
@@ -811,14 +622,14 @@ public class BasicCSP implements CSP {
 		message.setLinkContractXri(this.getCspInformation().getRnCspLinkContract());
 		message.setSecretToken(this.getCspInformation().getCspSecretToken());
 
-		List<XDI3Statement> targetStatements = new ArrayList<XDI3Statement> ();
+		List<XDI3Statement> targetStatementsSet = new ArrayList<XDI3Statement> ();
 
-		targetStatements.add(XDI3Statement.fromRelationComponents(
+		targetStatementsSet.add(XDI3Statement.fromRelationComponents(
 				this.getCspInformation().getRnCloudNumber().getXri(),
 				XRI_S_FIRST_LIFETIME_MEMBER,
 				cloudNumber.getXri()));
 
-		message.createSetOperation(targetStatements.iterator());
+		message.createSetOperation(targetStatementsSet.iterator());
 
 		// send message
 
@@ -840,18 +651,18 @@ public class BasicCSP implements CSP {
 		message.setLinkContractXri(this.getCspInformation().getRnCspLinkContract());
 		message.setSecretToken(this.getCspInformation().getCspSecretToken());
 
-		XDI3Statement targetStatement = XDI3Statement.fromRelationComponents(
+		XDI3Statement targetStatementGet = XDI3Statement.fromRelationComponents(
 				this.getCspInformation().getRnCloudNumber().getXri(),
 				XRI_S_FIRST_LIFETIME_MEMBER,
 				cloudNumber.getXri());
 
-		message.createGetOperation(targetStatement);
+		message.createGetOperation(targetStatementGet);
 
 		// send message and read result
 
 		MessageResult messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope, null);
 
-		boolean member = messageResult.getGraph().containsStatement(targetStatement);
+		boolean member = messageResult.getGraph().containsStatement(targetStatementGet);
 
 		// done
 
@@ -906,11 +717,11 @@ public class BasicCSP implements CSP {
 		message.setLinkContractXri(RootLinkContract.createRootLinkContractXri(this.getCspInformation().getCspCloudNumber().getXri()));
 		message.setSecretToken(this.getCspInformation().getCspSecretToken());
 
-		XDI3Statement[] targetStatementsDoDigestSecretToken = new XDI3Statement[] {
-				XDI3Statement.fromLiteralComponents(XDI3Util.concatXris(XDI3Segment.fromComponent(cloudNumber.getPeerRootXri()), XDIAuthenticationConstants.XRI_S_DIGEST_SECRET_TOKEN, XDIConstants.XRI_S_VALUE), secretToken)
-		};
+		XDI3Statement targetStatementsDoDigestSecretToken = XDI3Statement.fromLiteralComponents(
+				XDI3Util.concatXris(XDI3Segment.fromComponent(cloudNumber.getPeerRootXri()), XDIAuthenticationConstants.XRI_S_DIGEST_SECRET_TOKEN, XDIConstants.XRI_S_VALUE), 
+				secretToken);
 
-		message.createOperation(XDI3Segment.create("$do<$digest><$secret><$token>"), Arrays.asList(targetStatementsDoDigestSecretToken).iterator());
+		message.createOperation(XDI3Segment.create("$do<$digest><$secret><$token>"), targetStatementsDoDigestSecretToken);
 
 		// send message
 
@@ -919,6 +730,42 @@ public class BasicCSP implements CSP {
 		// done
 
 		log.debug("In CSP: Secret token set for Cloud Number " + cloudNumber);
+	}
+
+	public CloudName[] checkCloudNamesInCSP(CloudNumber cloudNumber) throws Xdi2ClientException {
+
+		// prepare message to RN
+
+		MessageEnvelope messageEnvelope = new MessageEnvelope();
+
+		Message message = messageEnvelope.createMessage(this.getCspInformation().getCspCloudNumber().getXri());
+		message.setToPeerRootXri(this.getCspInformation().getRnCloudNumber().getPeerRootXri());
+		message.setLinkContractXri(this.getCspInformation().getRnCspLinkContract());
+		message.setSecretToken(this.getCspInformation().getCspSecretToken());
+
+		XDI3Statement targetStatementGet = XDI3Statement.fromRelationComponents(
+				XDI3Segment.fromComponent(cloudNumber.getPeerRootXri()),
+				XDIDictionaryConstants.XRI_S_IS_REF,
+				XDIConstants.XRI_S_VARIABLE);
+
+		message.createGetOperation(targetStatementGet);
+
+		// send message and read results
+
+		MessageResult messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope, null);
+
+		ReadOnlyIterator<Relation> relations = messageResult.getGraph().getDeepRelations(XDI3Segment.fromComponent(cloudNumber.getPeerRootXri()), XDIDictionaryConstants.XRI_S_IS_REF);
+
+		CloudName[] cloudNames = new IteratorArrayMaker<CloudName> (
+				new NotNullIterator<CloudName> (
+						new MappingCloudNameIterator(
+								new MappingRelationTargetContextNodeXriIterator(relations)
+								))).array(CloudName.class);
+
+		// done
+
+		log.debug("In CSP: For Cloud Number " + cloudNumber + " found Cloud Names " + Arrays.asList(cloudNames));
+		return cloudNames;
 	}
 
 	public void authenticateInCloud(CloudNumber cloudNumber, String secretToken) throws Xdi2ClientException {
@@ -948,7 +795,7 @@ public class BasicCSP implements CSP {
 
 		log.debug("In Cloud: Authenticated Cloud Number");
 	}
-	
+
 	public void setCloudServicesInCloud(CloudNumber cloudNumber, String secretToken, Map<XDI3Segment, String> services) throws Xdi2ClientException {
 
 		// prepare message to Cloud

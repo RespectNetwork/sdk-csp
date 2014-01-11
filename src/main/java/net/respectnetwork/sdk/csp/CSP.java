@@ -87,7 +87,7 @@ public interface CSP {
 	public void registerCloudNameInCloud(CloudName cloudName, CloudNumber cloudNumber, String secretToken) throws Xdi2ClientException;
 
 	/*
-	 * Methods for updating RN information for existing Cloud Numbers and Clouds.
+	 * Methods for updating and querying RN information for existing Cloud Numbers and Clouds.
 	 */
 
 	/**
@@ -163,7 +163,7 @@ public interface CSP {
 	public boolean checkRespectFirstLifetimeMembershipInRN(CloudNumber cloudNumber) throws Xdi2ClientException;
 
 	/*
-	 * Methods for updating CSP information for existing Cloud Numbers and Clouds.
+	 * Methods for updating and querying CSP information for existing Cloud Numbers and Clouds.
 	 */
 
 	/**
@@ -183,6 +183,14 @@ public interface CSP {
 	 *   [B] Not used
 	 */
 	public void setCloudSecretTokenInCSP(CloudNumber cloudNumber, String secretToken) throws Xdi2ClientException;
+
+	/**
+	 * This method checks what Cloud Names exist for a given Cloud Number.
+	 * Used in:
+	 *   [A] Not used
+	 *   [B] Not used
+	 */
+	public CloudName[] checkCloudNamesInCSP(CloudNumber cloudNumber) throws Xdi2ClientException;
 
 	/*
 	 * Methods for updating Cloud information for existing Cloud Numbers and Clouds.
