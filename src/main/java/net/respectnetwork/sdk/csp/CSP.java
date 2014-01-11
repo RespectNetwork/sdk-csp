@@ -189,7 +189,15 @@ public interface CSP {
 	 */
 
 	/**
-	 * This method registers or updates additional services in a User Cloud.
+	 * This method checks if a given secret token is correct for the User Cloud.
+	 * Used in:
+	 *   [A] Not used
+	 *   [B] Not used
+	 */
+	public void authenticateInCloud(CloudNumber cloudNumber, String secretToken) throws Xdi2ClientException;
+
+	/**
+	 * This method registers or updates additional discoverable services in a User Cloud.
 	 * Used in:
 	 *   [A] 2.1.1.4
 	 *   [B] 3.1.1.4
@@ -197,7 +205,7 @@ public interface CSP {
 	public void setCloudServicesInCloud(CloudNumber cloudNumber, String secretToken, Map<XDI3Segment, String> services) throws Xdi2ClientException;
 
 	/**
-	 * This methods registers or updates a verified phone number and verified e-mail address in the User's Cloud.
+	 * This method registers or updates a verified phone number and verified e-mail address in the User's Cloud.
 	 * Used in:
 	 *   [A] 3.1.1.3
 	 *   [B] 4.1.1.2

@@ -40,8 +40,10 @@ public class BasicCSP implements CSP {
 
 	private static final Logger log = LoggerFactory.getLogger(BasicCSP.class);
 
-	public static final XDI3Segment XRI_S_VERIFIED_DIGEST_PHONE = XDI3Segment.create("<+verified><$digest>[<+phone>]");
-	public static final XDI3Segment XRI_S_VERIFIED_DIGEST_EMAIL = XDI3Segment.create("<+verified><$digest>[<+email>]");
+	public static final XDI3Segment XRI_S_AC_VERIFIED_DIGEST_PHONE = XDI3Segment.create("<+verified><$digest>[<+phone>]");
+	public static final XDI3Segment XRI_S_AC_VERIFIED_DIGEST_EMAIL = XDI3Segment.create("<+verified><$digest>[<+email>]");
+	public static final XDI3Segment XRI_S_AS_VERIFIED_PHONE = XDI3Segment.create("<+verified><+phone>");
+	public static final XDI3Segment XRI_S_AS_VERIFIED_EMAIL = XDI3Segment.create("<+verified><+email>");
 	public static final XDI3Segment XRI_S_IS_PHONE = XDI3Segment.create("$is+phone");
 	public static final XDI3Segment XRI_S_IS_EMAIL = XDI3Segment.create("$is+email");
 
@@ -84,7 +86,7 @@ public class BasicCSP implements CSP {
 
 		Message message = messageEnvelope.createMessage(this.getCspInformation().getCspCloudNumber().getXri());
 		message.setToPeerRootXri(this.getCspInformation().getCspCloudNumber().getPeerRootXri());
-		message.setLinkContractXri(XDILinkContractConstants.XRI_S_DO);
+		message.setLinkContractXri(RootLinkContract.createRootLinkContractXri(this.getCspInformation().getCspCloudNumber().getXri()));
 		message.setSecretToken(this.getCspInformation().getCspSecretToken());
 
 		String cloudXdiEndpoint = makeCloudXdiEndpoint(this.getCspInformation(), cloudNumber);
@@ -164,8 +166,8 @@ public class BasicCSP implements CSP {
 		message.setLinkContractXri(this.getCspInformation().getRnCspLinkContract());
 		message.setSecretToken(this.getCspInformation().getCspSecretToken());
 
-		XDI3Segment targetAddress1 = verifiedPhone == null ? null : XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_VERIFIED_DIGEST_PHONE, XDI3Segment.fromComponent(XdiAttributeMemberUnordered.createDigestArcXri(verifiedPhone, true)));
-		XDI3Segment targetAddress2 = verifiedEmail == null ? null : XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_VERIFIED_DIGEST_EMAIL, XDI3Segment.fromComponent(XdiAttributeMemberUnordered.createDigestArcXri(verifiedEmail, true)));
+		XDI3Segment targetAddress1 = verifiedPhone == null ? null : XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_AC_VERIFIED_DIGEST_PHONE, XDI3Segment.fromComponent(XdiAttributeMemberUnordered.createDigestArcXri(verifiedPhone, true)));
+		XDI3Segment targetAddress2 = verifiedEmail == null ? null : XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_AC_VERIFIED_DIGEST_EMAIL, XDI3Segment.fromComponent(XdiAttributeMemberUnordered.createDigestArcXri(verifiedEmail, true)));
 
 		if (targetAddress1 != null) message.createGetOperation(targetAddress1);
 		if (targetAddress2 != null) message.createGetOperation(targetAddress2);
@@ -303,7 +305,7 @@ public class BasicCSP implements CSP {
 		if (verifiedPhone != null) {
 
 			targetStatementsSet3.add(XDI3Statement.fromRelationComponents(
-					XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_VERIFIED_DIGEST_PHONE, XDI3Segment.fromComponent(XdiAttributeMemberUnordered.createDigestArcXri(verifiedPhone, true))),
+					XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_AC_VERIFIED_DIGEST_PHONE, XDI3Segment.fromComponent(XdiAttributeMemberUnordered.createDigestArcXri(verifiedPhone, true))),
 					XRI_S_IS_PHONE,
 					cloudNumber.getXri()));
 		}
@@ -311,7 +313,7 @@ public class BasicCSP implements CSP {
 		if (verifiedEmail != null) {
 
 			targetStatementsSet3.add(XDI3Statement.fromRelationComponents(
-					XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_VERIFIED_DIGEST_EMAIL, XDI3Segment.fromComponent(XdiAttributeMemberUnordered.createDigestArcXri(verifiedEmail, true))),
+					XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_AC_VERIFIED_DIGEST_EMAIL, XDI3Segment.fromComponent(XdiAttributeMemberUnordered.createDigestArcXri(verifiedEmail, true))),
 					XRI_S_IS_EMAIL,
 					cloudNumber.getXri()));
 		}
@@ -341,7 +343,7 @@ public class BasicCSP implements CSP {
 
 		Message message = messageEnvelope.createMessage(this.getCspInformation().getCspCloudNumber().getXri());
 		message.setToPeerRootXri(this.getCspInformation().getCspCloudNumber().getPeerRootXri());
-		message.setLinkContractXri(XDILinkContractConstants.XRI_S_DO);
+		message.setLinkContractXri(RootLinkContract.createRootLinkContractXri(this.getCspInformation().getCspCloudNumber().getXri()));
 		message.setSecretToken(this.getCspInformation().getCspSecretToken());
 
 		List<XDI3Statement> targetStatementsSet = new ArrayList<XDI3Statement> ();
@@ -461,7 +463,7 @@ public class BasicCSP implements CSP {
 		if (verifiedPhone != null) {
 
 			targetStatementsSet.add(XDI3Statement.fromRelationComponents(
-					XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_VERIFIED_DIGEST_PHONE, XDI3Segment.fromComponent(XdiAttributeMemberUnordered.createDigestArcXri(verifiedPhone, true))),
+					XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_AC_VERIFIED_DIGEST_PHONE, XDI3Segment.fromComponent(XdiAttributeMemberUnordered.createDigestArcXri(verifiedPhone, true))),
 					XRI_S_IS_PHONE,
 					cloudNumber.getXri()));
 		}
@@ -469,7 +471,7 @@ public class BasicCSP implements CSP {
 		if (verifiedEmail != null) {
 
 			targetStatementsSet.add(XDI3Statement.fromRelationComponents(
-					XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_VERIFIED_DIGEST_EMAIL, XDI3Segment.fromComponent(XdiAttributeMemberUnordered.createDigestArcXri(verifiedEmail, true))),
+					XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_AC_VERIFIED_DIGEST_EMAIL, XDI3Segment.fromComponent(XdiAttributeMemberUnordered.createDigestArcXri(verifiedEmail, true))),
 					XRI_S_IS_EMAIL,
 					cloudNumber.getXri()));
 		}
@@ -873,7 +875,7 @@ public class BasicCSP implements CSP {
 
 		Message message = messageEnvelope.createMessage(this.getCspInformation().getCspCloudNumber().getXri());
 		message.setToPeerRootXri(this.getCspInformation().getCspCloudNumber().getPeerRootXri());
-		message.setLinkContractXri(XDILinkContractConstants.XRI_S_DO);
+		message.setLinkContractXri(RootLinkContract.createRootLinkContractXri(this.getCspInformation().getCspCloudNumber().getXri()));
 		message.setSecretToken(this.getCspInformation().getCspSecretToken());
 
 		cloudXdiEndpoint = makeCloudXdiEndpoint(this.getCspInformation(), cloudNumber);
@@ -901,7 +903,7 @@ public class BasicCSP implements CSP {
 
 		Message message = messageEnvelope.createMessage(this.getCspInformation().getCspCloudNumber().getXri());
 		message.setToPeerRootXri(this.getCspInformation().getCspCloudNumber().getPeerRootXri());
-		message.setLinkContractXri(XDILinkContractConstants.XRI_S_DO);
+		message.setLinkContractXri(RootLinkContract.createRootLinkContractXri(this.getCspInformation().getCspCloudNumber().getXri()));
 		message.setSecretToken(this.getCspInformation().getCspSecretToken());
 
 		XDI3Statement[] targetStatementsDoDigestSecretToken = new XDI3Statement[] {
@@ -919,6 +921,34 @@ public class BasicCSP implements CSP {
 		log.debug("In CSP: Secret token set for Cloud Number " + cloudNumber);
 	}
 
+	public void authenticateInCloud(CloudNumber cloudNumber, String secretToken) throws Xdi2ClientException {
+
+		// prepare message to Cloud
+
+		MessageEnvelope messageEnvelope = new MessageEnvelope();
+
+		Message message = messageEnvelope.createMessage(cloudNumber.getXri());
+		message.setToPeerRootXri(cloudNumber.getPeerRootXri());
+		message.setLinkContractXri(RootLinkContract.createRootLinkContractXri(cloudNumber.getXri()));
+		message.setSecretToken(secretToken);
+
+		XDI3Segment targetAddress = RootLinkContract.createRootLinkContractXri(cloudNumber.getXri());
+
+		message.createGetOperation(targetAddress);
+
+		// send message
+
+		String cloudXdiEndpoint = makeCloudXdiEndpoint(this.getCspInformation(), cloudNumber);
+
+		XDIClient xdiClientCloud = new XDIHttpClient(cloudXdiEndpoint);
+
+		xdiClientCloud.send(messageEnvelope, null);
+
+		// done
+
+		log.debug("In Cloud: Authenticated Cloud Number");
+	}
+	
 	public void setCloudServicesInCloud(CloudNumber cloudNumber, String secretToken, Map<XDI3Segment, String> services) throws Xdi2ClientException {
 
 		// prepare message to Cloud
@@ -961,7 +991,44 @@ public class BasicCSP implements CSP {
 
 	public void setPhoneAndEmailInCloud(CloudNumber cloudNumber, String secretToken, String verifiedPhone, String verifiedEmail) throws Xdi2ClientException {
 
-		throw new RuntimeException("Not implemented");
+		// prepare message to Cloud
+
+		MessageEnvelope messageEnvelope = new MessageEnvelope();
+
+		Message message = messageEnvelope.createMessage(cloudNumber.getXri());
+		message.setToPeerRootXri(cloudNumber.getPeerRootXri());
+		message.setLinkContractXri(RootLinkContract.createRootLinkContractXri(cloudNumber.getXri()));
+		message.setSecretToken(secretToken);
+
+		List<XDI3Statement> targetStatementsSet = new ArrayList<XDI3Statement> ();
+
+		if (verifiedPhone != null) {
+
+			targetStatementsSet.add(XDI3Statement.fromLiteralComponents(
+					XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_AS_VERIFIED_PHONE, XDIConstants.XRI_S_VALUE),
+					verifiedPhone));
+		}
+
+		if (verifiedEmail != null) {
+
+			targetStatementsSet.add(XDI3Statement.fromLiteralComponents(
+					XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_AS_VERIFIED_EMAIL, XDIConstants.XRI_S_VALUE),
+					verifiedEmail));
+		}
+
+		message.createSetOperation(targetStatementsSet.iterator());
+
+		// send message
+
+		String cloudXdiEndpoint = makeCloudXdiEndpoint(this.getCspInformation(), cloudNumber);
+
+		XDIClient xdiClientCloud = new XDIHttpClient(cloudXdiEndpoint);
+
+		xdiClientCloud.send(messageEnvelope, null);
+
+		// done
+
+		log.debug("In Cloud: Verified phone " + verifiedPhone + " and verified e-mail " + verifiedEmail + " set for Cloud Number " + cloudNumber);
 	}
 
 	/*
