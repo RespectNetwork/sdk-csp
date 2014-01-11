@@ -202,5 +202,5 @@ public interface CSP {
 	 *   [A] 3.1.1.3
 	 *   [B] 4.1.1.2
 	 */
-	public void setPhoneAndEmailInCloud(CloudNumber cloudNumber, String verifiedPhone, String verifiedEmail) throws Xdi2ClientException;
+	public void setPhoneAndEmailInCloud(CloudNumber cloudNumber, String secretToken, String verifiedPhone, String verifiedEmail) throws Xdi2ClientException;
 }

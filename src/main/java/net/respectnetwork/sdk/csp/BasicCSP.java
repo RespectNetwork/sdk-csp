@@ -260,12 +260,19 @@ public class BasicCSP implements CSP {
 		message1.setLinkContractXri(this.getCspInformation().getRnCspLinkContract());
 		message1.setSecretToken(this.getCspInformation().getCspSecretToken());
 
-		XDI3Statement targetStatementSet1 = XDI3Statement.fromRelationComponents(
+		List<XDI3Statement> targetStatementsSet = new ArrayList<XDI3Statement> ();
+
+		targetStatementsSet.add(XDI3Statement.fromRelationComponents(
 				XDI3Segment.fromComponent(cloudName.getPeerRootXri()), 
 				XDIDictionaryConstants.XRI_S_REF, 
-				XDI3Segment.fromComponent(cloudNumber.getPeerRootXri()));
+				XDI3Segment.fromComponent(cloudNumber.getPeerRootXri())));
 
-		message1.createSetOperation(targetStatementSet1);
+		targetStatementsSet.add(XDI3Statement.fromRelationComponents(
+				XDI3Segment.fromComponent(cloudNumber.getPeerRootXri()),
+				XDIDictionaryConstants.XRI_S_IS_REF, 
+				XDI3Segment.fromComponent(cloudName.getPeerRootXri())));
+
+		message1.createSetOperation(targetStatementsSet.iterator());
 
 		// prepare message 2 to RN
 
@@ -277,13 +284,25 @@ public class BasicCSP implements CSP {
 		String cloudXdiEndpoint = makeCloudXdiEndpoint(this.getCspInformation(), cloudNumber);
 
 		List<XDI3Statement> targetStatementsSet2 = new ArrayList<XDI3Statement> ();
+
 		targetStatementsSet2.add(XDI3Statement.fromLiteralComponents(
 				XDI3Util.concatXris(cloudNumber.getPeerRootXri(), XDI3Segment.create("<$xdi><$uri>&")), 
 				cloudXdiEndpoint));
 
+		message2.createSetOperation(targetStatementsSet2.iterator());
+
+		// prepare message 3 to RN
+
+		Message message3 = messageEnvelope.getMessageCollection(this.getCspInformation().getCspCloudNumber().getXri(), true).createMessage(-1);
+		message3.setToPeerRootXri(this.getCspInformation().getRnCloudNumber().getPeerRootXri());
+		message3.setLinkContractXri(this.getCspInformation().getRnCspLinkContract());
+		message3.setSecretToken(this.getCspInformation().getCspSecretToken());
+
+		List<XDI3Statement> targetStatementsSet3 = new ArrayList<XDI3Statement> ();
+
 		if (verifiedPhone != null) {
 
-			targetStatementsSet2.add(XDI3Statement.fromRelationComponents(
+			targetStatementsSet3.add(XDI3Statement.fromRelationComponents(
 					XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_VERIFIED_DIGEST_PHONE, XDI3Segment.fromComponent(XdiAttributeMemberUnordered.createDigestArcXri(verifiedPhone, true))),
 					XRI_S_IS_PHONE,
 					cloudNumber.getXri()));
@@ -291,13 +310,13 @@ public class BasicCSP implements CSP {
 
 		if (verifiedEmail != null) {
 
-			targetStatementsSet2.add(XDI3Statement.fromRelationComponents(
+			targetStatementsSet3.add(XDI3Statement.fromRelationComponents(
 					XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_VERIFIED_DIGEST_EMAIL, XDI3Segment.fromComponent(XdiAttributeMemberUnordered.createDigestArcXri(verifiedEmail, true))),
 					XRI_S_IS_EMAIL,
 					cloudNumber.getXri()));
 		}
 
-		message2.createSetOperation(targetStatementsSet2.iterator());
+		message3.createSetOperation(targetStatementsSet3.iterator());
 
 		// send messages
 
@@ -468,7 +487,7 @@ public class BasicCSP implements CSP {
 
 	public void setRespectNetworkMembershipInRN(CloudNumber cloudNumber)  throws Xdi2ClientException {
 
-/*		// prepare message 1 to RN
+		/*		// prepare message 1 to RN
 
 		MessageEnvelope messageEnvelope1 = new MessageEnvelope();
 
@@ -690,7 +709,7 @@ public class BasicCSP implements CSP {
 
 	public void setRespectFirstLifetimeMembershipInRN(CloudNumber cloudNumber)  throws Xdi2ClientException {
 
-/*		// prepare message 1 to RN
+		/*		// prepare message 1 to RN
 
 		MessageEnvelope messageEnvelope1 = new MessageEnvelope();
 
@@ -940,7 +959,7 @@ public class BasicCSP implements CSP {
 		log.debug("In Cloud: For Cloud Number " + cloudNumber + " registered services " + services);
 	}
 
-	public void setPhoneAndEmailInCloud(CloudNumber cloudNumber, String verifiedPhone, String verifiedEmail) throws Xdi2ClientException {
+	public void setPhoneAndEmailInCloud(CloudNumber cloudNumber, String secretToken, String verifiedPhone, String verifiedEmail) throws Xdi2ClientException {
 
 		throw new RuntimeException("Not implemented");
 	}
