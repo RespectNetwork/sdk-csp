@@ -89,7 +89,11 @@ public class ExampleRegister {
 		csp.registerCloudNameInCSP(cloudName, cloudNumber);
 		csp.registerCloudNameInCloud(cloudName, cloudNumber, secretToken);
 
-		// step 6: Set RN/RF/RFL membership
+		// step 6: Set phone number and e-mail address
+
+		csp.setPhoneAndEmailInCloud(cloudNumber, secretToken, verifiedPhone, verifiedEmail);
+
+		// step 7: Set RN/RF/RFL membership
 
 		csp.setRespectNetworkMembershipInRN(cloudNumber);
 		csp.setRespectFirstMembershipInRN(cloudNumber, new Date());
