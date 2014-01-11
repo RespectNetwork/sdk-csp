@@ -185,7 +185,7 @@ public interface CSP {
 	public void setCloudSecretTokenInCSP(CloudNumber cloudNumber, String secretToken) throws Xdi2ClientException;
 
 	/**
-	 * This method checks what Cloud Names exist for a given Cloud Number.
+	 * This method checks what Cloud Names exist for a given Cloud Number in the CSP Cloud.
 	 * Used in:
 	 *   [A] Not used
 	 *   [B] Not used
