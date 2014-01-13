@@ -46,6 +46,11 @@ public class BasicCSPInformation implements CSPInformation, Serializable {
 		this.cspCloudNumber = cspCloudNumber;
 	}
 
+	public void setCspCloudNumber(String cspCloudNumber) {
+
+		this.cspCloudNumber = CloudNumber.create(cspCloudNumber);
+	}
+
 	public String getCspSecretToken() {
 
 		return this.cspSecretToken;
@@ -86,6 +91,11 @@ public class BasicCSPInformation implements CSPInformation, Serializable {
 		this.rnCloudNumber = rnCloudNumber;
 	}
 
+	public void setRnCloudNumber(String rnCloudNumber) {
+
+		this.rnCloudNumber = CloudNumber.create(rnCloudNumber);
+	}
+
 	public String getRnRegistrationServiceXdiEndpoint() {
 
 		return this.rnRegistrationServiceXdiEndpoint;
@@ -104,5 +114,10 @@ public class BasicCSPInformation implements CSPInformation, Serializable {
 	public void setRnCspLinkContract(XDI3Segment rnCspLinkContract) {
 
 		this.rnCspLinkContract = rnCspLinkContract;
+	}
+
+	public void setRnCspLinkContract(String rnCspLinkContract) {
+
+		this.rnCspLinkContract = XDI3Segment.create(rnCspLinkContract);
 	}
 }
