@@ -68,7 +68,7 @@ public interface CSP {
 	 *   [A] 5.1.1.3
 	 *   [B] Not used
 	 */
-	public void registerCloudNameInRN(CloudName cloudName, CloudNumber cloudNumber, String verifiedPhone, String verifiedEmail) throws Xdi2ClientException;
+	public void registerCloudNameInRN(CloudName cloudName, CloudNumber cloudNumber, String verifiedPhone, String verifiedEmail, NeustarRnDiscountCode neustarRnDiscountCode) throws Xdi2ClientException;
 
 	/**
 	 * This method registers a new Cloud Name and Cloud Number in the CSP Cloud.
@@ -219,4 +219,14 @@ public interface CSP {
 	 *   [B] 4.1.1.2
 	 */
 	public void setPhoneAndEmailInCloud(CloudNumber cloudNumber, String secretToken, String verifiedPhone, String verifiedEmail) throws Xdi2ClientException;
+
+	/*
+	 * Helper enum
+	 */
+
+	public enum NeustarRnDiscountCode {
+
+		OnePersonOneName,
+		RespectFirst;
+	}
 }

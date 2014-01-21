@@ -40,6 +40,7 @@ import xdi2.core.xri3.XDI3XRef;
 import xdi2.messaging.Message;
 import xdi2.messaging.MessageEnvelope;
 import xdi2.messaging.MessageResult;
+import xdi2.messaging.Operation;
 
 public class BasicCSP implements CSP {
 
@@ -62,6 +63,8 @@ public class BasicCSP implements CSP {
 	public static final XDI3Segment XRI_S_FIRST_LIFETIME_MEMBER_NEXT = XDI3Segment.create("+first+lifetime[+member]<+next>&");
 	public static final XDI3Segment XRI_S_FIRST_LIFETIME_MEMBER_LOCK = XDI3Segment.create("+first+lifetime[+member]<+lock>&");
 
+	public static final XDI3Segment XRI_S_PARAMETER_NEUSTAR_RNDISCOUNTCODE = XDI3Segment.create("<+([@]!:uuid:e9b5165b-fa7b-4387-a685-7125d138a872)><+(RNDiscountCode)>");
+
 	private CSPInformation cspInformation;
 
 	private XDIClient xdiClientRNRegistrationService;
@@ -77,6 +80,7 @@ public class BasicCSP implements CSP {
 
 		this.xdiClientCSPRegistry = new XDIHttpClient(cspInformation.getCspRegistryXdiEndpoint());
 		this.xdiClientRNRegistrationService = new XDIHttpClient(cspInformation.getRnRegistrationServiceXdiEndpoint());
+		((XDIHttpClient) this.xdiClientRNRegistrationService).setFollowRedirects(true);
 	}
 
 	public void registerCloudInCSP(CloudNumber cloudNumber, String secretToken) throws Xdi2ClientException {
@@ -248,7 +252,7 @@ public class BasicCSP implements CSP {
 		return cloudNumber;
 	}
 
-	public void registerCloudNameInRN(CloudName cloudName, CloudNumber cloudNumber, String verifiedPhone, String verifiedEmail) throws Xdi2ClientException {
+	public void registerCloudNameInRN(CloudName cloudName, CloudNumber cloudNumber, String verifiedPhone, String verifiedEmail, NeustarRnDiscountCode neustarRnDiscountCode) throws Xdi2ClientException {
 
 		// prepare message 1 to RN
 
@@ -271,7 +275,12 @@ public class BasicCSP implements CSP {
 				XDIDictionaryConstants.XRI_S_IS_REF, 
 				XDI3Segment.fromComponent(cloudName.getPeerRootXri())));
 
-		message1.createSetOperation(targetStatementsSet.iterator());
+		Operation operation = message1.createSetOperation(targetStatementsSet.iterator());
+
+		if (neustarRnDiscountCode != null) {
+
+			operation.setParameter(XRI_S_PARAMETER_NEUSTAR_RNDISCOUNTCODE, neustarRnDiscountCode.toString());
+		}
 
 		// prepare message 2 to RN
 

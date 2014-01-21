@@ -11,6 +11,7 @@ import java.util.UUID;
 
 import net.respectnetwork.sdk.csp.BasicCSP;
 import net.respectnetwork.sdk.csp.CSP;
+import net.respectnetwork.sdk.csp.CSP.NeustarRnDiscountCode;
 import net.respectnetwork.sdk.csp.CSPInformation;
 import net.respectnetwork.sdk.csp.TrustAllTrustManager;
 import xdi2.core.constants.XDIConstants;
@@ -85,7 +86,7 @@ public class ExampleRegister {
 
 		// step 5: Register Cloud Name
 
-		csp.registerCloudNameInRN(cloudName, cloudNumber, verifiedPhone, verifiedEmail);
+		csp.registerCloudNameInRN(cloudName, cloudNumber, verifiedPhone, verifiedEmail, NeustarRnDiscountCode.OnePersonOneName);
 		csp.registerCloudNameInCSP(cloudName, cloudNumber);
 		csp.registerCloudNameInCloud(cloudName, cloudNumber, secretToken);
 
