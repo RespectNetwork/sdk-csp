@@ -109,7 +109,7 @@ public interface CSP {
 	public void setPhoneAndEmailInRN(CloudNumber cloudNumber, String verifiedPhone, String verifiedEmail) throws Xdi2ClientException;
 
 	/**
-	 * This method sets a flag for a Cloud Number to indicate that it is a member of
+	 * This method sets a flag for a Cloud Number in the RN Member Graph Service to indicate that it is a member of
 	 * the Respect Network.
 	 * Used in:
 	 *   [A] Not used
@@ -118,7 +118,7 @@ public interface CSP {
 	public void setRespectNetworkMembershipInRN(CloudNumber cloudNumber)  throws Xdi2ClientException;
 
 	/**
-	 * This method retrieves a flag for a Cloud Number to indicate whether it is a member of
+	 * This method retrieves a flag for a Cloud Number in the RN Member Graph Service to indicate whether it is a member of
 	 * the Respect Network.
 	 * Used in:
 	 *   [A] Not used
@@ -127,7 +127,7 @@ public interface CSP {
 	public boolean checkRespectNetworkMembershipInRN(CloudNumber cloudNumber) throws Xdi2ClientException;
 
 	/**
-	 * This method sets a flag for a Cloud Number to indicate that it is a member of
+	 * This method sets a flag for a Cloud Number in the RN Member Graph Service to indicate that it is a member of
 	 * the Respect First program.
 	 * Used in:
 	 *   [A] Not used
@@ -136,7 +136,7 @@ public interface CSP {
 	public void setRespectFirstMembershipInRN(CloudNumber cloudNumber, Date expirationTime)  throws Xdi2ClientException;
 
 	/**
-	 * This method retrieves a flag for a Cloud Number to indicate whether it is a member of
+	 * This method retrieves a flag for a Cloud Number in the RN Member Graph Service to indicate whether it is a member of
 	 * the Respect First program.
 	 * Used in:
 	 *   [A] Not used
@@ -145,7 +145,7 @@ public interface CSP {
 	public boolean checkRespectFirstMembershipInRN(CloudNumber cloudNumber) throws Xdi2ClientException;
 
 	/**
-	 * This method sets a flag for a Cloud Number to indicate that it is a member of
+	 * This method sets a flag for a Cloud Number in the RN Member Graph Service to indicate that it is a member of
 	 * the Respect First Lifetime program.
 	 * Used in:
 	 *   [A] Not used
@@ -154,7 +154,7 @@ public interface CSP {
 	public void setRespectFirstLifetimeMembershipInRN(CloudNumber cloudNumber)  throws Xdi2ClientException;
 
 	/**
-	 * This method retrieves a flag for a Cloud Number to indicate whether it is a member of
+	 * This method retrieves a flag for a Cloud Number in the RN Member Graph Service to indicate whether it is a member of
 	 * the Respect First Lifetime program.
 	 * Used in:
 	 *   [A] Not used
