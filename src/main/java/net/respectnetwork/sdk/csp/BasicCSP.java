@@ -83,6 +83,11 @@ public class BasicCSP implements CSP {
 		((XDIHttpClient) this.xdiClientRNRegistrationService).setFollowRedirects(true);
 	}
 
+	public CSPInformation getCSPInformation() {
+
+		return this.cspInformation;
+	}
+
 	public void registerCloudInCSP(CloudNumber cloudNumber, String secretToken) throws Xdi2ClientException {
 
 		// prepare message to CSP
