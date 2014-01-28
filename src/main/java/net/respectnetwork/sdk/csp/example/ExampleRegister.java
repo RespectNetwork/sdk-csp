@@ -14,7 +14,6 @@ import net.respectnetwork.sdk.csp.CSP;
 import net.respectnetwork.sdk.csp.CSP.NeustarRnDiscountCode;
 import net.respectnetwork.sdk.csp.CSPInformation;
 import net.respectnetwork.sdk.csp.TrustAllTrustManager;
-import xdi2.core.constants.XDIConstants;
 import xdi2.core.xri3.CloudName;
 import xdi2.core.xri3.CloudNumber;
 import xdi2.core.xri3.XDI3Segment;
@@ -22,7 +21,7 @@ import xdi2.core.xri3.XDI3Segment;
 public class ExampleRegister {
 
 	/* CHOOSE THE INDIVIDUAL's CLOUD NUMBER HERE */
-	private static CloudNumber cloudNumber = CloudNumber.createRandom(XDIConstants.CS_EQUALS);
+	private static CloudNumber cloudNumber;
 
 	/* CHOOSE THE INDIVIDUAL's CLOUD NAME HERE */
 	private static CloudName cloudName;
@@ -42,6 +41,7 @@ public class ExampleRegister {
 
 			System.out.print("Enter Cloud Name: ");
 			cloudName = CloudName.create(new BufferedReader(new InputStreamReader(System.in)).readLine());
+			cloudNumber = CloudNumber.createRandom(cloudName.getCs());
 		} catch (IOException ex) {
 
 			throw new RuntimeException(ex.getMessage(), ex);
