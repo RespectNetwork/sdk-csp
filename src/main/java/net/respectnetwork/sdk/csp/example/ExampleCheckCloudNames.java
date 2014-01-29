@@ -23,6 +23,12 @@ public class ExampleCheckCloudNames {
 
 			System.out.print("Enter Cloud Number: ");
 			cloudNumber = CloudNumber.create(new BufferedReader(new InputStreamReader(System.in)).readLine());
+
+			if (cloudNumber == null) {
+				
+				System.err.println("Invalid Cloud Number.");
+				System.exit(0);
+			}
 		} catch (IOException ex) {
 
 			throw new RuntimeException(ex.getMessage(), ex);

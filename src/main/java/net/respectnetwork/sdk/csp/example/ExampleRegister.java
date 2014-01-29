@@ -41,6 +41,13 @@ public class ExampleRegister {
 
 			System.out.print("Enter Cloud Name: ");
 			cloudName = CloudName.create(new BufferedReader(new InputStreamReader(System.in)).readLine());
+
+			if (cloudName == null) {
+				
+				System.err.println("Invalid Cloud Name.");
+				System.exit(0);
+			}
+
 			cloudNumber = CloudNumber.createRandom(cloudName.getCs());
 		} catch (IOException ex) {
 

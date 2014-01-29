@@ -26,6 +26,12 @@ public class ExampleChangeCloudXdiEndpoint {
 
 			System.out.print("Enter Cloud Name: ");
 			cloudName = CloudName.create(new BufferedReader(new InputStreamReader(System.in)).readLine());
+
+			if (cloudName == null) {
+				
+				System.err.println("Invalid Cloud Name.");
+				System.exit(0);
+			}
 		} catch (IOException ex) {
 
 			throw new RuntimeException(ex.getMessage(), ex);
