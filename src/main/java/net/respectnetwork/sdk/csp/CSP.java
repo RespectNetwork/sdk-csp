@@ -154,24 +154,6 @@ public interface CSP {
 	 */
 	public boolean checkRespectFirstMembershipInRN(CloudNumber cloudNumber) throws Xdi2ClientException;
 
-	/**
-	 * This method sets a flag for a Cloud Number in the RN Member Graph Service to indicate that it is a member of
-	 * the Respect First Lifetime program.
-	 * Used in:
-	 *   [A] Not used
-	 *   [B] Not used
-	 */
-	public void setRespectFirstLifetimeMembershipInRN(CloudNumber cloudNumber)  throws Xdi2ClientException;
-
-	/**
-	 * This method retrieves a flag for a Cloud Number in the RN Member Graph Service to indicate whether it is a member of
-	 * the Respect First Lifetime program.
-	 * Used in:
-	 *   [A] Not used
-	 *   [B] Not used
-	 */
-	public boolean checkRespectFirstLifetimeMembershipInRN(CloudNumber cloudNumber) throws Xdi2ClientException;
-
 	/*
 	 * Methods for updating and querying CSP information for existing Cloud Numbers and Clouds.
 	 */

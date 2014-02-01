@@ -59,10 +59,9 @@ public class ExampleCheckMembership {
 
 		boolean rnMember = csp.checkRespectNetworkMembershipInRN(cloudNumber);
 		boolean rfMember = csp.checkRespectFirstMembershipInRN(cloudNumber);
-		boolean rflMember = csp.checkRespectFirstLifetimeMembershipInRN(cloudNumber);
 
 		// done
 
-		System.out.println("Cloud Number " + cloudNumber + ": RN Membership: " + rnMember + ", RF Membership: " + rfMember + ", RFL Membership: " + rflMember);
+		System.out.println("Cloud Number " + cloudNumber + ": RN Membership: " + rnMember + ", RF Membership: " + rfMember);
 	}
 }

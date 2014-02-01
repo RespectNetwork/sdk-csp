@@ -101,11 +101,10 @@ public class ExampleRegister {
 
 		csp.setPhoneAndEmailInCloud(cloudNumber, secretToken, verifiedPhone, verifiedEmail);
 
-		// step 7: Set RN/RF/RFL membership
+		// step 7: Set RN/RF membership
 
 		csp.setRespectNetworkMembershipInRN(cloudNumber);
 		csp.setRespectFirstMembershipInRN(cloudNumber, new Date());
-		csp.setRespectFirstLifetimeMembershipInRN(cloudNumber);
 
 		// done
 
