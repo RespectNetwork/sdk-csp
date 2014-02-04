@@ -8,7 +8,6 @@ import java.util.Arrays;
 import net.respectnetwork.sdk.csp.BasicCSP;
 import net.respectnetwork.sdk.csp.CSP;
 import net.respectnetwork.sdk.csp.CSPInformation;
-import net.respectnetwork.sdk.csp.TrustAllTrustManager;
 import xdi2.core.xri3.CloudName;
 import xdi2.core.xri3.CloudNumber;
 
@@ -36,8 +35,6 @@ public class ExampleCheckCloudNames {
 	}
 
 	public static void main(String[] args) throws Exception {
-
-		TrustAllTrustManager.trustAll();
 
 		// Step 0: Set up CSP
 

@@ -10,9 +10,6 @@ import javax.net.ssl.X509TrustManager;
 
 /**
  * DO NOT USE THIS IN A PRODUCTION ENVIRONMENT !!
- * 
- * WE ONLY USE THIS FOR NOW BECAUSE *.respectnetwork.net
- * DOES NOT HAVE AN SSL CERTIFICATE TRUSTED BY JAVA.
  */
 public class TrustAllTrustManager implements X509TrustManager {
 
