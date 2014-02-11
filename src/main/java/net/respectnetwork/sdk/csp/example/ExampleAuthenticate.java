@@ -11,13 +11,13 @@ import xdi2.client.exceptions.Xdi2ClientException;
 import xdi2.core.xri3.CloudName;
 import xdi2.core.xri3.CloudNumber;
 
-public class ExampleChangeSecretToken {
+public class ExampleAuthenticate {
 
 	/* CHOOSE THE INDIVIDUAL's CLOUD NAME HERE */
 	private static CloudName cloudName;
 
 	/* CHOOSE THE INDIVIDUAL's SECRET TOKEN HERE */
-	private static String secretToken = "mynewsecret";
+	private static String secretToken;
 
 	static {
 
@@ -26,11 +26,8 @@ public class ExampleChangeSecretToken {
 			System.out.print("Enter Cloud Name: ");
 			cloudName = CloudName.create(new BufferedReader(new InputStreamReader(System.in)).readLine());
 
-			if (cloudName == null) {
-				
-				System.err.println("Invalid Cloud Name.");
-				System.exit(0);
-			}
+			System.out.print("Enter Secret Token: ");
+			secretToken = new BufferedReader(new InputStreamReader(System.in)).readLine();
 		} catch (IOException ex) {
 
 			throw new RuntimeException(ex.getMessage(), ex);
@@ -55,12 +52,12 @@ public class ExampleChangeSecretToken {
 
 		if (cloudNumber == null) throw new RuntimeException("Cloud Name " + cloudName + " does not exist.");
 
-		// Step 2: Change Secret Token
+		// Step 2: Authenticate
 
-		csp.setCloudSecretTokenInCSP(cloudNumber, secretToken);
+		csp.authenticateInCloud(cloudNumber, secretToken);
 
 		// done
 
-		System.out.println("Done setting secret token for Cloud Name " + cloudName);
+		System.out.println("Done authenticating for Cloud Name " + cloudName);
 	}
 }

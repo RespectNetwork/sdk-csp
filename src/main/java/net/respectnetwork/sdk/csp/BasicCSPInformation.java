@@ -2,52 +2,46 @@ package net.respectnetwork.sdk.csp;
 
 import java.io.Serializable;
 
+import xdi2.core.xri3.CloudNumber;
 import xdi2.core.xri3.XDI3Segment;
 
 public class BasicCSPInformation implements CSPInformation, Serializable {
 
 	private static final long serialVersionUID = 4621748646529792450L;
 
-	public static final String DEFAULT_RESPECT_NETWORK_REGISTRATION_SERVICE_XDI_ENDPOINT = "http://registration.respectnetwork.net/registration";
-	public static final XDI3Segment DEFAULT_RESPECT_NETWORK_CLOUD_NUMBER = XDI3Segment.create("[@]!:uuid:299089fd-9d81-3c59-2990-89fd9d813c59");
-
-	private XDI3Segment cspCloudNumber;
+	private CloudNumber cspCloudNumber;
 	private String cspSecretToken;
-	private String hostingEnvironmentRegistryXdiEndpoint;
-	private String hostingEnvironmentCloudBaseXdiEndpoint;
-	private String respectNetworkRegistrationServiceXdiEndpoint;
-	private XDI3Segment respectNetworkCloudNumber;
+	private String cspRegistryXdiEndpoint;
+	private String cspCloudBaseXdiEndpoint;
+	private CloudNumber rnCloudNumber;
+	private String rnRegistrationServiceXdiEndpoint;
+	private XDI3Segment rnCspLinkContract;
 
-	public BasicCSPInformation(XDI3Segment cspCloudNumber, String cspSecretToken, String hostingEnvironmentRegistryXdiEndpoint, String hostingEnvironmentCloudBaseXdiEndpoint, String respectNetworkRegistrationServiceXdiEndpoint, XDI3Segment respectNetworkCloudNumber) {
+	public BasicCSPInformation() {
 
-		this.cspCloudNumber = cspCloudNumber;
-		this.cspSecretToken = cspSecretToken;
-		this.hostingEnvironmentRegistryXdiEndpoint = hostingEnvironmentRegistryXdiEndpoint;
-		this.hostingEnvironmentCloudBaseXdiEndpoint = hostingEnvironmentCloudBaseXdiEndpoint;
-		this.respectNetworkRegistrationServiceXdiEndpoint = respectNetworkRegistrationServiceXdiEndpoint;
-		this.respectNetworkCloudNumber = respectNetworkCloudNumber;
 	}
 
-	public BasicCSPInformation(XDI3Segment cspCloudNumber, String cspSecretToken, String hostingEnvironmentRegistryXdiEndpoint, String hostingEnvironmentCloudBaseXdiEndpoint) {
+	public BasicCSPInformation(CloudNumber cspCloudNumber, String cspSecretToken, String cspRegistryXdiEndpoint, String cspCloudBaseXdiEndpoint, CloudNumber rnCloudNumber, String rnRegistrationServiceXdiEndpoint, XDI3Segment rnCspLinkContract) {
 
 		this.cspCloudNumber = cspCloudNumber;
 		this.cspSecretToken = cspSecretToken;
-		this.hostingEnvironmentRegistryXdiEndpoint = hostingEnvironmentRegistryXdiEndpoint;
-		this.hostingEnvironmentCloudBaseXdiEndpoint = hostingEnvironmentCloudBaseXdiEndpoint;
-		this.respectNetworkRegistrationServiceXdiEndpoint = DEFAULT_RESPECT_NETWORK_REGISTRATION_SERVICE_XDI_ENDPOINT;
-		this.respectNetworkCloudNumber = DEFAULT_RESPECT_NETWORK_CLOUD_NUMBER;
+		this.cspRegistryXdiEndpoint = cspRegistryXdiEndpoint;
+		this.cspCloudBaseXdiEndpoint = cspCloudBaseXdiEndpoint;
+		this.rnCloudNumber = rnCloudNumber;
+		this.rnRegistrationServiceXdiEndpoint = rnRegistrationServiceXdiEndpoint;
+		this.rnCspLinkContract = rnCspLinkContract;
 	}
 
 	/*
 	 * Getters and setters
 	 */
 
-	public XDI3Segment getCspCloudNumber() {
+	public CloudNumber getCspCloudNumber() {
 
 		return this.cspCloudNumber;
 	}
 
-	public void setCspCloudNumber(XDI3Segment cspCloudNumber) {
+	public void setCspCloudNumber(CloudNumber cspCloudNumber) {
 
 		this.cspCloudNumber = cspCloudNumber;
 	}
@@ -62,43 +56,53 @@ public class BasicCSPInformation implements CSPInformation, Serializable {
 		this.cspSecretToken = cspSecretToken;
 	}
 
-	public String getHostingEnvironmentRegistryXdiEndpoint() {
+	public String getCspRegistryXdiEndpoint() {
 
-		return this.hostingEnvironmentRegistryXdiEndpoint;
+		return this.cspRegistryXdiEndpoint;
 	}
 
-	public void setHostingEnvironmentRegistryXdiEndpoint(String hostingEnvironmentRegistryXdiEndpoint) {
+	public void setCspRegistryXdiEndpoint(String cspRegistryXdiEndpoint) {
 
-		this.hostingEnvironmentRegistryXdiEndpoint = hostingEnvironmentRegistryXdiEndpoint;
+		this.cspRegistryXdiEndpoint = cspRegistryXdiEndpoint;
 	}
 
-	public String getHostingEnvironmentCloudBaseXdiEndpoint() {
+	public String getCspCloudBaseXdiEndpoint() {
 
-		return this.hostingEnvironmentCloudBaseXdiEndpoint;
+		return this.cspCloudBaseXdiEndpoint;
 	}
 
-	public void setHostingEnvironmentCloudBaseXdiEndpoint(String hostingEnvironmentCloudBaseXdiEndpoint) {
+	public void setCspCloudBaseXdiEndpoint(String cspCloudBaseXdiEndpoint) {
 
-		this.hostingEnvironmentCloudBaseXdiEndpoint = hostingEnvironmentCloudBaseXdiEndpoint;
+		this.cspCloudBaseXdiEndpoint = cspCloudBaseXdiEndpoint;
 	}
 
-	public String getRespectNetworkRegistrationServiceXdiEndpoint() {
+	public CloudNumber getRnCloudNumber() {
 
-		return this.respectNetworkRegistrationServiceXdiEndpoint;
+		return this.rnCloudNumber;
 	}
 
-	public void setRespectNetworkRegistrationServiceXdiEndpoint(String respectNetworkRegistrationServiceXdiEndpoint) {
+	public void setRnCloudNumber(CloudNumber rnCloudNumber) {
 
-		this.respectNetworkRegistrationServiceXdiEndpoint = respectNetworkRegistrationServiceXdiEndpoint;
+		this.rnCloudNumber = rnCloudNumber;
 	}
 
-	public XDI3Segment getRespectNetworkCloudNumber() {
+	public String getRnRegistrationServiceXdiEndpoint() {
 
-		return this.respectNetworkCloudNumber;
+		return this.rnRegistrationServiceXdiEndpoint;
 	}
 
-	public void setRespectNetworkCloudNumber(XDI3Segment respectNetworkCloudNumber) {
+	public void setRnRegistrationServiceXdiEndpoint(String rnRegistrationServiceXdiEndpoint) {
 
-		this.respectNetworkCloudNumber = respectNetworkCloudNumber;
+		this.rnRegistrationServiceXdiEndpoint = rnRegistrationServiceXdiEndpoint;
+	}
+
+	public XDI3Segment getRnCspLinkContract() {
+
+		return this.rnCspLinkContract;
+	}
+
+	public void setRnCspLinkContract(XDI3Segment rnCspLinkContract) {
+
+		this.rnCspLinkContract = rnCspLinkContract;
 	}
 }

@@ -1,5 +1,6 @@
 package net.respectnetwork.sdk.csp;
 
+import xdi2.core.xri3.CloudNumber;
 import xdi2.core.xri3.XDI3Segment;
 
 /**
@@ -7,10 +8,20 @@ import xdi2.core.xri3.XDI3Segment;
  */
 public interface CSPInformation {
 
-	public XDI3Segment getCspCloudNumber();
+	/*
+	 * Information about the CSP
+	 */
+
+	public CloudNumber getCspCloudNumber();
 	public String getCspSecretToken();
-	public String getHostingEnvironmentRegistryXdiEndpoint();
-	public String getHostingEnvironmentCloudBaseXdiEndpoint();
-	public String getRespectNetworkRegistrationServiceXdiEndpoint();
-	public XDI3Segment getRespectNetworkCloudNumber();
+	public String getCspRegistryXdiEndpoint();
+	public String getCspCloudBaseXdiEndpoint();
+
+	/*
+	 * Information about RN
+	 */
+
+	public CloudNumber getRnCloudNumber();
+	public String getRnRegistrationServiceXdiEndpoint();
+	public XDI3Segment getRnCspLinkContract();
 }

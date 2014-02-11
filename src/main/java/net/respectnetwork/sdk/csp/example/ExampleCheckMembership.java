@@ -11,13 +11,10 @@ import xdi2.client.exceptions.Xdi2ClientException;
 import xdi2.core.xri3.CloudName;
 import xdi2.core.xri3.CloudNumber;
 
-public class ExampleChangeSecretToken {
+public class ExampleCheckMembership {
 
 	/* CHOOSE THE INDIVIDUAL's CLOUD NAME HERE */
 	private static CloudName cloudName;
-
-	/* CHOOSE THE INDIVIDUAL's SECRET TOKEN HERE */
-	private static String secretToken = "mynewsecret";
 
 	static {
 
@@ -55,12 +52,13 @@ public class ExampleChangeSecretToken {
 
 		if (cloudNumber == null) throw new RuntimeException("Cloud Name " + cloudName + " does not exist.");
 
-		// Step 2: Change Secret Token
+		// Step 2: Check Membership
 
-		csp.setCloudSecretTokenInCSP(cloudNumber, secretToken);
+		boolean rnMember = csp.checkRespectNetworkMembershipInRN(cloudNumber);
+		boolean rfMember = csp.checkRespectFirstMembershipInRN(cloudNumber);
 
 		// done
 
-		System.out.println("Done setting secret token for Cloud Name " + cloudName);
+		System.out.println("Cloud Number " + cloudNumber + ": RN Membership: " + rnMember + ", RF Membership: " + rfMember);
 	}
 }
