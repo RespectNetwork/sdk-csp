@@ -418,6 +418,30 @@ public class BasicCSP implements CSP {
 		log.debug("In Cloud: Cloud Name " + cloudName + " registered with Cloud Number " + cloudNumber);
 	}
 
+	public void deleteCloudNameInRN(CloudName cloudName) throws Xdi2ClientException {
+
+		// prepare message to RN
+
+		MessageEnvelope messageEnvelope = new MessageEnvelope();
+
+		Message message = messageEnvelope.getMessageCollection(this.getCspInformation().getCspCloudNumber().getXri(), true).createMessage(-1);
+		message.setToPeerRootXri(this.getCspInformation().getRnCloudNumber().getPeerRootXri());
+		message.setLinkContractXri(this.getCspInformation().getRnCspLinkContract());
+		message.setSecretToken(this.getCspInformation().getCspSecretToken());
+
+		XDI3Segment targetAddress = XDI3Segment.fromComponent(cloudName.getPeerRootXri());
+
+		message.createDelOperation(targetAddress);
+
+		// send message
+
+		this.getXdiClientRNRegistrationService().send(messageEnvelope, null);
+
+		// done
+
+		log.debug("In RN: Cloud Name " + cloudName + " deleted.");
+	}
+
 	public void setCloudXdiEndpointInRN(CloudNumber cloudNumber, String cloudXdiEndpoint) throws Xdi2ClientException {
 
 		// auto-generate XDI endpoint

@@ -96,6 +96,15 @@ public interface CSP {
 	 */
 	public void registerCloudNameInCloud(CloudName cloudName, CloudNumber cloudNumber, String secretToken) throws Xdi2ClientException;
 
+	/**
+	 * This method deletes a Cloud Number from the RN Registration Service and
+	 * RN Member Graph Service.
+	 * Used in:
+	 *   [A] Not used
+	 *   [B] Not used
+	 */
+	public void deleteCloudNameInRN(CloudName cloudName) throws Xdi2ClientException;
+
 	/*
 	 * Methods for updating and querying RN information for existing Cloud Numbers and Clouds.
 	 */
