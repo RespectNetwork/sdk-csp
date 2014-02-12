@@ -436,6 +436,11 @@ public class BasicCSP implements CSP {
 				XDIDictionaryConstants.XRI_S_REF, 
 				XDI3Segment.fromComponent(cloudNumber.getPeerRootXri())));
 
+		targetStatementsDel.add(XDI3Statement.fromRelationComponents(
+				XDI3Segment.fromComponent(cloudNumber.getPeerRootXri()),
+				XDIDictionaryConstants.XRI_S_IS_REF, 
+				XDI3Segment.fromComponent(cloudName.getPeerRootXri())));
+
 		message.createDelOperation(targetStatementsDel.iterator());
 
 		// send message
