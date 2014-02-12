@@ -103,7 +103,7 @@ public interface CSP {
 	 *   [A] Not used
 	 *   [B] Not used
 	 */
-	public void deleteCloudNameInRN(CloudName cloudName) throws Xdi2ClientException;
+	public void deleteCloudNameInRN(CloudName cloudName, CloudNumber cloudNumber) throws Xdi2ClientException;
 
 	/*
 	 * Methods for updating and querying RN information for existing Cloud Numbers and Clouds.

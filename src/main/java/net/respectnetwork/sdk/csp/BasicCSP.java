@@ -418,7 +418,7 @@ public class BasicCSP implements CSP {
 		log.debug("In Cloud: Cloud Name " + cloudName + " registered with Cloud Number " + cloudNumber);
 	}
 
-	public void deleteCloudNameInRN(CloudName cloudName) throws Xdi2ClientException {
+	public void deleteCloudNameInRN(CloudName cloudName, CloudNumber cloudNumber) throws Xdi2ClientException {
 
 		// prepare message to RN
 
@@ -429,9 +429,14 @@ public class BasicCSP implements CSP {
 		message.setLinkContractXri(this.getCspInformation().getRnCspLinkContract());
 		message.setSecretToken(this.getCspInformation().getCspSecretToken());
 
-		XDI3Segment targetAddress = XDI3Segment.fromComponent(cloudName.getPeerRootXri());
+		List<XDI3Statement> targetStatementsDel = new ArrayList<XDI3Statement> ();
 
-		message.createDelOperation(targetAddress);
+		targetStatementsDel.add(XDI3Statement.fromRelationComponents(
+				XDI3Segment.fromComponent(cloudName.getPeerRootXri()), 
+				XDIDictionaryConstants.XRI_S_REF, 
+				XDI3Segment.fromComponent(cloudNumber.getPeerRootXri())));
+
+		message.createDelOperation(targetStatementsDel.iterator());
 
 		// send message
 
