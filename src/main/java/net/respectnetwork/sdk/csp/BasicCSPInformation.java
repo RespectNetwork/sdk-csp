@@ -36,6 +36,7 @@ public class BasicCSPInformation implements CSPInformation, Serializable {
 	 * Getters and setters
 	 */
 
+	@Override
 	public CloudNumber getCspCloudNumber() {
 
 		return this.cspCloudNumber;
@@ -46,6 +47,7 @@ public class BasicCSPInformation implements CSPInformation, Serializable {
 		this.cspCloudNumber = cspCloudNumber;
 	}
 
+	@Override
 	public String getCspSecretToken() {
 
 		return this.cspSecretToken;
@@ -56,6 +58,7 @@ public class BasicCSPInformation implements CSPInformation, Serializable {
 		this.cspSecretToken = cspSecretToken;
 	}
 
+	@Override
 	public String getCspRegistryXdiEndpoint() {
 
 		return this.cspRegistryXdiEndpoint;
@@ -66,6 +69,7 @@ public class BasicCSPInformation implements CSPInformation, Serializable {
 		this.cspRegistryXdiEndpoint = cspRegistryXdiEndpoint;
 	}
 
+	@Override
 	public String getCspCloudBaseXdiEndpoint() {
 
 		return this.cspCloudBaseXdiEndpoint;
@@ -76,6 +80,7 @@ public class BasicCSPInformation implements CSPInformation, Serializable {
 		this.cspCloudBaseXdiEndpoint = cspCloudBaseXdiEndpoint;
 	}
 
+	@Override
 	public CloudNumber getRnCloudNumber() {
 
 		return this.rnCloudNumber;
@@ -86,6 +91,7 @@ public class BasicCSPInformation implements CSPInformation, Serializable {
 		this.rnCloudNumber = rnCloudNumber;
 	}
 
+	@Override
 	public String getRnRegistrationServiceXdiEndpoint() {
 
 		return this.rnRegistrationServiceXdiEndpoint;
@@ -96,6 +102,7 @@ public class BasicCSPInformation implements CSPInformation, Serializable {
 		this.rnRegistrationServiceXdiEndpoint = rnRegistrationServiceXdiEndpoint;
 	}
 
+	@Override
 	public XDI3Segment getRnCspLinkContract() {
 
 		return this.rnCspLinkContract;

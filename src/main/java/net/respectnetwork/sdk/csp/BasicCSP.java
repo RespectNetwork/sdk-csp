@@ -23,7 +23,7 @@ import xdi2.core.constants.XDIDictionaryConstants;
 import xdi2.core.constants.XDILinkContractConstants;
 import xdi2.core.features.linkcontracts.PublicLinkContract;
 import xdi2.core.features.linkcontracts.RootLinkContract;
-import xdi2.core.features.nodetypes.XdiAttributeMemberUnordered;
+import xdi2.core.features.nodetypes.XdiAbstractMemberUnordered;
 import xdi2.core.features.timestamps.Timestamps;
 import xdi2.core.util.XDI3Util;
 import xdi2.core.util.iterators.IteratorArrayMaker;
@@ -77,11 +77,13 @@ public class BasicCSP implements CSP {
 		((XDIHttpClient) this.xdiClientRNRegistrationService).setFollowRedirects(true);
 	}
 
+	@Override
 	public CSPInformation getCSPInformation() {
 
 		return this.cspInformation;
 	}
 
+	@Override
 	public void registerCloudInCSP(CloudNumber cloudNumber, String secretToken) throws Xdi2ClientException {
 
 		// prepare message to CSP
@@ -119,6 +121,7 @@ public class BasicCSP implements CSP {
 		log.debug("In CSP: Cloud registered with Cloud Number " + cloudNumber + " and Secret Token and Cloud XDI endpoint " + cloudXdiEndpoint);
 	}
 
+	@Override
 	public CloudNumber checkCloudNameAvailableInRN(CloudName cloudName) throws Xdi2ClientException {
 
 		CloudNumber cloudNumber = null;
@@ -153,6 +156,7 @@ public class BasicCSP implements CSP {
 		return cloudNumber;
 	}
 
+	@Override
 	public CloudNumber[] checkPhoneAndEmailAvailableInRN(String verifiedPhone, String verifiedEmail) throws Xdi2ClientException {
 
 		CloudNumber[] cloudNumbers = new CloudNumber[2];
@@ -166,8 +170,8 @@ public class BasicCSP implements CSP {
 		message.setLinkContractXri(this.getCspInformation().getRnCspLinkContract());
 		message.setSecretToken(this.getCspInformation().getCspSecretToken());
 
-		XDI3Segment targetAddress1 = verifiedPhone == null ? null : XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_AC_VERIFIED_DIGEST_PHONE, XDI3Segment.fromComponent(XdiAttributeMemberUnordered.createDigestArcXri(verifiedPhone, true)));
-		XDI3Segment targetAddress2 = verifiedEmail == null ? null : XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_AC_VERIFIED_DIGEST_EMAIL, XDI3Segment.fromComponent(XdiAttributeMemberUnordered.createDigestArcXri(verifiedEmail, true)));
+		XDI3Segment targetAddress1 = verifiedPhone == null ? null : XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_AC_VERIFIED_DIGEST_PHONE, XDI3Segment.fromComponent(XdiAbstractMemberUnordered.createDigestArcXri(verifiedPhone, true)));
+		XDI3Segment targetAddress2 = verifiedEmail == null ? null : XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_AC_VERIFIED_DIGEST_EMAIL, XDI3Segment.fromComponent(XdiAbstractMemberUnordered.createDigestArcXri(verifiedEmail, true)));
 
 		if (targetAddress1 != null) message.createGetOperation(targetAddress1);
 		if (targetAddress2 != null) message.createGetOperation(targetAddress2);
@@ -251,6 +255,7 @@ public class BasicCSP implements CSP {
 		return cloudNumber;
 	}
 
+	@Override
 	public void registerCloudNameInRN(CloudName cloudName, CloudNumber cloudNumber, String verifiedPhone, String verifiedEmail, NeustarRnDiscountCode neustarRnDiscountCode) throws Xdi2ClientException {
 
 		// prepare message 1 to RN
@@ -310,7 +315,7 @@ public class BasicCSP implements CSP {
 		if (verifiedPhone != null) {
 
 			targetStatementsSet3.add(XDI3Statement.fromRelationComponents(
-					XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_AC_VERIFIED_DIGEST_PHONE, XDI3Segment.fromComponent(XdiAttributeMemberUnordered.createDigestArcXri(verifiedPhone, true))),
+					XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_AC_VERIFIED_DIGEST_PHONE, XDI3Segment.fromComponent(XdiAbstractMemberUnordered.createDigestArcXri(verifiedPhone, true))),
 					XRI_S_IS_PHONE,
 					cloudNumber.getXri()));
 		}
@@ -318,7 +323,7 @@ public class BasicCSP implements CSP {
 		if (verifiedEmail != null) {
 
 			targetStatementsSet3.add(XDI3Statement.fromRelationComponents(
-					XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_AC_VERIFIED_DIGEST_EMAIL, XDI3Segment.fromComponent(XdiAttributeMemberUnordered.createDigestArcXri(verifiedEmail, true))),
+					XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_AC_VERIFIED_DIGEST_EMAIL, XDI3Segment.fromComponent(XdiAbstractMemberUnordered.createDigestArcXri(verifiedEmail, true))),
 					XRI_S_IS_EMAIL,
 					cloudNumber.getXri()));
 		}
@@ -340,6 +345,7 @@ public class BasicCSP implements CSP {
 		log.debug("In RN: Cloud Name " + cloudName + " registered with Cloud Number " + cloudNumber);
 	}
 
+	@Override
 	public void registerCloudNameInCSP(CloudName cloudName, CloudNumber cloudNumber) throws Xdi2ClientException {
 
 		// prepare message to CSP
@@ -374,6 +380,7 @@ public class BasicCSP implements CSP {
 		log.debug("In CSP: Cloud Name " + cloudName + " registered with Cloud Number " + cloudNumber);
 	}
 
+	@Override
 	public void registerCloudNameInCloud(CloudName cloudName, CloudNumber cloudNumber, String secretToken) throws Xdi2ClientException {
 
 		// prepare message to Cloud
@@ -418,6 +425,7 @@ public class BasicCSP implements CSP {
 		log.debug("In Cloud: Cloud Name " + cloudName + " registered with Cloud Number " + cloudNumber);
 	}
 
+	@Override
 	public void deleteCloudNameInRN(CloudName cloudName, CloudNumber cloudNumber) throws Xdi2ClientException {
 
 		// prepare message to RN
@@ -452,6 +460,7 @@ public class BasicCSP implements CSP {
 		log.debug("In RN: Cloud Name " + cloudName + " deleted.");
 	}
 
+	@Override
 	public void setCloudXdiEndpointInRN(CloudNumber cloudNumber, String cloudXdiEndpoint) throws Xdi2ClientException {
 
 		// auto-generate XDI endpoint
@@ -482,6 +491,7 @@ public class BasicCSP implements CSP {
 		log.debug("In RN: Cloud XDI endpoint " + cloudXdiEndpoint + " set for Cloud Number " + cloudNumber);
 	}
 
+	@Override
 	public void setPhoneAndEmailInRN(CloudNumber cloudNumber, String verifiedPhone, String verifiedEmail) throws Xdi2ClientException {
 
 		// prepare message to RN
@@ -498,7 +508,7 @@ public class BasicCSP implements CSP {
 		if (verifiedPhone != null) {
 
 			targetStatementsSet.add(XDI3Statement.fromRelationComponents(
-					XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_AC_VERIFIED_DIGEST_PHONE, XDI3Segment.fromComponent(XdiAttributeMemberUnordered.createDigestArcXri(verifiedPhone, true))),
+					XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_AC_VERIFIED_DIGEST_PHONE, XDI3Segment.fromComponent(XdiAbstractMemberUnordered.createDigestArcXri(verifiedPhone, true))),
 					XRI_S_IS_PHONE,
 					cloudNumber.getXri()));
 		}
@@ -506,7 +516,7 @@ public class BasicCSP implements CSP {
 		if (verifiedEmail != null) {
 
 			targetStatementsSet.add(XDI3Statement.fromRelationComponents(
-					XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_AC_VERIFIED_DIGEST_EMAIL, XDI3Segment.fromComponent(XdiAttributeMemberUnordered.createDigestArcXri(verifiedEmail, true))),
+					XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_AC_VERIFIED_DIGEST_EMAIL, XDI3Segment.fromComponent(XdiAbstractMemberUnordered.createDigestArcXri(verifiedEmail, true))),
 					XRI_S_IS_EMAIL,
 					cloudNumber.getXri()));
 		}
@@ -522,6 +532,7 @@ public class BasicCSP implements CSP {
 		log.debug("In RN: Verified phone " + verifiedPhone + " and verified e-mail " + verifiedEmail + " set for Cloud Number " + cloudNumber);
 	}
 
+	@Override
 	public void setRespectNetworkMembershipInRN(CloudNumber cloudNumber)  throws Xdi2ClientException {
 
 		// prepare message to RN
@@ -551,6 +562,7 @@ public class BasicCSP implements CSP {
 		log.debug("In RN: Respect Network membership set for Cloud Number " + cloudNumber);
 	}
 
+	@Override
 	public boolean checkRespectNetworkMembershipInRN(CloudNumber cloudNumber) throws Xdi2ClientException {
 
 		// prepare message to RN
@@ -582,6 +594,7 @@ public class BasicCSP implements CSP {
 		return member;
 	}
 
+	@Override
 	public void setRespectFirstMembershipInRN(CloudNumber cloudNumber, Date expirationTime)  throws Xdi2ClientException {
 
 		// prepare message to RN
@@ -622,6 +635,7 @@ public class BasicCSP implements CSP {
 		log.debug("In RN: Respect First membership set for Cloud Number " + cloudNumber);
 	}
 
+	@Override
 	public boolean checkRespectFirstMembershipInRN(CloudNumber cloudNumber) throws Xdi2ClientException {
 
 		// prepare message to RN
@@ -653,14 +667,12 @@ public class BasicCSP implements CSP {
 		return member;
 	}
 
+	@Override
 	public void setCloudXdiEndpointInCSP(CloudNumber cloudNumber, String cloudXdiEndpoint) throws Xdi2ClientException {
 
 		// auto-generate XDI endpoint
 
-		if (cloudXdiEndpoint == null) {
-
-			cloudXdiEndpoint = makeCloudXdiEndpoint(this.getCspInformation(), cloudNumber);
-		}
+		if (cloudXdiEndpoint == null) cloudXdiEndpoint = makeCloudXdiEndpoint(this.getCspInformation(), cloudNumber);
 
 		// prepare message to CSP
 
@@ -670,8 +682,6 @@ public class BasicCSP implements CSP {
 		message.setToPeerRootXri(this.getCspInformation().getCspCloudNumber().getPeerRootXri());
 		message.setLinkContractXri(RootLinkContract.createRootLinkContractXri(this.getCspInformation().getCspCloudNumber().getXri()));
 		message.setSecretToken(this.getCspInformation().getCspSecretToken());
-
-		cloudXdiEndpoint = makeCloudXdiEndpoint(this.getCspInformation(), cloudNumber);
 
 		XDI3Statement targetStatementSet = XDI3Statement.fromLiteralComponents(
 				XDI3Util.concatXris(cloudNumber.getPeerRootXri(), XDI3Segment.create("<$xdi><$uri>&")), 
@@ -688,6 +698,7 @@ public class BasicCSP implements CSP {
 		log.debug("In CSP: Cloud XDI endpoint " + cloudXdiEndpoint + " set for Cloud Number " + cloudNumber);
 	}
 
+	@Override
 	public void setCloudSecretTokenInCSP(CloudNumber cloudNumber, String secretToken) throws Xdi2ClientException {
 
 		// prepare message to CSP
@@ -714,6 +725,7 @@ public class BasicCSP implements CSP {
 		log.debug("In CSP: Secret token set for Cloud Number " + cloudNumber);
 	}
 
+	@Override
 	public CloudName[] checkCloudNamesInCSP(CloudNumber cloudNumber) throws Xdi2ClientException {
 
 		// prepare message to RN
@@ -750,6 +762,7 @@ public class BasicCSP implements CSP {
 		return cloudNames;
 	}
 
+	@Override
 	public void authenticateInCloud(CloudNumber cloudNumber, String secretToken) throws Xdi2ClientException {
 
 		// prepare message to Cloud
@@ -778,6 +791,7 @@ public class BasicCSP implements CSP {
 		log.debug("In Cloud: Authenticated Cloud Number");
 	}
 
+	@Override
 	public void setCloudServicesInCloud(CloudNumber cloudNumber, String secretToken, Map<XDI3Segment, String> services) throws Xdi2ClientException {
 
 		// prepare message to Cloud
@@ -818,6 +832,7 @@ public class BasicCSP implements CSP {
 		log.debug("In Cloud: For Cloud Number " + cloudNumber + " registered services " + services);
 	}
 
+	@Override
 	public void setPhoneAndEmailInCloud(CloudNumber cloudNumber, String secretToken, String verifiedPhone, String verifiedEmail) throws Xdi2ClientException {
 
 		// prepare message to Cloud
