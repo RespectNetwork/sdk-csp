@@ -13,9 +13,9 @@ public interface CSPInformation {
 	 */
 
 	public CloudNumber getCspCloudNumber();
-	public String getCspSecretToken();
 	public String getCspRegistryXdiEndpoint();
 	public String getCspCloudBaseXdiEndpoint();
+	public String getCspSecretToken();
 
 	/*
 	 * Information about RN
@@ -24,4 +24,5 @@ public interface CSPInformation {
 	public CloudNumber getRnCloudNumber();
 	public String getRnRegistrationServiceXdiEndpoint();
 	public XDI3Segment getRnCspLinkContract();
+	public String getRnCspSecretToken();
 }

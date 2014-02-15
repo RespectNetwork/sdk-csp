@@ -12,12 +12,13 @@ public class CSPInformationTTCC extends BasicCSPInformation {
 
 		super(
 				CloudNumber.create("[@]!:uuid:e9449d30-b032-4ad0-89a3-b7498fbc731e"),
-				"ofniruoynwo",
 				"http://clouds.ownyourinfo.com:14440/ownyourinfo-registry",
 				"http://clouds.ownyourinfo.com:14440/ownyourinfo-users/",
+				"ofniruoynwo",
 				CloudNumber.create("[@]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa"),
 				"https://registration-dev.respectnetwork.net/registration",
-				XDI3Segment.create("[@]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa$to+registrar$from$do")
+				XDI3Segment.create("[@]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa$to+registrar$from$do"),
+				"ofniruoynwo"
 				);
 	}
 }

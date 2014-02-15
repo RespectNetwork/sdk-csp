@@ -37,7 +37,7 @@ public class ExampleCheckCloudNameAvailable {
 
 		// Step 0: Set up CSP
 
-		CSPInformation cspInformation = new CSPInformationRespectNetwork();
+		CSPInformation cspInformation = new CSPInformationRespectNetworkOTE();
 		//CSPInformation cspInformation = new CSPInformationTTCC();
 
 		CSP csp = new BasicCSP(cspInformation);

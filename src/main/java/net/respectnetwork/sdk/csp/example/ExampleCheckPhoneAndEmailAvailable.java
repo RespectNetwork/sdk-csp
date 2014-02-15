@@ -10,16 +10,16 @@ import xdi2.core.xri3.CloudNumber;
 public class ExampleCheckPhoneAndEmailAvailable {
 
 	/* CHOOSE THE INDIVIDUAL's VERIFIED PHONE NUMBER HERE */
-	private static String verifiedPhone = "123456";
+	private static String verifiedPhone = "+61 481084204";
 
 	/* CHOOSE THE INDIVIDUAL's VERIFIED EMAIL HERE */
-	private static String verifiedEmail = "test@test.com";
+	private static String verifiedEmail = "fun@geek.net.au";
 
 	public static void main(String[] args) throws Exception {
 
 		// Step 0: Set up CSP
 
-		CSPInformation cspInformation = new CSPInformationRespectNetwork();
+		CSPInformation cspInformation = new CSPInformationRespectNetworkOTE();
 		//CSPInformation cspInformation = new CSPInformationTTCC();
 
 		CSP csp = new BasicCSP(cspInformation);

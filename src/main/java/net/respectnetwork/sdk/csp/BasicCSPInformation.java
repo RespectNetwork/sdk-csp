@@ -10,26 +10,28 @@ public class BasicCSPInformation implements CSPInformation, Serializable {
 	private static final long serialVersionUID = 4621748646529792450L;
 
 	private CloudNumber cspCloudNumber;
-	private String cspSecretToken;
 	private String cspRegistryXdiEndpoint;
 	private String cspCloudBaseXdiEndpoint;
+	private String cspSecretToken;
 	private CloudNumber rnCloudNumber;
 	private String rnRegistrationServiceXdiEndpoint;
 	private XDI3Segment rnCspLinkContract;
+	private String rnCspSecretToken;
 
 	public BasicCSPInformation() {
 
 	}
 
-	public BasicCSPInformation(CloudNumber cspCloudNumber, String cspSecretToken, String cspRegistryXdiEndpoint, String cspCloudBaseXdiEndpoint, CloudNumber rnCloudNumber, String rnRegistrationServiceXdiEndpoint, XDI3Segment rnCspLinkContract) {
+	public BasicCSPInformation(CloudNumber cspCloudNumber, String cspRegistryXdiEndpoint, String cspCloudBaseXdiEndpoint, String cspSecretToken, CloudNumber rnCloudNumber, String rnRegistrationServiceXdiEndpoint, XDI3Segment rnCspLinkContract, String rnCspSecretToken) {
 
 		this.cspCloudNumber = cspCloudNumber;
-		this.cspSecretToken = cspSecretToken;
 		this.cspRegistryXdiEndpoint = cspRegistryXdiEndpoint;
 		this.cspCloudBaseXdiEndpoint = cspCloudBaseXdiEndpoint;
+		this.cspSecretToken = cspSecretToken;
 		this.rnCloudNumber = rnCloudNumber;
 		this.rnRegistrationServiceXdiEndpoint = rnRegistrationServiceXdiEndpoint;
 		this.rnCspLinkContract = rnCspLinkContract;
+		this.rnCspSecretToken = rnCspSecretToken;
 	}
 
 	/*
@@ -45,17 +47,6 @@ public class BasicCSPInformation implements CSPInformation, Serializable {
 	public void setCspCloudNumber(CloudNumber cspCloudNumber) {
 
 		this.cspCloudNumber = cspCloudNumber;
-	}
-
-	@Override
-	public String getCspSecretToken() {
-
-		return this.cspSecretToken;
-	}
-
-	public void setCspSecretToken(String cspSecretToken) {
-
-		this.cspSecretToken = cspSecretToken;
 	}
 
 	@Override
@@ -78,6 +69,17 @@ public class BasicCSPInformation implements CSPInformation, Serializable {
 	public void setCspCloudBaseXdiEndpoint(String cspCloudBaseXdiEndpoint) {
 
 		this.cspCloudBaseXdiEndpoint = cspCloudBaseXdiEndpoint;
+	}
+
+	@Override
+	public String getCspSecretToken() {
+
+		return this.cspSecretToken;
+	}
+
+	public void setCspSecretToken(String cspSecretToken) {
+
+		this.cspSecretToken = cspSecretToken;
 	}
 
 	@Override
@@ -111,5 +113,16 @@ public class BasicCSPInformation implements CSPInformation, Serializable {
 	public void setRnCspLinkContract(XDI3Segment rnCspLinkContract) {
 
 		this.rnCspLinkContract = rnCspLinkContract;
+	}
+
+	@Override
+	public String getRnCspSecretToken() {
+
+		return this.rnCspSecretToken;
+	}
+
+	public void setRnCspSecretToken(String rnCspSecretToken) {
+
+		this.rnCspSecretToken = rnCspSecretToken;
 	}
 }
