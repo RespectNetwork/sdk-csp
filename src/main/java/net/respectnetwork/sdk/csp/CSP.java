@@ -3,6 +3,8 @@ package net.respectnetwork.sdk.csp;
 import java.util.Date;
 import java.util.Map;
 
+import net.respectnetwork.sdk.csp.discount.CloudNameDiscountCode;
+import net.respectnetwork.sdk.csp.discount.RespectNetworkMembershipDiscountCode;
 import xdi2.client.exceptions.Xdi2ClientException;
 import xdi2.core.xri3.CloudName;
 import xdi2.core.xri3.CloudNumber;
@@ -78,7 +80,7 @@ public interface CSP {
 	 *   [A] 5.1.1.3
 	 *   [B] Not used
 	 */
-	public void registerCloudNameInRN(CloudName cloudName, CloudNumber cloudNumber, String verifiedPhone, String verifiedEmail, NeustarRnDiscountCode neustarRnDiscountCode) throws Xdi2ClientException;
+	public void registerCloudNameInRN(CloudName cloudName, CloudNumber cloudNumber, String verifiedPhone, String verifiedEmail, CloudNameDiscountCode cloudNameDiscountCode) throws Xdi2ClientException;
 
 	/**
 	 * This method registers a new Cloud Name and Cloud Number in the CSP Cloud.
@@ -134,7 +136,7 @@ public interface CSP {
 	 *   [A] Not used
 	 *   [B] Not used
 	 */
-	public void setRespectNetworkMembershipInRN(CloudNumber cloudNumber)  throws Xdi2ClientException;
+	public void setRespectNetworkMembershipInRN(CloudNumber cloudNumber, Date expirationTime, RespectNetworkMembershipDiscountCode respectNetworkMembershipDiscountCode)  throws Xdi2ClientException;
 
 	/**
 	 * This method retrieves a flag for a Cloud Number in the RN Member Graph Service to indicate whether it is a member of
@@ -152,7 +154,7 @@ public interface CSP {
 	 *   [A] Not used
 	 *   [B] Not used
 	 */
-	public void setRespectFirstMembershipInRN(CloudNumber cloudNumber, Date expirationTime)  throws Xdi2ClientException;
+	public void setRespectFirstMembershipInRN(CloudNumber cloudNumber)  throws Xdi2ClientException;
 
 	/**
 	 * This method retrieves a flag for a Cloud Number in the RN Member Graph Service to indicate whether it is a member of
@@ -220,14 +222,4 @@ public interface CSP {
 	 *   [B] 4.1.1.2
 	 */
 	public void setPhoneAndEmailInCloud(CloudNumber cloudNumber, String secretToken, String verifiedPhone, String verifiedEmail) throws Xdi2ClientException;
-
-	/*
-	 * Helper enum
-	 */
-
-	public enum NeustarRnDiscountCode {
-
-		OnePersonOneName,
-		RespectFirst;
-	}
 }

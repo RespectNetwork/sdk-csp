@@ -11,8 +11,9 @@ import java.util.UUID;
 
 import net.respectnetwork.sdk.csp.BasicCSP;
 import net.respectnetwork.sdk.csp.CSP;
-import net.respectnetwork.sdk.csp.CSP.NeustarRnDiscountCode;
 import net.respectnetwork.sdk.csp.CSPInformation;
+import net.respectnetwork.sdk.csp.discount.CloudNameDiscountCode;
+import net.respectnetwork.sdk.csp.discount.RespectNetworkMembershipDiscountCode;
 import xdi2.core.xri3.CloudName;
 import xdi2.core.xri3.CloudNumber;
 import xdi2.core.xri3.XDI3Segment;
@@ -34,6 +35,12 @@ public class ExampleRegister {
 	/* CHOOSE THE INDIVIDUAL's VERIFIED EMAIL HERE */
 	private static String verifiedEmail = "test" + UUID.randomUUID().toString() + "@test.com";
 
+	/* CHOOSE A CLOUD NAME DISCOUNT CODE */
+	private static CloudNameDiscountCode cloudNameDiscountCode = CloudNameDiscountCode.OnePersonOneName;
+
+	/* CHOOSE A RESPECT NETWORK MEMBERSHIP DISCOUNT CODE */
+	private static RespectNetworkMembershipDiscountCode respectNetworkMembershipDiscountCode = RespectNetworkMembershipDiscountCode.IIW17;
+
 	static {
 
 		try {
@@ -42,7 +49,7 @@ public class ExampleRegister {
 			cloudName = CloudName.create(new BufferedReader(new InputStreamReader(System.in)).readLine());
 
 			if (cloudName == null) {
-				
+
 				System.err.println("Invalid Cloud Name.");
 				System.exit(0);
 			}
@@ -90,7 +97,7 @@ public class ExampleRegister {
 
 		// step 5: Register Cloud Name
 
-		csp.registerCloudNameInRN(cloudName, cloudNumber, verifiedPhone, verifiedEmail, NeustarRnDiscountCode.OnePersonOneName);
+		csp.registerCloudNameInRN(cloudName, cloudNumber, verifiedPhone, verifiedEmail, cloudNameDiscountCode);
 		csp.registerCloudNameInCSP(cloudName, cloudNumber);
 		csp.registerCloudNameInCloud(cloudName, cloudNumber, secretToken);
 
@@ -100,8 +107,8 @@ public class ExampleRegister {
 
 		// step 7: Set RN/RF membership
 
-		csp.setRespectNetworkMembershipInRN(cloudNumber);
-		csp.setRespectFirstMembershipInRN(cloudNumber, new Date());
+		csp.setRespectNetworkMembershipInRN(cloudNumber, new Date(), respectNetworkMembershipDiscountCode);
+		csp.setRespectFirstMembershipInRN(cloudNumber);
 
 		// done
 

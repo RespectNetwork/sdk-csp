@@ -9,6 +9,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import net.respectnetwork.sdk.csp.discount.CloudNameDiscountCode;
+import net.respectnetwork.sdk.csp.discount.RespectNetworkMembershipDiscountCode;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,10 +57,12 @@ public class BasicCSP implements CSP {
 	public static final XDI3Segment XRI_S_IS_EMAIL = XDI3Segment.create("$is+email");
 
 	public static final XDI3Segment XRI_S_MEMBER = XDI3Segment.create("+member");
-	public static final XDI3Segment XRI_S_FIRST_MEMBER = XDI3Segment.create("+first+member");
-	public static final XDI3Segment XRI_S_AS_FIRST_MEMBER_EXPIRATION_TIME = XDI3Segment.create("<+first><+member><+expiration><$t>");
+	public static final XDI3Segment XRI_S_AS_MEMBER_EXPIRATION_TIME = XDI3Segment.create("<+member><+expiration><$t>");
 
-	public static final XDI3Segment XRI_S_PARAMETER_NEUSTAR_RNDISCOUNTCODE = XDI3Segment.create("<+([@]!:uuid:e9b5165b-fa7b-4387-a685-7125d138a872)><+(RNDiscountCode)>");
+	public static final XDI3Segment XRI_S_FIRST_MEMBER = XDI3Segment.create("+first+member");
+
+	public static final XDI3Segment XRI_S_PARAMETER_CLOUDNAME_DISCOUNTCODE = XDI3Segment.create("<+([@]!:uuid:e9b5165b-fa7b-4387-a685-7125d138a872)><+(RNDiscountCode)>");
+	public static final XDI3Segment XRI_S_PARAMETER_RESPECT_NETWORK_MEMBERSHIP_DISCOUNTCODE = XDI3Segment.create("<+([@]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa)><+(RNDiscountCode)>");
 
 	private CSPInformation cspInformation;
 
@@ -256,7 +261,7 @@ public class BasicCSP implements CSP {
 	}
 
 	@Override
-	public void registerCloudNameInRN(CloudName cloudName, CloudNumber cloudNumber, String verifiedPhone, String verifiedEmail, NeustarRnDiscountCode neustarRnDiscountCode) throws Xdi2ClientException {
+	public void registerCloudNameInRN(CloudName cloudName, CloudNumber cloudNumber, String verifiedPhone, String verifiedEmail, CloudNameDiscountCode cloudNameDiscountCode) throws Xdi2ClientException {
 
 		// prepare message 1 to RN
 
@@ -279,11 +284,11 @@ public class BasicCSP implements CSP {
 				XDIDictionaryConstants.XRI_S_IS_REF, 
 				XDI3Segment.fromComponent(cloudName.getPeerRootXri())));
 
-		Operation operation = message1.createSetOperation(targetStatementsSet.iterator());
+		Operation operation1 = message1.createSetOperation(targetStatementsSet.iterator());
 
-		if (neustarRnDiscountCode != null) {
+		if (cloudNameDiscountCode != null) {
 
-			operation.setParameter(XRI_S_PARAMETER_NEUSTAR_RNDISCOUNTCODE, neustarRnDiscountCode.toString());
+			operation1.setParameter(XRI_S_PARAMETER_CLOUDNAME_DISCOUNTCODE, cloudNameDiscountCode.toString());
 		}
 
 		// prepare message 2 to RN
@@ -533,7 +538,7 @@ public class BasicCSP implements CSP {
 	}
 
 	@Override
-	public void setRespectNetworkMembershipInRN(CloudNumber cloudNumber)  throws Xdi2ClientException {
+	public void setRespectNetworkMembershipInRN(CloudNumber cloudNumber, Date expirationTime, RespectNetworkMembershipDiscountCode respectNetworkMembershipDiscountCode)  throws Xdi2ClientException {
 
 		// prepare message to RN
 
@@ -551,7 +556,23 @@ public class BasicCSP implements CSP {
 				XRI_S_MEMBER,
 				cloudNumber.getXri()));
 
-		message.createSetOperation(targetStatements.iterator());
+		targetStatements.add(XDI3Statement.fromComponents(
+				this.getCspInformation().getRnCloudNumber().getXri(),
+				XRI_S_MEMBER,
+				XDI3Segment.fromComponent(
+						XDI3SubSegment.fromComponents(null, false, false, null, 
+								XDI3XRef.fromComponents(XDIConstants.XS_ROOT, null, 
+										XDI3Statement.fromLiteralComponents(
+												XDI3Util.concatXris(cloudNumber.getXri(), XRI_S_AS_MEMBER_EXPIRATION_TIME, XDIConstants.XRI_S_VALUE), 
+												Timestamps.timestampToString(expirationTime)), 
+												null, null, null, null)))));
+
+		Operation operation = message.createSetOperation(targetStatements.iterator());
+
+		if (respectNetworkMembershipDiscountCode != null) {
+
+			operation.setParameter(XRI_S_PARAMETER_RESPECT_NETWORK_MEMBERSHIP_DISCOUNTCODE, respectNetworkMembershipDiscountCode.toString());
+		}
 
 		// send message
 
@@ -595,7 +616,7 @@ public class BasicCSP implements CSP {
 	}
 
 	@Override
-	public void setRespectFirstMembershipInRN(CloudNumber cloudNumber, Date expirationTime)  throws Xdi2ClientException {
+	public void setRespectFirstMembershipInRN(CloudNumber cloudNumber)  throws Xdi2ClientException {
 
 		// prepare message to RN
 
@@ -612,17 +633,6 @@ public class BasicCSP implements CSP {
 				this.getCspInformation().getRnCloudNumber().getXri(),
 				XRI_S_FIRST_MEMBER,
 				cloudNumber.getXri()));
-
-		targetStatements.add(XDI3Statement.fromComponents(
-				this.getCspInformation().getRnCloudNumber().getXri(),
-				XRI_S_FIRST_MEMBER,
-				XDI3Segment.fromComponent(
-						XDI3SubSegment.fromComponents(null, false, false, null, 
-								XDI3XRef.fromComponents(XDIConstants.XS_ROOT, null, 
-										XDI3Statement.fromLiteralComponents(
-												XDI3Util.concatXris(cloudNumber.getXri(), XRI_S_AS_FIRST_MEMBER_EXPIRATION_TIME, XDIConstants.XRI_S_VALUE), 
-												Timestamps.timestampToString(expirationTime)), 
-												null, null, null, null)))));
 
 		message.createSetOperation(targetStatements.iterator());
 
