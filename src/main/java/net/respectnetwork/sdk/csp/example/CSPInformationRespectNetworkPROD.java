@@ -1,6 +1,7 @@
 package net.respectnetwork.sdk.csp.example;
 
 import net.respectnetwork.sdk.csp.BasicCSPInformation;
+import net.respectnetwork.sdk.csp.ssl.TLSv1Support;
 import xdi2.core.xri3.CloudNumber;
 import xdi2.core.xri3.XDI3Segment;
 
@@ -20,5 +21,7 @@ public class CSPInformationRespectNetworkPROD extends BasicCSPInformation {
 				XDI3Segment.create("[@]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa$to+registrar$from$do"),
 				"s3cr3t"
 				);
+
+		TLSv1Support.supportTLSv1();
 	}
 }
