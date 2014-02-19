@@ -1,4 +1,4 @@
-package net.respectnetwork.sdk.csp;
+package net.respectnetwork.sdk.csp.ssl;
 
 import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;
