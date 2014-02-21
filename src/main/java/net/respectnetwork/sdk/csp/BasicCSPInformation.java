@@ -1,11 +1,12 @@
 package net.respectnetwork.sdk.csp;
 
 import java.io.Serializable;
+import java.security.PrivateKey;
 
 import xdi2.core.xri3.CloudNumber;
 import xdi2.core.xri3.XDI3Segment;
 
-public class BasicCSPInformation implements CSPInformation, Serializable {
+public class BasicCSPInformation extends AbstractCSPInformation implements CSPInformation, Serializable {
 
 	private static final long serialVersionUID = 4621748646529792450L;
 
@@ -13,6 +14,7 @@ public class BasicCSPInformation implements CSPInformation, Serializable {
 	private String cspRegistryXdiEndpoint;
 	private String cspCloudBaseXdiEndpoint;
 	private String cspSecretToken;
+	private PrivateKey cspPrivateKey;
 	private CloudNumber rnCloudNumber;
 	private String rnRegistrationServiceXdiEndpoint;
 	private XDI3Segment rnCspLinkContract;
@@ -22,12 +24,13 @@ public class BasicCSPInformation implements CSPInformation, Serializable {
 
 	}
 
-	public BasicCSPInformation(CloudNumber cspCloudNumber, String cspRegistryXdiEndpoint, String cspCloudBaseXdiEndpoint, String cspSecretToken, CloudNumber rnCloudNumber, String rnRegistrationServiceXdiEndpoint, XDI3Segment rnCspLinkContract, String rnCspSecretToken) {
+	public BasicCSPInformation(CloudNumber cspCloudNumber, String cspRegistryXdiEndpoint, String cspCloudBaseXdiEndpoint, String cspSecretToken, PrivateKey cspPrivateKey, CloudNumber rnCloudNumber, String rnRegistrationServiceXdiEndpoint, XDI3Segment rnCspLinkContract, String rnCspSecretToken) {
 
 		this.cspCloudNumber = cspCloudNumber;
 		this.cspRegistryXdiEndpoint = cspRegistryXdiEndpoint;
 		this.cspCloudBaseXdiEndpoint = cspCloudBaseXdiEndpoint;
 		this.cspSecretToken = cspSecretToken;
+		this.cspPrivateKey = cspPrivateKey;
 		this.rnCloudNumber = rnCloudNumber;
 		this.rnRegistrationServiceXdiEndpoint = rnRegistrationServiceXdiEndpoint;
 		this.rnCspLinkContract = rnCspLinkContract;
@@ -80,6 +83,17 @@ public class BasicCSPInformation implements CSPInformation, Serializable {
 	public void setCspSecretToken(String cspSecretToken) {
 
 		this.cspSecretToken = cspSecretToken;
+	}
+
+	@Override
+	public PrivateKey getCspPrivateKey() {
+
+		return this.cspPrivateKey;
+	}
+
+	public void setCspPrivateKey(PrivateKey cspPrivateKey) {
+
+		this.cspPrivateKey = cspPrivateKey;
 	}
 
 	@Override

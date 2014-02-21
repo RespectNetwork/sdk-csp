@@ -41,6 +41,7 @@ import xdi2.core.xri3.XDI3Statement;
 import xdi2.core.xri3.XDI3SubSegment;
 import xdi2.core.xri3.XDI3XRef;
 import xdi2.messaging.Message;
+import xdi2.messaging.MessageCollection;
 import xdi2.messaging.MessageEnvelope;
 import xdi2.messaging.MessageResult;
 import xdi2.messaging.Operation;
@@ -83,22 +84,15 @@ public class BasicCSP implements CSP {
 	}
 
 	@Override
-	public CSPInformation getCSPInformation() {
-
-		return this.cspInformation;
-	}
-
-	@Override
 	public void registerCloudInCSP(CloudNumber cloudNumber, String secretToken) throws Xdi2ClientException {
 
 		// prepare message to CSP
 
 		MessageEnvelope messageEnvelope = new MessageEnvelope();
+		MessageCollection messageCollection = this.getCspInformation().createMessageCollectionToCSP(messageEnvelope);
 
-		Message message = messageEnvelope.createMessage(this.getCspInformation().getCspCloudNumber().getXri());
-		message.setToPeerRootXri(this.getCspInformation().getCspCloudNumber().getPeerRootXri());
-		message.setLinkContractXri(RootLinkContract.createRootLinkContractXri(this.getCspInformation().getCspCloudNumber().getXri()));
-		message.setSecretToken(this.getCspInformation().getCspSecretToken());
+		Message message = messageCollection.createMessage();
+		this.getCspInformation().prepareMessageToCSP(message);
 
 		String cloudXdiEndpoint = makeCloudXdiEndpoint(this.getCspInformation(), cloudNumber);
 
@@ -134,11 +128,10 @@ public class BasicCSP implements CSP {
 		// prepare message to RN
 
 		MessageEnvelope messageEnvelope = new MessageEnvelope();
+		MessageCollection messageCollection = this.getCspInformation().createMessageCollectionToRN(messageEnvelope);
 
-		Message message = messageEnvelope.createMessage(this.getCspInformation().getCspCloudNumber().getXri());
-		message.setToPeerRootXri(this.getCspInformation().getRnCloudNumber().getPeerRootXri());
-		message.setLinkContractXri(this.getCspInformation().getRnCspLinkContract());
-		message.setSecretToken(this.getCspInformation().getRnCspSecretToken());
+		Message message = messageCollection.createMessage();
+		this.getCspInformation().prepareMessageToRN(message);
 
 		XDI3Segment targetAddress = XDI3Segment.fromComponent(cloudName.getPeerRootXri());
 
@@ -169,11 +162,10 @@ public class BasicCSP implements CSP {
 		// prepare message to RN
 
 		MessageEnvelope messageEnvelope = new MessageEnvelope();
+		MessageCollection messageCollection = this.getCspInformation().createMessageCollectionToRN(messageEnvelope);
 
-		Message message = messageEnvelope.createMessage(this.getCspInformation().getCspCloudNumber().getXri());
-		message.setToPeerRootXri(this.getCspInformation().getRnCloudNumber().getPeerRootXri());
-		message.setLinkContractXri(this.getCspInformation().getRnCspLinkContract());
-		message.setSecretToken(this.getCspInformation().getRnCspSecretToken());
+		Message message = messageCollection.createMessage();
+		this.getCspInformation().prepareMessageToRN(message);
 
 		XDI3Segment targetAddress1 = verifiedPhone == null ? null : XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_AC_VERIFIED_DIGEST_PHONE, XDI3Segment.fromComponent(XdiAbstractMemberUnordered.createDigestArcXri(verifiedPhone, true)));
 		XDI3Segment targetAddress2 = verifiedEmail == null ? null : XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_AC_VERIFIED_DIGEST_EMAIL, XDI3Segment.fromComponent(XdiAbstractMemberUnordered.createDigestArcXri(verifiedEmail, true)));
@@ -210,11 +202,10 @@ public class BasicCSP implements CSP {
 		// prepare message 1 to RN
 
 		MessageEnvelope messageEnvelope1 = new MessageEnvelope();
+		MessageCollection messageCollection1 = this.getCspInformation().createMessageCollectionToRN(messageEnvelope1);
 
-		Message message1 = messageEnvelope1.createMessage(this.getCspInformation().getCspCloudNumber().getXri());
-		message1.setToPeerRootXri(this.getCspInformation().getRnCloudNumber().getPeerRootXri());
-		message1.setLinkContractXri(this.getCspInformation().getRnCspLinkContract());
-		message1.setSecretToken(this.getCspInformation().getRnCspSecretToken());
+		Message message1 = messageCollection1.createMessage();
+		this.getCspInformation().prepareMessageToRN(message1);
 
 		XDI3Statement targetStatementSet1 = XDI3Statement.fromRelationComponents(
 				XDI3Segment.fromComponent(cloudName.getPeerRootXri()), 
@@ -235,11 +226,10 @@ public class BasicCSP implements CSP {
 		// prepare message 2 to RN
 
 		MessageEnvelope messageEnvelope2 = new MessageEnvelope();
+		MessageCollection messageCollection2 = this.getCspInformation().createMessageCollectionToCSP(messageEnvelope2);
 
-		Message message2 = messageEnvelope2.getMessageCollection(this.getCspInformation().getCspCloudNumber().getXri(), true).createMessage();
-		message2.setToPeerRootXri(this.getCspInformation().getRnCloudNumber().getPeerRootXri());
-		message2.setLinkContractXri(this.getCspInformation().getRnCspLinkContract());
-		message2.setSecretToken(this.getCspInformation().getRnCspSecretToken());
+		Message message2 = messageCollection2.createMessage();
+		this.getCspInformation().prepareMessageToRN(message2);
 
 		String cloudXdiEndpoint = makeCloudXdiEndpoint(this.getCspInformation(), cloudNumber);
 
@@ -266,11 +256,10 @@ public class BasicCSP implements CSP {
 		// prepare message 1 to RN
 
 		MessageEnvelope messageEnvelope = new MessageEnvelope();
+		MessageCollection messageCollection = this.getCspInformation().createMessageCollectionToRN(messageEnvelope);
 
-		Message message1 = messageEnvelope.getMessageCollection(this.getCspInformation().getCspCloudNumber().getXri(), true).createMessage(-1);
-		message1.setToPeerRootXri(this.getCspInformation().getRnCloudNumber().getPeerRootXri());
-		message1.setLinkContractXri(this.getCspInformation().getRnCspLinkContract());
-		message1.setSecretToken(this.getCspInformation().getRnCspSecretToken());
+		Message message1 = messageCollection.createMessage(-1);
+		this.getCspInformation().prepareMessageToRN(message1);
 
 		List<XDI3Statement> targetStatementsSet = new ArrayList<XDI3Statement> ();
 
@@ -293,10 +282,8 @@ public class BasicCSP implements CSP {
 
 		// prepare message 2 to RN
 
-		Message message2 = messageEnvelope.getMessageCollection(this.getCspInformation().getCspCloudNumber().getXri(), true).createMessage(-1);
-		message2.setToPeerRootXri(this.getCspInformation().getRnCloudNumber().getPeerRootXri());
-		message2.setLinkContractXri(this.getCspInformation().getRnCspLinkContract());
-		message2.setSecretToken(this.getCspInformation().getRnCspSecretToken());
+		Message message2 = messageCollection.createMessage(-1);
+		this.getCspInformation().prepareMessageToRN(message2);
 
 		String cloudXdiEndpoint = makeCloudXdiEndpoint(this.getCspInformation(), cloudNumber);
 
@@ -310,10 +297,8 @@ public class BasicCSP implements CSP {
 
 		// prepare message 3 to RN
 
-		Message message3 = messageEnvelope.getMessageCollection(this.getCspInformation().getCspCloudNumber().getXri(), true).createMessage(-1);
-		message3.setToPeerRootXri(this.getCspInformation().getRnCloudNumber().getPeerRootXri());
-		message3.setLinkContractXri(this.getCspInformation().getRnCspLinkContract());
-		message3.setSecretToken(this.getCspInformation().getRnCspSecretToken());
+		Message message3 = messageCollection.createMessage(-1);
+		this.getCspInformation().prepareMessageToRN(message3);
 
 		List<XDI3Statement> targetStatementsSet3 = new ArrayList<XDI3Statement> ();
 
@@ -356,11 +341,10 @@ public class BasicCSP implements CSP {
 		// prepare message to CSP
 
 		MessageEnvelope messageEnvelope = new MessageEnvelope();
+		MessageCollection messageCollection = this.getCspInformation().createMessageCollectionToCSP(messageEnvelope);
 
-		Message message = messageEnvelope.createMessage(this.getCspInformation().getCspCloudNumber().getXri());
-		message.setToPeerRootXri(this.getCspInformation().getCspCloudNumber().getPeerRootXri());
-		message.setLinkContractXri(RootLinkContract.createRootLinkContractXri(this.getCspInformation().getCspCloudNumber().getXri()));
-		message.setSecretToken(this.getCspInformation().getCspSecretToken());
+		Message message = messageCollection.createMessage();
+		this.getCspInformation().prepareMessageToCSP(message);
 
 		List<XDI3Statement> targetStatementsSet = new ArrayList<XDI3Statement> ();
 
@@ -391,11 +375,10 @@ public class BasicCSP implements CSP {
 		// prepare message to Cloud
 
 		MessageEnvelope messageEnvelope = new MessageEnvelope();
+		MessageCollection messageCollection = this.getCspInformation().createMessageCollectionToCloud(messageEnvelope, cloudNumber);
 
-		Message message = messageEnvelope.createMessage(cloudNumber.getXri());
-		message.setToPeerRootXri(cloudNumber.getPeerRootXri());
-		message.setLinkContractXri(RootLinkContract.createRootLinkContractXri(cloudNumber.getXri()));
-		message.setSecretToken(secretToken);
+		Message message = messageCollection.createMessage();
+		this.getCspInformation().prepareMessageToCloud(message, cloudNumber, secretToken);
 
 		List<XDI3Statement> targetStatementsSet = new ArrayList<XDI3Statement> ();
 		targetStatementsSet.add(XDI3Statement.fromRelationComponents(
@@ -436,11 +419,10 @@ public class BasicCSP implements CSP {
 		// prepare message to RN
 
 		MessageEnvelope messageEnvelope = new MessageEnvelope();
+		MessageCollection messageCollection = this.getCspInformation().createMessageCollectionToRN(messageEnvelope);
 
-		Message message = messageEnvelope.getMessageCollection(this.getCspInformation().getCspCloudNumber().getXri(), true).createMessage(-1);
-		message.setToPeerRootXri(this.getCspInformation().getRnCloudNumber().getPeerRootXri());
-		message.setLinkContractXri(this.getCspInformation().getRnCspLinkContract());
-		message.setSecretToken(this.getCspInformation().getRnCspSecretToken());
+		Message message = messageCollection.createMessage();
+		this.getCspInformation().prepareMessageToRN(message);
 
 		List<XDI3Statement> targetStatementsDel = new ArrayList<XDI3Statement> ();
 
@@ -475,11 +457,10 @@ public class BasicCSP implements CSP {
 		// prepare message to RN
 
 		MessageEnvelope messageEnvelope = new MessageEnvelope();
+		MessageCollection messageCollection = this.getCspInformation().createMessageCollectionToRN(messageEnvelope);
 
-		Message message = messageEnvelope.createMessage(this.getCspInformation().getCspCloudNumber().getXri());
-		message.setToPeerRootXri(this.getCspInformation().getRnCloudNumber().getPeerRootXri());
-		message.setLinkContractXri(this.getCspInformation().getRnCspLinkContract());
-		message.setSecretToken(this.getCspInformation().getRnCspSecretToken());
+		Message message = messageCollection.createMessage();
+		this.getCspInformation().prepareMessageToRN(message);
 
 		XDI3Statement targetStatementSet = XDI3Statement.fromLiteralComponents(
 				XDI3Util.concatXris(cloudNumber.getPeerRootXri(), XDI3Segment.create("<$xdi><$uri>&")), 
@@ -502,11 +483,10 @@ public class BasicCSP implements CSP {
 		// prepare message to RN
 
 		MessageEnvelope messageEnvelope = new MessageEnvelope();
+		MessageCollection messageCollection = this.getCspInformation().createMessageCollectionToRN(messageEnvelope);
 
-		Message message = messageEnvelope.getMessageCollection(this.getCspInformation().getCspCloudNumber().getXri(), true).createMessage();
-		message.setToPeerRootXri(this.getCspInformation().getRnCloudNumber().getPeerRootXri());
-		message.setLinkContractXri(this.getCspInformation().getRnCspLinkContract());
-		message.setSecretToken(this.getCspInformation().getRnCspSecretToken());
+		Message message = messageCollection.createMessage();
+		this.getCspInformation().prepareMessageToRN(message);
 
 		List<XDI3Statement> targetStatementsSet = new ArrayList<XDI3Statement> ();
 
@@ -543,11 +523,10 @@ public class BasicCSP implements CSP {
 		// prepare message to RN
 
 		MessageEnvelope messageEnvelope = new MessageEnvelope();
+		MessageCollection messageCollection = this.getCspInformation().createMessageCollectionToRN(messageEnvelope);
 
-		Message message = messageEnvelope.getMessageCollection(this.getCspInformation().getCspCloudNumber().getXri(), true).createMessage();
-		message.setToPeerRootXri(this.getCspInformation().getRnCloudNumber().getPeerRootXri());
-		message.setLinkContractXri(this.getCspInformation().getRnCspLinkContract());
-		message.setSecretToken(this.getCspInformation().getRnCspSecretToken());
+		Message message = messageCollection.createMessage();
+		this.getCspInformation().prepareMessageToRN(message);
 
 		List<XDI3Statement> targetStatements = new ArrayList<XDI3Statement> ();
 
@@ -589,11 +568,10 @@ public class BasicCSP implements CSP {
 		// prepare message to RN
 
 		MessageEnvelope messageEnvelope = new MessageEnvelope();
+		MessageCollection messageCollection = this.getCspInformation().createMessageCollectionToRN(messageEnvelope);
 
-		Message message = messageEnvelope.getMessageCollection(this.getCspInformation().getCspCloudNumber().getXri(), true).createMessage();
-		message.setToPeerRootXri(this.getCspInformation().getRnCloudNumber().getPeerRootXri());
-		message.setLinkContractXri(this.getCspInformation().getRnCspLinkContract());
-		message.setSecretToken(this.getCspInformation().getRnCspSecretToken());
+		Message message = messageCollection.createMessage();
+		this.getCspInformation().prepareMessageToRN(message);
 
 		XDI3Statement targetStatement = XDI3Statement.fromRelationComponents(
 				this.getCspInformation().getRnCloudNumber().getXri(),
@@ -621,11 +599,10 @@ public class BasicCSP implements CSP {
 		// prepare message to RN
 
 		MessageEnvelope messageEnvelope = new MessageEnvelope();
+		MessageCollection messageCollection = this.getCspInformation().createMessageCollectionToRN(messageEnvelope);
 
-		Message message = messageEnvelope.getMessageCollection(this.getCspInformation().getCspCloudNumber().getXri(), true).createMessage();
-		message.setToPeerRootXri(this.getCspInformation().getRnCloudNumber().getPeerRootXri());
-		message.setLinkContractXri(this.getCspInformation().getRnCspLinkContract());
-		message.setSecretToken(this.getCspInformation().getRnCspSecretToken());
+		Message message = messageCollection.createMessage();
+		this.getCspInformation().prepareMessageToRN(message);
 
 		List<XDI3Statement> targetStatements = new ArrayList<XDI3Statement> ();
 
@@ -651,11 +628,10 @@ public class BasicCSP implements CSP {
 		// prepare message to RN
 
 		MessageEnvelope messageEnvelope = new MessageEnvelope();
+		MessageCollection messageCollection = this.getCspInformation().createMessageCollectionToRN(messageEnvelope);
 
-		Message message = messageEnvelope.getMessageCollection(this.getCspInformation().getCspCloudNumber().getXri(), true).createMessage();
-		message.setToPeerRootXri(this.getCspInformation().getRnCloudNumber().getPeerRootXri());
-		message.setLinkContractXri(this.getCspInformation().getRnCspLinkContract());
-		message.setSecretToken(this.getCspInformation().getRnCspSecretToken());
+		Message message = messageCollection.createMessage();
+		this.getCspInformation().prepareMessageToRN(message);
 
 		XDI3Statement targetStatement = XDI3Statement.fromRelationComponents(
 				this.getCspInformation().getRnCloudNumber().getXri(),
@@ -687,11 +663,10 @@ public class BasicCSP implements CSP {
 		// prepare message to CSP
 
 		MessageEnvelope messageEnvelope = new MessageEnvelope();
+		MessageCollection messageCollection = this.getCspInformation().createMessageCollectionToCSP(messageEnvelope);
 
-		Message message = messageEnvelope.createMessage(this.getCspInformation().getCspCloudNumber().getXri());
-		message.setToPeerRootXri(this.getCspInformation().getCspCloudNumber().getPeerRootXri());
-		message.setLinkContractXri(RootLinkContract.createRootLinkContractXri(this.getCspInformation().getCspCloudNumber().getXri()));
-		message.setSecretToken(this.getCspInformation().getCspSecretToken());
+		Message message = messageCollection.createMessage();
+		this.getCspInformation().prepareMessageToCSP(message);
 
 		XDI3Statement targetStatementSet = XDI3Statement.fromLiteralComponents(
 				XDI3Util.concatXris(cloudNumber.getPeerRootXri(), XDI3Segment.create("<$xdi><$uri>&")), 
@@ -714,11 +689,10 @@ public class BasicCSP implements CSP {
 		// prepare message to CSP
 
 		MessageEnvelope messageEnvelope = new MessageEnvelope();
+		MessageCollection messageCollection = this.getCspInformation().createMessageCollectionToCSP(messageEnvelope);
 
-		Message message = messageEnvelope.createMessage(this.getCspInformation().getCspCloudNumber().getXri());
-		message.setToPeerRootXri(this.getCspInformation().getCspCloudNumber().getPeerRootXri());
-		message.setLinkContractXri(RootLinkContract.createRootLinkContractXri(this.getCspInformation().getCspCloudNumber().getXri()));
-		message.setSecretToken(this.getCspInformation().getCspSecretToken());
+		Message message = messageCollection.createMessage();
+		this.getCspInformation().prepareMessageToCSP(message);
 
 		XDI3Statement targetStatementsDoDigestSecretToken = XDI3Statement.fromLiteralComponents(
 				XDI3Util.concatXris(XDI3Segment.fromComponent(cloudNumber.getPeerRootXri()), XDIAuthenticationConstants.XRI_S_DIGEST_SECRET_TOKEN, XDIConstants.XRI_S_VALUE), 
@@ -738,14 +712,13 @@ public class BasicCSP implements CSP {
 	@Override
 	public CloudName[] checkCloudNamesInCSP(CloudNumber cloudNumber) throws Xdi2ClientException {
 
-		// prepare message to RN
+		// prepare message to CSP
 
 		MessageEnvelope messageEnvelope = new MessageEnvelope();
+		MessageCollection messageCollection = this.getCspInformation().createMessageCollectionToCSP(messageEnvelope);
 
-		Message message = messageEnvelope.createMessage(this.getCspInformation().getCspCloudNumber().getXri());
-		message.setToPeerRootXri(this.getCspInformation().getRnCloudNumber().getPeerRootXri());
-		message.setLinkContractXri(this.getCspInformation().getRnCspLinkContract());
-		message.setSecretToken(this.getCspInformation().getRnCspSecretToken());
+		Message message = messageCollection.createMessage();
+		this.getCspInformation().prepareMessageToCSP(message);
 
 		XDI3Statement targetStatementGet = XDI3Statement.fromRelationComponents(
 				XDI3Segment.fromComponent(cloudNumber.getPeerRootXri()),
@@ -778,11 +751,10 @@ public class BasicCSP implements CSP {
 		// prepare message to Cloud
 
 		MessageEnvelope messageEnvelope = new MessageEnvelope();
+		MessageCollection messageCollection = this.getCspInformation().createMessageCollectionToCloud(messageEnvelope, cloudNumber);
 
-		Message message = messageEnvelope.createMessage(cloudNumber.getXri());
-		message.setToPeerRootXri(cloudNumber.getPeerRootXri());
-		message.setLinkContractXri(RootLinkContract.createRootLinkContractXri(cloudNumber.getXri()));
-		message.setSecretToken(secretToken);
+		Message message = messageCollection.createMessage();
+		this.getCspInformation().prepareMessageToCloud(message, cloudNumber, secretToken);
 
 		XDI3Segment targetAddress = RootLinkContract.createRootLinkContractXri(cloudNumber.getXri());
 
@@ -807,11 +779,10 @@ public class BasicCSP implements CSP {
 		// prepare message to Cloud
 
 		MessageEnvelope messageEnvelope = new MessageEnvelope();
+		MessageCollection messageCollection = this.getCspInformation().createMessageCollectionToCloud(messageEnvelope, cloudNumber);
 
-		Message message = messageEnvelope.createMessage(cloudNumber.getXri());
-		message.setToPeerRootXri(cloudNumber.getPeerRootXri());
-		message.setLinkContractXri(RootLinkContract.createRootLinkContractXri(cloudNumber.getXri()));
-		message.setSecretToken(secretToken);
+		Message message = messageCollection.createMessage();
+		this.getCspInformation().prepareMessageToCloud(message, cloudNumber, secretToken);
 
 		List<XDI3Statement> targetStatementsSet = new ArrayList<XDI3Statement> (services.size() * 2);
 
@@ -848,11 +819,10 @@ public class BasicCSP implements CSP {
 		// prepare message to Cloud
 
 		MessageEnvelope messageEnvelope = new MessageEnvelope();
+		MessageCollection messageCollection = this.getCspInformation().createMessageCollectionToCloud(messageEnvelope, cloudNumber);
 
-		Message message = messageEnvelope.createMessage(cloudNumber.getXri());
-		message.setToPeerRootXri(cloudNumber.getPeerRootXri());
-		message.setLinkContractXri(RootLinkContract.createRootLinkContractXri(cloudNumber.getXri()));
-		message.setSecretToken(secretToken);
+		Message message = messageCollection.createMessage();
+		this.getCspInformation().prepareMessageToCloud(message, cloudNumber, secretToken);
 
 		List<XDI3Statement> targetStatementsSet = new ArrayList<XDI3Statement> ();
 
