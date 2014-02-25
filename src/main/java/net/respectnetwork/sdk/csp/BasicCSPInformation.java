@@ -14,7 +14,7 @@ public class BasicCSPInformation implements CSPInformation, Serializable {
 	private String cspRegistryXdiEndpoint;
 	private String cspCloudBaseXdiEndpoint;
 	private String cspSecretToken;
-	private PrivateKey cspPrivateKey;
+	private PrivateKey cspSignaturePrivateKey;
 	private CloudNumber rnCloudNumber;
 	private String rnRegistrationServiceXdiEndpoint;
 	private XDI3Segment rnCspLinkContract;
@@ -30,7 +30,7 @@ public class BasicCSPInformation implements CSPInformation, Serializable {
 		this.cspRegistryXdiEndpoint = cspRegistryXdiEndpoint;
 		this.cspCloudBaseXdiEndpoint = cspCloudBaseXdiEndpoint;
 		this.cspSecretToken = cspSecretToken;
-		this.cspPrivateKey = cspPrivateKey;
+		this.cspSignaturePrivateKey = cspPrivateKey;
 		this.rnCloudNumber = rnCloudNumber;
 		this.rnRegistrationServiceXdiEndpoint = rnRegistrationServiceXdiEndpoint;
 		this.rnCspLinkContract = rnCspLinkContract;
@@ -86,14 +86,14 @@ public class BasicCSPInformation implements CSPInformation, Serializable {
 	}
 
 	@Override
-	public PrivateKey getCspPrivateKey() {
+	public PrivateKey getCspSignaturePrivateKey() {
 
-		return this.cspPrivateKey;
+		return this.cspSignaturePrivateKey;
 	}
 
-	public void setCspPrivateKey(PrivateKey cspPrivateKey) {
+	public void setCspSignaturePrivateKey(PrivateKey cspSignaturePrivateKey) {
 
-		this.cspPrivateKey = cspPrivateKey;
+		this.cspSignaturePrivateKey = cspSignaturePrivateKey;
 	}
 
 	@Override

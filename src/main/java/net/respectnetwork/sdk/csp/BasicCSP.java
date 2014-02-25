@@ -897,13 +897,13 @@ public class BasicCSP implements CSP {
 			message.setSecretToken(this.getCspInformation().getRnCspSecretToken());
 		}
 
-		if (this.getCspInformation().getCspPrivateKey() != null) {
+		if (this.getCspInformation().getCspSignaturePrivateKey() != null) {
 
 			KeyPairSignature signature = (KeyPairSignature) message.setSignature(KeyPairSignature.DIGEST_ALGORITHM_SHA, 256, KeyPairSignature.KEY_ALGORITHM_RSA, 2048);
 
 			try {
 
-				signature.sign(this.getCspInformation().getCspPrivateKey());
+				signature.sign(this.getCspInformation().getCspSignaturePrivateKey());
 			} catch (GeneralSecurityException ex) {
 
 				throw new RuntimeException(ex.getMessage(), ex);
@@ -921,13 +921,13 @@ public class BasicCSP implements CSP {
 			message.setSecretToken(this.getCspInformation().getCspSecretToken());
 		}
 
-		if (this.getCspInformation().getCspPrivateKey() != null) {
+		if (this.getCspInformation().getCspSignaturePrivateKey() != null) {
 
 			KeyPairSignature signature = (KeyPairSignature) message.setSignature(KeyPairSignature.DIGEST_ALGORITHM_SHA, 256, KeyPairSignature.KEY_ALGORITHM_RSA, 2048);
 
 			try {
 
-				signature.sign(this.getCspInformation().getCspPrivateKey());
+				signature.sign(this.getCspInformation().getCspSignaturePrivateKey());
 			} catch (GeneralSecurityException ex) {
 
 				throw new RuntimeException(ex.getMessage(), ex);
@@ -945,13 +945,13 @@ public class BasicCSP implements CSP {
 			message.setSecretToken(secretToken);
 		}
 
-		if (this.getCspInformation().getCspPrivateKey() != null) {
+		if (this.getCspInformation().getCspSignaturePrivateKey() != null) {
 
 			KeyPairSignature signature = (KeyPairSignature) message.setSignature(KeyPairSignature.DIGEST_ALGORITHM_SHA, 256, KeyPairSignature.KEY_ALGORITHM_RSA, 2048);
 
 			try {
 
-				signature.sign(this.getCspInformation().getCspPrivateKey());
+				signature.sign(this.getCspInformation().getCspSignaturePrivateKey());
 			} catch (GeneralSecurityException ex) {
 
 				throw new RuntimeException(ex.getMessage(), ex);

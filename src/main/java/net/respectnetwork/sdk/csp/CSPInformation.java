@@ -18,7 +18,7 @@ public interface CSPInformation {
 	public String getCspRegistryXdiEndpoint();
 	public String getCspCloudBaseXdiEndpoint();
 	public String getCspSecretToken();
-	public PrivateKey getCspPrivateKey();
+	public PrivateKey getCspSignaturePrivateKey();
 
 	/*
 	 * Information about RN
