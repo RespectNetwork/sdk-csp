@@ -6,7 +6,7 @@ import java.security.PrivateKey;
 import xdi2.core.xri3.CloudNumber;
 import xdi2.core.xri3.XDI3Segment;
 
-public class BasicCSPInformation extends AbstractCSPInformation implements CSPInformation, Serializable {
+public class BasicCSPInformation implements CSPInformation, Serializable {
 
 	private static final long serialVersionUID = 4621748646529792450L;
 
