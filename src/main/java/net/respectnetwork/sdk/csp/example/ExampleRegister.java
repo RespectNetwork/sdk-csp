@@ -10,8 +10,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import net.respectnetwork.sdk.csp.BasicCSP;
+import net.respectnetwork.sdk.csp.BasicCSPInformation;
 import net.respectnetwork.sdk.csp.CSP;
-import net.respectnetwork.sdk.csp.CSPInformation;
 import net.respectnetwork.sdk.csp.discount.CloudNameDiscountCode;
 import net.respectnetwork.sdk.csp.discount.RespectNetworkMembershipDiscountCode;
 import xdi2.core.xri3.CloudName;
@@ -65,8 +65,11 @@ public class ExampleRegister {
 
 		// Step 0: Set up CSP
 
-		CSPInformation cspInformation = new CSPInformationRespectNetworkOTE();
+		BasicCSPInformation cspInformation = new CSPInformationRespectNetworkOTE();
 		//CSPInformation cspInformation = new CSPInformationTTCC();
+
+		cspInformation.retrieveSignaturePrivateKey();
+		cspInformation.setRnCspSecretToken(null);
 
 		CSP csp = new BasicCSP(cspInformation);
 
