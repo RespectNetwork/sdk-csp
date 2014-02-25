@@ -861,7 +861,7 @@ public class BasicCSP implements CSP {
 	 * Helper methods
 	 */
 
-	protected String makeCloudXdiEndpoint(CloudNumber cloudNumber) {
+	private String makeCloudXdiEndpoint(CloudNumber cloudNumber) {
 
 		try {
 
@@ -872,26 +872,22 @@ public class BasicCSP implements CSP {
 		}
 	}
 
-	@Override
-	public MessageCollection createMessageCollectionToRN(MessageEnvelope messageEnvelope) {
+	private MessageCollection createMessageCollectionToRN(MessageEnvelope messageEnvelope) {
 
 		return messageEnvelope.getMessageCollection(this.getCspInformation().getCspCloudNumber().getXri(), true);
 	}
 
-	@Override
-	public MessageCollection createMessageCollectionToCSP(MessageEnvelope messageEnvelope) {
+	private MessageCollection createMessageCollectionToCSP(MessageEnvelope messageEnvelope) {
 
 		return messageEnvelope.getMessageCollection(this.getCspInformation().getCspCloudNumber().getXri(), true);
 	}
 
-	@Override
-	public MessageCollection createMessageCollectionToCloud(MessageEnvelope messageEnvelope, CloudNumber cloudNumber) {
+	private MessageCollection createMessageCollectionToCloud(MessageEnvelope messageEnvelope, CloudNumber cloudNumber) {
 
 		return messageEnvelope.getMessageCollection(cloudNumber.getXri(), true);
 	}
 
-	@Override
-	public void prepareMessageToRN(Message message) {
+	private void prepareMessageToRN(Message message) {
 
 		message.setToPeerRootXri(this.getCspInformation().getRnCloudNumber().getPeerRootXri());
 		message.setLinkContractXri(this.getCspInformation().getRnCspLinkContract());
@@ -915,8 +911,7 @@ public class BasicCSP implements CSP {
 		}
 	}
 
-	@Override
-	public void prepareMessageToCSP(Message message) {
+	private void prepareMessageToCSP(Message message) {
 
 		message.setToPeerRootXri(this.getCspInformation().getCspCloudNumber().getPeerRootXri());
 		message.setLinkContractXri(RootLinkContract.createRootLinkContractXri(this.getCspInformation().getCspCloudNumber().getXri()));
@@ -940,8 +935,7 @@ public class BasicCSP implements CSP {
 		}
 	}
 
-	@Override
-	public void prepareMessageToCloud(Message message, CloudNumber cloudNumber, String secretToken) {
+	private void prepareMessageToCloud(Message message, CloudNumber cloudNumber, String secretToken) {
 
 		message.setToPeerRootXri(cloudNumber.getPeerRootXri());
 		message.setLinkContractXri(RootLinkContract.createRootLinkContractXri(cloudNumber.getXri()));
@@ -982,16 +976,6 @@ public class BasicCSP implements CSP {
 		this.xdiClientRNRegistrationService = new XDIHttpClient(cspInformation.getRnRegistrationServiceXdiEndpoint());
 	}
 
-	public XDIClient getXdiClientRNRegistrationService() {
-
-		return this.xdiClientRNRegistrationService;
-	}
-
-	public void setXdiClientRNRegistrationService(XDIClient xdiClientRNRegistrationService) {
-
-		this.xdiClientRNRegistrationService = xdiClientRNRegistrationService;
-	}
-
 	public XDIClient getXdiClientCSPRegistry() {
 
 		return this.xdiClientCSPRegistry;
@@ -1000,5 +984,15 @@ public class BasicCSP implements CSP {
 	public void setXdiClientCSPRegistry(XDIClient xdiClientCSPRegistry) {
 
 		this.xdiClientCSPRegistry = xdiClientCSPRegistry;
+	}
+
+	public XDIClient getXdiClientRNRegistrationService() {
+
+		return this.xdiClientRNRegistrationService;
+	}
+
+	public void setXdiClientRNRegistrationService(XDIClient xdiClientRNRegistrationService) {
+
+		this.xdiClientRNRegistrationService = xdiClientRNRegistrationService;
 	}
 }

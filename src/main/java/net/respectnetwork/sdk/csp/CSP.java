@@ -9,9 +9,6 @@ import xdi2.client.exceptions.Xdi2ClientException;
 import xdi2.core.xri3.CloudName;
 import xdi2.core.xri3.CloudNumber;
 import xdi2.core.xri3.XDI3Segment;
-import xdi2.messaging.Message;
-import xdi2.messaging.MessageCollection;
-import xdi2.messaging.MessageEnvelope;
 
 /**
  * This interface represents CSP-related functionality of this SDK to communicate with
@@ -215,16 +212,4 @@ public interface CSP {
 	 *   [B] 4.1.1.2
 	 */
 	public void setPhoneAndEmailInCloud(CloudNumber cloudNumber, String secretToken, String verifiedPhone, String verifiedEmail) throws Xdi2ClientException;
-
-	/*
-	 * Convenience methods for constructing messages
-	 */
-
-	public MessageCollection createMessageCollectionToRN(MessageEnvelope messageEnvelope);
-	public MessageCollection createMessageCollectionToCSP(MessageEnvelope messageEnvelope);
-	public MessageCollection createMessageCollectionToCloud(MessageEnvelope messageEnvelope, CloudNumber cloudNumber);
-
-	public void prepareMessageToRN(Message message);
-	public void prepareMessageToCSP(Message message);
-	public void prepareMessageToCloud(Message message, CloudNumber cloudNumber, String secretToken);
 }
