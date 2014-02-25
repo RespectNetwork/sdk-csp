@@ -997,7 +997,7 @@ public class BasicCSP implements CSP {
 		return this.xdiClientCSPRegistry;
 	}
 
-	public void setXdiCSPRegistry(XDIClient xdiClientCSPRegistry) {
+	public void setXdiClientCSPRegistry(XDIClient xdiClientCSPRegistry) {
 
 		this.xdiClientCSPRegistry = xdiClientCSPRegistry;
 	}
