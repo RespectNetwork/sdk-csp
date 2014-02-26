@@ -1,6 +1,10 @@
 package net.respectnetwork.sdk.csp;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,9 +15,19 @@ import java.util.Map.Entry;
 
 import net.respectnetwork.sdk.csp.discount.CloudNameDiscountCode;
 import net.respectnetwork.sdk.csp.discount.RespectNetworkMembershipDiscountCode;
+import net.respectnetwork.sdk.csp.exception.CoreRNServiceException;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import xdi2.client.XDIClient;
 import xdi2.client.constants.XDIClientConstants;
@@ -884,6 +898,78 @@ public class BasicCSP implements CSP {
 
 		log.debug("In Cloud: Verified phone " + verifiedPhone + " and verified e-mail " + verifiedEmail + " set for Cloud Number " + cloudNumber);
 	}
+	
+	
+	
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long getRespectFirstMemberCount(String secretToken)
+        throws CoreRNServiceException {
+
+        long numberOfMembers = 0;
+
+        String jsonMessage = "{\"([@]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa[$msg]!:uuid:1234$do/$get)[@]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa/+first+member\":[\"([@]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa[$msg]!:uuid:1234$do/$get){}\"],\"[@]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa[$msg]!:uuid:1234/$do\":[\"[@]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa$to+registrar$from$do\"],\"[@]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa[$msg]!:uuid:1234/$is()\":[\"([@]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa)\"],\"[@]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa[$msg]!:uuid:1234<$secret><$token>&/&\":\"" + secretToken  + "\"}";
+
+        try {
+            DefaultHttpClient httpClient = new DefaultHttpClient();
+            HttpPost postRequest = new HttpPost(
+                    cspInformation.getRnRegistrationServiceXdiEndpoint());
+
+            StringEntity input = new StringEntity(jsonMessage);
+            input.setContentType("application/xdi+json");
+            postRequest.setEntity(input);
+
+            HttpResponse response = httpClient.execute(postRequest);
+
+            if (response.getStatusLine().getStatusCode() != 200) {
+                throw new CoreRNServiceException("Failed getRespectFirstMemberCount JSON Request : HTTP error code : "
+                        + response.getStatusLine().getStatusCode());
+            }
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(
+                    (response.getEntity().getContent())));
+
+            String output;
+            
+            while ((output = br.readLine()) != null) {
+                System.out.println(output);
+                log.debug("Output for  Registration Service: {}", output);
+
+                JsonElement jelement = new JsonParser().parse(output);
+                JsonObject jobject = jelement.getAsJsonObject();
+                String lookupKey = "[@]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa/+member";
+                JsonArray jarray = jobject.getAsJsonArray(lookupKey);
+                
+                
+                if (jarray.equals(null)) {
+                    numberOfMembers = 0;
+                } else {
+                    numberOfMembers = jarray.size();
+                }
+                
+            }
+            httpClient.getConnectionManager().shutdown();
+
+        } catch (MalformedURLException e) {
+            String errorMessage = String.format("Exception Processing JSON Message to Reg. Service: %s", e.getMessage());
+            log.warn(errorMessage);
+            throw new CoreRNServiceException(errorMessage);
+        } catch (IOException e) {
+            String errorMessage = String.format("Exception Processing JSON Message to Reg. Service: %s", e.getMessage());
+            log.warn(errorMessage);
+            throw new CoreRNServiceException(errorMessage);            
+        } catch (IllegalStateException e) {
+            String errorMessage = String.format("Exception Processing JSON Message to Reg. Service: %s", e.getMessage());
+            log.warn(errorMessage);
+            throw new CoreRNServiceException(errorMessage);            
+        }
+
+        return numberOfMembers;
+    }
+	
+	
 
 	/*
 	 * Helper methods

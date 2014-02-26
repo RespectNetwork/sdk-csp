@@ -5,6 +5,7 @@ import java.util.Map;
 
 import net.respectnetwork.sdk.csp.discount.CloudNameDiscountCode;
 import net.respectnetwork.sdk.csp.discount.RespectNetworkMembershipDiscountCode;
+import net.respectnetwork.sdk.csp.exception.CoreRNServiceException;
 import xdi2.client.exceptions.Xdi2ClientException;
 import xdi2.core.xri3.CloudName;
 import xdi2.core.xri3.CloudNumber;
@@ -222,4 +223,33 @@ public interface CSP {
 	 *   [B] 4.1.1.2
 	 */
 	public void setPhoneAndEmailInCloud(CloudNumber cloudNumber, String secretToken, String verifiedPhone, String verifiedEmail) throws Xdi2ClientException;
+	
+    /**
+     * Get the Number of Respect First Members in the Member Graph Service.
+     * Used in:
+     *   [A] Not used
+     *   [B] Not used
+     */
+    public long getRespectFirstMemberCount(String secretToken) throws CoreRNServiceException;
+    
+    /** 
+     * Get CSP Information
+     * 
+     *  Used in:
+     *   [A] Utility Method
+     *   [B] Utility Method
+     */    
+    public CSPInformation getCspInformation();
+    
+    /** 
+     * 
+     * Set CSP Information
+     * 
+     *  Used in:
+     *   [A] Utility Method
+     *   [B] Utility Method
+     */   
+    public void setCspInformation(CSPInformation cspInformation);
+
+    
 }
