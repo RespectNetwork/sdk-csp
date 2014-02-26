@@ -3,6 +3,7 @@ package net.respectnetwork.sdk.csp.example;
 import net.respectnetwork.sdk.csp.BasicCSPInformation;
 import xdi2.core.xri3.CloudNumber;
 import xdi2.core.xri3.XDI3Segment;
+import xdi2.discovery.XDIDiscoveryClient;
 
 public class CSPInformationTTCC extends BasicCSPInformation {
 
@@ -15,10 +16,12 @@ public class CSPInformationTTCC extends BasicCSPInformation {
 				"http://clouds.ownyourinfo.com:14440/ownyourinfo-registry",
 				"http://clouds.ownyourinfo.com:14440/ownyourinfo-users/",
 				"ofniruoynwo",
+				null,
 				CloudNumber.create("[@]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa"),
 				"https://registration.respectnetwork.net/registration",
 				XDI3Segment.create("[@]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa$to+registrar$from$do"),
-				"ofniruoynwo"
+				"ofniruoynwo",
+				XDIDiscoveryClient.NEUSTAR_PROD_DISCOVERY_CLIENT
 				);
 	}
 }

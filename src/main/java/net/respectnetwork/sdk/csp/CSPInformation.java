@@ -1,5 +1,7 @@
 package net.respectnetwork.sdk.csp;
 
+import java.security.PrivateKey;
+
 import xdi2.core.xri3.CloudNumber;
 import xdi2.core.xri3.XDI3Segment;
 
@@ -16,6 +18,7 @@ public interface CSPInformation {
 	public String getCspRegistryXdiEndpoint();
 	public String getCspCloudBaseXdiEndpoint();
 	public String getCspSecretToken();
+	public PrivateKey getCspSignaturePrivateKey();
 
 	/*
 	 * Information about RN

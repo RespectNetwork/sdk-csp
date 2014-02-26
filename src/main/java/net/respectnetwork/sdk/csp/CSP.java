@@ -24,16 +24,6 @@ import xdi2.core.xri3.XDI3Segment;
 public interface CSP {
 
 	/*
-	 * The CSPInformation
-	 */
-
-	/**
-	 * This method returns the CSPInformation object that was used to 
-	 * construct this CSP object.
-	 */
-	public CSPInformation getCSPInformation();
-
-	/*
 	 * Methods for registering User Clouds
 	 */
 
