@@ -82,7 +82,6 @@ public class ExampleCreateGuardianship {
 		// Step 0: Set up CSP
 
 		BasicCSPInformation cspInformation = new CSPInformationRespectNetworkOTE();
-		//CSPInformation cspInformation = new CSPInformationTTCC();
 
 		cspInformation.retrieveCspSignaturePrivateKey();
 		cspInformation.setRnCspSecretToken(null);

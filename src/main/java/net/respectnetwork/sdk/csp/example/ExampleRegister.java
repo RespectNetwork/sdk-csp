@@ -66,7 +66,6 @@ public class ExampleRegister {
 		// Step 0: Set up CSP
 
 		BasicCSPInformation cspInformation = new CSPInformationTestCSPOTE();
-		//CSPInformation cspInformation = new CSPInformationTTCC();
 
 		cspInformation.retrieveCspSignaturePrivateKey();
 		cspInformation.setRnCspSecretToken(null);
