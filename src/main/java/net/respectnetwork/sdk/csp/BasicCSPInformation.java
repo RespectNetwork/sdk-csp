@@ -46,7 +46,7 @@ public class BasicCSPInformation implements CSPInformation, Serializable {
 		this.xdiDiscoveryClient = xdiDiscoveryClient;
 	}
 
-	public void retrieveSignaturePrivateKey() throws Xdi2ClientException, GeneralSecurityException {
+	public void retrieveCspSignaturePrivateKey() throws Xdi2ClientException, GeneralSecurityException {
 
 		XDIDiscoveryResult xdiDiscoveryResult = this.getXdiDiscoveryClient().discoverFromRegistry(this.getCspCloudNumber().getXri(), null);
 		String cspXdiEndpoint = xdiDiscoveryResult.getXdiEndpointUri();
