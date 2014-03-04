@@ -1,5 +1,6 @@
 package net.respectnetwork.sdk.csp;
 
+import java.security.PrivateKey;
 import java.util.Date;
 import java.util.Map;
 
@@ -19,6 +20,7 @@ import xdi2.core.xri3.XDI3Segment;
  * The comments on individual methods reference the following diagrams:
  * [A] Initial Sign-Up: https://wiki.respectnetwork.net/wiki/Alice_Signs_Up
  * [B] Inline Provisioning: https://wiki.respectnetwork.net/wiki/Inline_Provisioning
+ * [C] Dependency Flow: http://docs.respectnetwork.net/wiki/Dependent_Registration
  */
 public interface CSP {
 
@@ -212,4 +214,89 @@ public interface CSP {
 	 *   [B] 4.1.1.2
 	 */
 	public void setPhoneAndEmailInCloud(CloudNumber cloudNumber, String secretToken, String verifiedPhone, String verifiedEmail) throws Xdi2ClientException;
+	
+    /**
+     * Get the Number of Respect First Members in the Member Graph Service.
+     * Used in:
+     *   [A] Not used
+     *   [B] Not used
+     */
+    public long getRespectFirstMemberCount() throws Xdi2ClientException;
+    
+    /** 
+     * Get CSP Information
+     * 
+     *  Used in:
+     *   [A] Utility Method
+     *   [B] Utility Method
+     */    
+    public CSPInformation getCspInformation();
+    
+    /** 
+     * 
+     * Set CSP Information
+     * 
+     *  Used in:
+     *   [A] Utility Method
+     *   [B] Utility Method
+     */   
+    public void setCspInformation(CSPInformation cspInformation);
+    
+    
+
+    /**
+     * Set Guardian -> Dependent Relationship in User's Cloud
+     * 
+     *  Used in:
+     *   [C] Dependency Flow.  
+     */
+    public void setGuardianshipInCloud(CSPInformation cspInformation, CloudNumber guardian,
+        CloudNumber dependent, Date dependentBirthDate, boolean withConsent, String secretToken,
+        PrivateKey guardianPrivateSigningKey)
+            throws Xdi2ClientException;   
+      
+      
+    /**
+     * Set Guardian -> Dependent Relationship in CSP Cloud
+     * 
+     *  Used in:
+     *   [C] Dependency Flow.  
+     */
+    public void setGuardianshipInCSP(CSPInformation cspInformation, CloudNumber guardian,
+        CloudNumber dependent, Date dependentBirthDate, boolean withConsent,
+        PrivateKey guardianPrivateSigningKey)
+            throws Xdi2ClientException; 
+       
+    
+    /**
+     * Set Guardian -> Dependent Relationship in Respect Network
+     * 
+     *  Used in:
+     *   [C] Dependency Flow.  
+     */
+    public void setGuardianshipInRN(CSPInformation cspInformation, CloudNumber guardian,
+        CloudNumber dependent, Date dependentBirthDate, boolean withConsent,
+        PrivateKey guardianPrivateSigningKey)
+            throws Xdi2ClientException; 
+    
+    
+    /**
+     *  Get a Guardian's Dependents from the CSP Graph 
+     * 
+     *  Used in:
+     *   [C] Dependency Flow.  
+     */
+    public CloudNumber[] getMyDependentsInCSP(CSPInformation cspInformation, CloudNumber guardian)
+        throws Xdi2ClientException;
+    
+    
+    /**
+     *  Get a Dependent's Parent from the CSP Graph 
+     * 
+     *  Used in:
+     *   [C] Dependency Flow.  
+     */
+    public CloudNumber[] getMyGuardiansInCSP(CSPInformation cspInformation, CloudNumber dependent)
+        throws Xdi2ClientException;
+    
 }

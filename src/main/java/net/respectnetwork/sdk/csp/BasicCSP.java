@@ -1,18 +1,30 @@
 package net.respectnetwork.sdk.csp;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URLEncoder;
 import java.security.GeneralSecurityException;
+import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.UUID;
 
 import net.respectnetwork.sdk.csp.discount.CloudNameDiscountCode;
 import net.respectnetwork.sdk.csp.discount.RespectNetworkMembershipDiscountCode;
+import net.respectnetwork.sdk.csp.exception.CoreRNServiceException;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +32,10 @@ import xdi2.client.XDIClient;
 import xdi2.client.constants.XDIClientConstants;
 import xdi2.client.exceptions.Xdi2ClientException;
 import xdi2.client.http.XDIHttpClient;
+import xdi2.core.ContextNode;
+import xdi2.core.Graph;
 import xdi2.core.Relation;
+import xdi2.core.Statement;
 import xdi2.core.constants.XDIAuthenticationConstants;
 import xdi2.core.constants.XDIConstants;
 import xdi2.core.constants.XDIDictionaryConstants;
@@ -29,10 +44,14 @@ import xdi2.core.features.linkcontracts.PublicLinkContract;
 import xdi2.core.features.linkcontracts.RootLinkContract;
 import xdi2.core.features.nodetypes.XdiAbstractMemberUnordered;
 import xdi2.core.features.signatures.KeyPairSignature;
+import xdi2.core.features.signatures.Signatures;
 import xdi2.core.features.timestamps.Timestamps;
+import xdi2.core.impl.memory.MemoryGraph;
+import xdi2.core.impl.memory.MemoryGraphFactory;
 import xdi2.core.util.XDI3Util;
 import xdi2.core.util.iterators.IteratorArrayMaker;
 import xdi2.core.util.iterators.MappingCloudNameIterator;
+import xdi2.core.util.iterators.MappingCloudNumberIterator;
 import xdi2.core.util.iterators.MappingRelationTargetContextNodeXriIterator;
 import xdi2.core.util.iterators.NotNullIterator;
 import xdi2.core.util.iterators.ReadOnlyIterator;
@@ -47,6 +66,12 @@ import xdi2.messaging.MessageCollection;
 import xdi2.messaging.MessageEnvelope;
 import xdi2.messaging.MessageResult;
 import xdi2.messaging.Operation;
+import xdi2.messaging.error.ErrorMessageResult;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 public class BasicCSP implements CSP {
 
@@ -58,6 +83,9 @@ public class BasicCSP implements CSP {
 	public static final XDI3Segment XRI_S_AS_VERIFIED_EMAIL = XDI3Segment.create("<+verified><+email>");
 	public static final XDI3Segment XRI_S_IS_PHONE = XDI3Segment.create("$is+phone");
 	public static final XDI3Segment XRI_S_IS_EMAIL = XDI3Segment.create("$is+email");
+	
+    public static final XDI3Segment XRI_S_IS_GUARDIAN = XDI3Segment.create("$is+guardian");
+    public static final XDI3Segment XRI_S_GUARDIAN = XDI3Segment.create("+guardian");
 
 	public static final XDI3Segment XRI_S_MEMBER = XDI3Segment.create("+member");
 	public static final XDI3Segment XRI_S_AS_MEMBER_EXPIRATION_TIME = XDI3Segment.create("<+member><+expiration><$t>");
@@ -66,6 +94,9 @@ public class BasicCSP implements CSP {
 
 	public static final XDI3Segment XRI_S_PARAMETER_CLOUDNAME_DISCOUNTCODE = XDI3Segment.create("<+([@]!:uuid:e9b5165b-fa7b-4387-a685-7125d138a872)><+(RNDiscountCode)>");
 	public static final XDI3Segment XRI_S_PARAMETER_RESPECT_NETWORK_MEMBERSHIP_DISCOUNTCODE = XDI3Segment.create("<+([@]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa)><+(RNDiscountCode)>");
+	
+	public static final CloudNumber AT_RESPECT_CLOUD_NUMBER = CloudNumber.create("[@]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa");
+
 
 	private CSPInformation cspInformation;
 
@@ -581,7 +612,7 @@ public class BasicCSP implements CSP {
 
 		message.createGetOperation(targetStatement);
 
-		// send message and read result
+		// Send message and read result
 
 		this.prepareMessageToRN(message);
 		MessageResult messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope, null);
@@ -731,7 +762,7 @@ public class BasicCSP implements CSP {
 		// send message and read results
 
 		this.prepareMessageToCSP(message);
-		MessageResult messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope, null);
+		MessageResult messageResult = this.getXdiClientCSPRegistry().send(messageEnvelope, null);
 
 		ReadOnlyIterator<Relation> relations = messageResult.getGraph().getDeepRelations(XDI3Segment.fromComponent(cloudNumber.getPeerRootXri()), XDIDictionaryConstants.XRI_S_IS_REF);
 
@@ -856,6 +887,115 @@ public class BasicCSP implements CSP {
 
 		log.debug("In Cloud: Verified phone " + verifiedPhone + " and verified e-mail " + verifiedEmail + " set for Cloud Number " + cloudNumber);
 	}
+	
+
+	
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long getRespectFirstMemberCount()
+        throws Xdi2ClientException {
+
+        long numberOfMembers = 0;
+
+        // prepare message to RN
+        MessageEnvelope messageEnvelope = new MessageEnvelope();
+        MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
+
+        Message message = messageCollection.createMessage();
+        
+        XDI3Statement targetStatementGet = XDI3Statement.fromRelationComponents(
+                AT_RESPECT_CLOUD_NUMBER.getXri(),
+                XRI_S_FIRST_MEMBER,
+                XDIConstants.XRI_S_VARIABLE);
+
+        message.createGetOperation(targetStatementGet);
+
+        // Send message and read result
+
+        this.prepareMessageToRN(message);
+        
+        MessageResult messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope, null);
+        
+        ReadOnlyIterator<Relation> relations =  (messageResult.getGraph()).getDeepRelations(AT_RESPECT_CLOUD_NUMBER.getXri(), XRI_S_FIRST_MEMBER);
+            
+        while (relations.hasNext()) {
+            relations.next();
+            numberOfMembers++;
+        }
+
+        // done
+        log.debug("In RN: getRespectFirstMemberCount = " + numberOfMembers);
+        return numberOfMembers;
+    }
+	
+
+    public long getRespectFirstMemberCountJSON(String secretToken)
+        throws CoreRNServiceException {
+
+        long numberOfMembers = 0;
+
+        String jsonMessage = "{\"([@]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa[$msg]!:uuid:1234$do/$get)[@]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa/+first+member\":[\"([@]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa[$msg]!:uuid:1234$do/$get){}\"],\"[@]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa[$msg]!:uuid:1234/$do\":[\"[@]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa$to+registrar$from$do\"],\"[@]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa[$msg]!:uuid:1234/$is()\":[\"([@]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa)\"],\"[@]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa[$msg]!:uuid:1234<$secret><$token>&/&\":\"" + secretToken  + "\"}";
+
+        try {
+            DefaultHttpClient httpClient = new DefaultHttpClient();
+            HttpPost postRequest = new HttpPost(
+                    cspInformation.getRnRegistrationServiceXdiEndpoint());
+
+            StringEntity input = new StringEntity(jsonMessage);
+            input.setContentType("application/xdi+json");
+            postRequest.setEntity(input);
+
+            HttpResponse response = httpClient.execute(postRequest);
+
+            if (response.getStatusLine().getStatusCode() != 200) {
+                throw new CoreRNServiceException("Failed getRespectFirstMemberCount JSON Request : HTTP error code : "
+                        + response.getStatusLine().getStatusCode());
+            }
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(
+                    (response.getEntity().getContent())));
+
+            String output;
+            
+            while ((output = br.readLine()) != null) {
+                System.out.println(output);
+                log.debug("Output for  Registration Service: {}", output);
+
+                JsonElement jelement = new JsonParser().parse(output);
+                JsonObject jobject = jelement.getAsJsonObject();
+                String lookupKey = "[@]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa/+first+member";
+                JsonArray jarray = jobject.getAsJsonArray(lookupKey);
+                
+                
+                if (jarray.equals(null)) {
+                    numberOfMembers = 0;
+                } else {
+                    numberOfMembers = jarray.size();
+                }
+                
+            }
+            httpClient.getConnectionManager().shutdown();
+
+        } catch (MalformedURLException e) {
+            String errorMessage = String.format("Exception Processing JSON Message to Reg. Service: %s", e.getMessage());
+            log.warn(errorMessage);
+            throw new CoreRNServiceException(errorMessage);
+        } catch (IOException e) {
+            String errorMessage = String.format("Exception Processing JSON Message to Reg. Service: %s", e.getMessage());
+            log.warn(errorMessage);
+            throw new CoreRNServiceException(errorMessage);            
+        } catch (IllegalStateException e) {
+            String errorMessage = String.format("Exception Processing JSON Message to Reg. Service: %s", e.getMessage());
+            log.warn(errorMessage);
+            throw new CoreRNServiceException(errorMessage);            
+        }
+
+        return numberOfMembers;
+    }
+	
+	
 
 	/*
 	 * Helper methods
@@ -958,6 +1098,418 @@ public class BasicCSP implements CSP {
 			}
 		}
 	}
+	
+	
+	/*
+	 * Dependency  Methods
+	 */
+
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setGuardianshipInCloud(CSPInformation cspInformation, CloudNumber guardian,
+        CloudNumber dependent, Date dependentBirthDate, boolean withConsent, String secretToken, PrivateKey guardianPrivateSigningKey)
+            throws Xdi2ClientException {
+        
+        // Prepare message to guardian Cloud
+
+        MessageEnvelope messageEnvelope = new MessageEnvelope();
+        MessageCollection messageCollection = this.createMessageCollectionToCloud(messageEnvelope, guardian);
+
+        Message message = messageCollection.createMessage();
+        
+        //Update Guardian's Graph
+
+        this.prepareMessageToCloud(message, guardian, secretToken);
+        
+        List<XDI3Statement> targetStatements = new ArrayList<XDI3Statement> ();
+
+        //Create the Relational Entry in the Guardian  Graph
+        targetStatements.add(XDI3Statement.fromRelationComponents(
+                guardian.getXri(),
+                XRI_S_IS_GUARDIAN,
+                dependent.getXri()));
+         
+        message.createSetOperation(targetStatements.iterator());
+
+        // send message
+        String cloudXdiEndpoint = this.makeCloudXdiEndpoint(guardian);
+        XDIClient xdiClientCloud = new XDIHttpClient(cloudXdiEndpoint);
+        xdiClientCloud.send(messageEnvelope, null);
+
+        // done
+        log.debug("In Guardian User Cloud: Creating is Guardian Relationship between " + guardian.toString() + " and " + dependent.toString() );
+         
+        
+        // Prepare message to Dependent's Cloud
+
+        MessageEnvelope messageEnvelope2 = new MessageEnvelope();
+        MessageCollection messageCollection2 = this.createMessageCollectionToCloud(messageEnvelope2, dependent);
+
+        Message message2 = messageCollection2.createMessage();
+        
+        //Update Dependent's Graph
+
+        this.prepareMessageToCloud(message2, dependent, secretToken);        
+        List<XDI3Statement> targetStatements2 = new ArrayList<XDI3Statement> ();
+        
+     
+        //Generating and Adding Dependent Statements
+        List<XDI3Statement> dependentStatements =  createDependentXDI3Statements( guardian,  dependent, dependentBirthDate, guardianPrivateSigningKey);
+        targetStatements.addAll(dependentStatements);
+        
+        
+        
+        if (withConsent) {    
+      
+            //Generating and Adding Consent Statements
+            List<XDI3Statement> consentStatements =  createConsentXDI3Statements(guardian,  dependent, guardianPrivateSigningKey);
+            targetStatements.addAll(consentStatements);
+        } else {
+            throw new Xdi2ClientException("Consent required for this operation", new ErrorMessageResult());
+        }
+                 
+        message2.createSetOperation(targetStatements2.iterator());
+
+        // send message
+        String cloudXdiEndpoint2 = this.makeCloudXdiEndpoint(dependent);
+        XDIClient xdiClientCloud2 = new XDIHttpClient(cloudXdiEndpoint2);
+        xdiClientCloud2.send(messageEnvelope2, null);
+
+        // done
+        log.debug("In Dependent User Cloud: Creating Guardian Relationship between " + dependent.toString() + " and " + guardian.toString() );
+          
+    }
+      
+      
+    /**
+     * {@inheritDoc}
+     */
+    public void setGuardianshipInCSP(CSPInformation cspInformation, CloudNumber guardian,
+        CloudNumber dependent, Date dependentBirthDate, boolean withConsent, PrivateKey guardianPrivateSigningKey)
+            throws Xdi2ClientException {
+        
+        // Prepare message to Guardian Sub Graph in CSP Graph
+
+        MessageEnvelope messageEnvelope = new MessageEnvelope();
+        MessageCollection messageCollection = this.createMessageCollectionToCSP(messageEnvelope);
+
+        Message message = messageCollection.createMessage();
+
+        List<XDI3Statement> targetStatements = new ArrayList<XDI3Statement> ();
+
+        
+        //Create the Relational Entry in the Guardian Sub Graph
+        targetStatements.add(XDI3Statement.fromRelationComponents(
+                guardian.getXri(),
+                XRI_S_IS_GUARDIAN,
+                dependent.getXri()));
+        
+
+        //Generating and Adding Dependent Statements
+        List<XDI3Statement> dependentStatements =  createDependentXDI3Statements(guardian, dependent, dependentBirthDate, guardianPrivateSigningKey);
+        targetStatements.addAll(dependentStatements);
+
+                 
+        if (withConsent) {     
+            //Generating and Adding Consent Statements
+            List<XDI3Statement> consentStatements =  createConsentXDI3Statements(guardian, dependent, guardianPrivateSigningKey);
+            targetStatements.addAll(consentStatements);
+        } else {
+            throw new Xdi2ClientException("Consent required for this operation", new ErrorMessageResult());
+        }
+              
+        message.createSetOperation(targetStatements.iterator());
+
+
+        // send message
+
+        this.prepareMessageToCSP(message);
+        this.getXdiClientCSPRegistry().send(messageEnvelope, null);
+
+        // done
+
+        log.debug("In CSP Cloud: Creating  is Guardian Relationship between " + guardian.toString() + " and " + dependent.toString() );
+    }
+
+       
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void setGuardianshipInRN(CSPInformation cspInformation, CloudNumber guardian,
+        CloudNumber dependent, Date dependentBirthDate, boolean withConsent, PrivateKey guardianPrivateSigningKey)
+            throws Xdi2ClientException {
+        
+        // Prepare message to Guardian Sub Graph in RN Member Graph Service
+
+        MessageEnvelope messageEnvelope = new MessageEnvelope();
+        MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
+
+        Message message = messageCollection.createMessage();
+        
+        
+        List<XDI3Statement> targetStatements = new ArrayList<XDI3Statement> ();
+
+        //Create the Relational Entry in the Guardian Sub Graph
+        targetStatements.add(XDI3Statement.fromRelationComponents(
+                guardian.getXri(),
+                XRI_S_IS_GUARDIAN,
+                dependent.getXri()));
+        
+        
+        //Generating and Adding Dependent Statements
+        List<XDI3Statement> dependentStatements =  createDependentXDI3Statements( guardian,  dependent, dependentBirthDate, guardianPrivateSigningKey);
+        targetStatements.addAll(dependentStatements);
+        
+        if (withConsent) {     
+            //Generating and Adding Consent Statements
+            List<XDI3Statement> consentStatements =  createConsentXDI3Statements(guardian,  dependent, guardianPrivateSigningKey);
+            targetStatements.addAll(consentStatements);
+        } else {
+            throw new Xdi2ClientException("Consent required for this operation", new ErrorMessageResult());
+        }
+        
+        message.createSetOperation(targetStatements.iterator());
+
+        // send message
+
+        this.prepareMessageToRN(message);
+        this.getXdiClientRNRegistrationService().send(messageEnvelope, null);
+
+        // done
+        log.debug("In RN: Creating is Guardian Relationship between " + guardian.toString() + " and " + dependent.toString() );
+                   
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public CloudNumber[] getMyDependentsInCSP(CSPInformation cspInformation, CloudNumber guardian)
+        throws Xdi2ClientException {
+        
+        // Prepare message to Guardian Sub Graph in CSP Graph
+
+        MessageEnvelope messageEnvelope = new MessageEnvelope();
+        MessageCollection messageCollection = this.createMessageCollectionToCSP(messageEnvelope);
+        Message message = messageCollection.createMessage();
+
+        XDI3Statement targetStatementGet = XDI3Statement.fromRelationComponents(
+             guardian.getXri(),
+                 XRI_S_IS_GUARDIAN,
+                    XDIConstants.XRI_S_VARIABLE);
+                    
+       message.createGetOperation(targetStatementGet);
+
+       // send message and read results
+
+       this.prepareMessageToCSP(message);
+        
+       MessageResult messageResult = this.getXdiClientCSPRegistry().send(messageEnvelope, null);
+
+       ReadOnlyIterator<Relation> relations = messageResult.getGraph().getDeepRelations(
+           guardian.getXri(), XRI_S_IS_GUARDIAN);
+
+       CloudNumber[] theDependencies = new IteratorArrayMaker<CloudNumber> (
+           new NotNullIterator<CloudNumber> (
+               new MappingCloudNumberIterator(
+                   new MappingRelationTargetContextNodeXriIterator(relations)
+                       ))).array(CloudNumber.class);
+       
+       if (theDependencies != null && theDependencies.length == 0) {
+           theDependencies = null;
+       }
+             
+        // done
+       log.debug("In CSP Cloud: Getting dependencies of " + guardian.toString() );
+        
+       return theDependencies;
+ 
+    }
+    
+    
+    /**
+     * {@inheritDoc}
+     */
+    public CloudNumber[] getMyGuardiansInCSP(CSPInformation cspInformation, CloudNumber dependent)
+        throws Xdi2ClientException {
+        
+        // Prepare message to Guardian Sub Graph in CSP Graph
+
+        MessageEnvelope messageEnvelope = new MessageEnvelope();
+        MessageCollection messageCollection = this.createMessageCollectionToCSP(messageEnvelope);
+        Message message = messageCollection.createMessage();
+
+        XDI3Statement targetStatementGet = XDI3Statement.fromRelationComponents(
+            dependent.getXri(),
+                XRI_S_GUARDIAN,
+                    XDIConstants.XRI_S_VARIABLE);
+                    
+       message.createGetOperation(targetStatementGet);
+
+       // send message and read results
+
+       this.prepareMessageToCSP(message);
+        
+       MessageResult messageResult = this.getXdiClientCSPRegistry().send(messageEnvelope, null);
+
+       Iterator<Relation> relations = messageResult.getGraph().getDeepRelations(
+           dependent.getXri(), XRI_S_GUARDIAN);
+       
+       
+       MappingRelationTargetContextNodeXriIterator contextNodeIterator = new MappingRelationTargetContextNodeXriIterator(relations);
+        
+       ArrayList<CloudNumber> theGuardianList = new ArrayList<CloudNumber>();
+       while (contextNodeIterator.hasNext()) {
+           XDI3Segment next = contextNodeIterator.next();
+           // We can expect to  get inner roots as well that we want to discard from this list.
+           // Only interested in Cloud Numbers.
+           if (CloudNumber.isValid(next)) {
+               theGuardianList.add(CloudNumber.create(next.toString()));
+           } else {
+               log.debug("Not a valid Clould Number ... : {}", next.toString());
+           }        
+       }
+       
+       CloudNumber[] theGuardians = theGuardianList.toArray( new CloudNumber[theGuardianList.size()]);
+       
+       if (theGuardians != null && theGuardians.length == 0) {
+           theGuardians = null;
+       }
+             
+        // done
+       log.debug("In CSP Cloud: Getting Guardians of " + dependent.toString() );
+        
+       return theGuardians;
+            
+    }
+    
+    
+    private List<XDI3Statement> createConsentXDI3Statements(CloudNumber guardian, CloudNumber dependent, PrivateKey signingKey) {
+        
+        
+        List<XDI3Statement> targetStatements = new ArrayList<XDI3Statement> ();
+        String consentUUID = "<!:uuid:" + UUID.randomUUID() + ">";
+        
+                        
+        MemoryGraph g = MemoryGraphFactory.getInstance().openGraph();
+        
+
+        //[=]!:uuid:1111[<+consent>]<!:uuid:6545>/$is+/[@]:uuid:0000<+parental><+consent>
+        XDI3Statement consentStatement = XDI3Statement.fromRelationComponents(
+                XDI3Util.concatXris(guardian.getXri(), XDI3Segment.create("[<+consent>]"), XDI3Segment.create(consentUUID)),
+                XDI3Segment.create("$is+"),
+                XDI3Util.concatXris(AT_RESPECT_CLOUD_NUMBER.getXri(), XDI3Segment.create("<+parental><+consent>")));
+        
+        g.setStatement(consentStatement);
+        
+        XDI3Segment consentSubjectTo = XDI3Util.concatXris(guardian.getXri(), XDI3Segment.create("[<+consent>]"), XDI3Segment.create(consentUUID));
+     
+        //[=]!:uuid:1111[<+consent>]<!:uuid:6545>/$to/[=]!:uuid:3333
+        XDI3Statement consentStatementTo = XDI3Statement.fromRelationComponents(
+                consentSubjectTo,
+                XDI3Segment.create("$to"),
+                dependent.getXri());
+        g.setStatement(consentStatementTo);
+        
+          
+        //Sign the Context: //[=]!:uuid:1111[<+consent>]<!:uuid:6545>        
+        ContextNode signingNode = g.getRootContextNode().getDeepContextNode(consentSubjectTo);
+
+        // now create the signature and add it to the graph
+        KeyPairSignature s = (KeyPairSignature) Signatures.setSignature(signingNode, "sha", 256, "rsa", 2048);
+
+        try {
+            s.sign(signingKey);
+        } catch (GeneralSecurityException e) {
+            throw new RuntimeException("Problem Signing Dependent Graph");           
+        }
+        
+        ContextNode c = g.getRootContextNode();
+        
+        Iterator<Statement> dependencyStatmentIterator = c.getAllStatements();
+        
+        //Converting from Statement to  XDI3Statement
+        while(dependencyStatmentIterator.hasNext()){
+            Statement next = dependencyStatmentIterator.next();
+            XDI3Statement graphStatement = next.getXri();
+            targetStatements.add(graphStatement);
+        }
+        
+        return targetStatements;
+       
+        
+    }
+    
+    
+    private List<XDI3Statement> createDependentXDI3Statements(CloudNumber guardian, CloudNumber dependent, Date dependentBirthDate, PrivateKey signingKey) {
+        
+                
+        XDI3SubSegment innerGraph = XDI3SubSegment.create("(" + dependent.getXri() +"/+guardian" + ")");
+        
+        MemoryGraph g = MemoryGraphFactory.getInstance().openGraph();
+        
+        List<XDI3Statement> targetStatements = new ArrayList<XDI3Statement> ();
+
+                    
+        //Create the Relational Entry in the Dependent Sub Graph
+        //[=]!:uuid:3333/+guardian/[=]!:uuid:1111
+        XDI3Statement guardianStatement = XDI3Statement.fromRelationComponents(
+                dependent.getXri(),
+                XRI_S_GUARDIAN,
+                guardian.getXri());
+        
+        g.setStatement(guardianStatement);
+        
+        //([=]!:uuid:3333/+guardian)[=]!:uuid:3333/+guardian/[=]!:uuid:1111
+        XDI3Statement innerGuardianStatement = XDI3Statement.fromRelationComponents(
+                XDI3Util.concatXris(innerGraph, dependent.getXri()),
+                XRI_S_GUARDIAN,
+                guardian.getXri());
+        
+        g.setStatement(innerGuardianStatement);
+        
+        //Adding Date to  Dependent's SubGraph
+        XDI3Statement dobStatement = XDI3Statement.fromLiteralComponents(
+                XDI3Util.concatXris(dependent.getXri(), XDI3Segment.create("<+birth><$date>&")), 
+                dependentBirthDate.toString());
+        
+        g.setStatement(dobStatement);
+        
+
+        
+        //Sign the Context: ([=]!:uuid:3333/+guardian)<$sig>&/&/”...”        
+        ContextNode signingNode = g.getRootContextNode().getContextNode(innerGraph);
+
+        // now create the signature and add it to the graph
+
+        KeyPairSignature s = (KeyPairSignature) Signatures.setSignature(signingNode, "sha", 256, "rsa", 2048);
+
+        try {
+            s.sign(signingKey);
+        } catch (GeneralSecurityException e) {
+            throw new RuntimeException("Problem Signing Dependent Graph");           
+        }
+        
+        
+        ContextNode c = g.getRootContextNode();
+        
+        Iterator<Statement> dependencyStatmentIterator = c.getAllStatements();
+        
+        //Converting from Statement to  XDI3Statement
+        while(dependencyStatmentIterator.hasNext()){
+            Statement next = dependencyStatmentIterator.next();
+            XDI3Statement graphStatement = next.getXri();
+            targetStatements.add(graphStatement);
+        }
+        
+      
+        return targetStatements;
+              
+    }
+    
 
 	/*
 	 * Getters and setters
