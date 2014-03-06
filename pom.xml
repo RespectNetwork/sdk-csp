@@ -5,7 +5,7 @@
 	<groupId>net.respectnetwork</groupId>
 	<artifactId>sdk-csp</artifactId>
 	<packaging>jar</packaging>
-	<version>0.1</version>
+	<version>0.1.1</version>
 	<name>sdk-csp</name>
 	<description>Respect Network SDK for CSPs</description>
 
@@ -122,6 +122,33 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
             <version>4.1.2</version>
+        </dependency>
+        
+        <!-- Twilio SDK -->
+        <dependency>
+            <groupId>com.twilio.sdk</groupId>
+            <artifactId>twilio-java-sdk</artifactId>
+            <version>3.4.1</version>
+        </dependency>
+        
+        <!-- Java Mail -->
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+            <version>1.4</version>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.activation</groupId>
+            <artifactId>activation</artifactId>
+            <version>1.1-rev-1</version>
+        </dependency>
+        
+        <!-- Phone Number Parser -->
+        <dependency>
+            <groupId>com.googlecode.libphonenumber</groupId>
+            <artifactId>libphonenumber</artifactId>
+            <version>4.3</version>
         </dependency>
         
 	</dependencies>
