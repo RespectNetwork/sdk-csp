@@ -12,8 +12,6 @@ import net.respectnetwork.sdk.csp.validation.CSPValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import xdi2.core.xri3.CloudNumber;
-
 public class BasicUserValidator implements UserValidator {
     
     /** Class Logger */

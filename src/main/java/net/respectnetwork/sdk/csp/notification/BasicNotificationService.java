@@ -30,7 +30,7 @@ import com.twilio.sdk.resource.instance.Sms;
  * Basic Notification Service uses
  *
  *    1) Twillio for SMS Notifications
- *    2) Java Mail(POP) for EMail
+ *    2) Java Mail Transport for EMail
  *
  */
 public class BasicNotificationService implements Notifier {
@@ -64,16 +64,22 @@ public class BasicNotificationService implements Notifier {
     private  String mailAccountPassword;
     
     /** SMTP  Auth Option */
-    private String mailSMTPAuth = "true";
+    private String mailSMTPAuth;
     
     /** SMTP Start TLS Option */
-    private String mailStartTLS = "true";
+    private String mailStartTLS;
     
     /** SMTP  Host */
-    private String mailSMTPHost = "smtp.gmail.com";
+    private String mailSMTPHost;
     
     /** SMTP Port */
-    private String mailSMTPPort = "587";
+    private String mailSMTPPort;
+    
+    /** Debug */
+    private String mailDebug;
+ 
+    /** Mail Transport */
+    private String mailTransport;
     
     
      
@@ -246,6 +252,34 @@ public class BasicNotificationService implements Notifier {
     }
 
     /**
+     * @return the mailDebug
+     */
+    public String getMailDebug() {
+        return mailDebug;
+    }
+
+    /**
+     * @param mailDebug the mailDebug to set
+     */
+    public void setMailDebug(String mailDebug) {
+        this.mailDebug = mailDebug;
+    }
+
+    /**
+     * @return the mailTransport
+     */
+    public String getMailTransport() {
+        return mailTransport;
+    }
+
+    /**
+     * @param mailTransport the mailTransport to set
+     */
+    public void setMailTransport(String mailTransport) {
+        this.mailTransport = mailTransport;
+    }
+
+    /**
      * Send SMS Notification to Twilio
      */
     @Override
@@ -276,15 +310,15 @@ public class BasicNotificationService implements Notifier {
     @Override
     public void sendEmailNotification(String emailTo, String messageOut)
             throws NotificationException {
-       
- 
-        
-        //@TODO: Make Static for performance
+
         Properties props = new Properties();
+        
         props.put("mail.smtp.auth", mailSMTPAuth);
         props.put("mail.smtp.starttls.enable", mailStartTLS);
         props.put("mail.smtp.host", mailSMTPHost);
         props.put("mail.smtp.port", mailSMTPPort);
+        props.put("mail.debug", mailDebug);
+        props.put("mail.transport.protocol", mailTransport);
         
  
         Session session = Session.getInstance(props,
