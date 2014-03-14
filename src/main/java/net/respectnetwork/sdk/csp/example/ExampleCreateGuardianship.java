@@ -80,9 +80,8 @@ public class ExampleCreateGuardianship {
 	public static void main(String[] args) throws Exception {
 
 		// Step 0: Set up CSP
-
-		BasicCSPInformation cspInformation = new CSPInformationRespectNetworkOTE();
-		//CSPInformation cspInformation = new CSPInformationTTCC();
+		//BasicCSPInformation cspInformation = new CSPInformationRespectNetworkOTE();
+	    BasicCSPInformation cspInformation = new CSPInformationTestCSPOTE();
 
 		cspInformation.retrieveCspSignaturePrivateKey();
 		cspInformation.setRnCspSecretToken(null);
@@ -116,8 +115,11 @@ public class ExampleCreateGuardianship {
             String dependentXdiEndpoint = dependentRegistry.getXdiEndpointUri();
 
             guardianPrivateKey = XDIClientUtil.retrieveSignaturePrivateKey(guardianCloudNumber, guardianXdiEndpoint, guardianToken);
-            dependentPrivateKey = XDIClientUtil.retrieveSignaturePrivateKey(dependentCloudNumber, dependentXdiEndpoint, dependentToken);
+            System.out.println("GuardianPrivateKey Algo: " + guardianPrivateKey.getAlgorithm());
 
+            dependentPrivateKey = XDIClientUtil.retrieveSignaturePrivateKey(dependentCloudNumber, dependentXdiEndpoint, dependentToken);
+            System.out.println("DependentPrivateKey Algo: " + dependentPrivateKey.getAlgorithm());
+            
             if (guardianCloudNumber == null || dependentCloudNumber == null) {
                 System.err.println("Un-registered Cloud Name.");
                 System.exit(0);

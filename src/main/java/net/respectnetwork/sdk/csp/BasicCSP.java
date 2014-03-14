@@ -1102,13 +1102,13 @@ public class BasicCSP implements CSP {
 	/*
 	 * Dependency  Methods
 	 */
-
-
+	
     /**
      * {@inheritDoc}
      */
     public void setGuardianshipInCloud(CSPInformation cspInformation, CloudNumber guardian,
-        CloudNumber dependent, Date dependentBirthDate, boolean withConsent, String secretToken, PrivateKey guardianPrivateSigningKey)
+        CloudNumber dependent, Date dependentBirthDate, boolean withConsent, String secretToken,
+        PrivateKey guardianPrivateSigningKey)
             throws Xdi2ClientException {
         
         // Prepare message to guardian Cloud
@@ -1137,12 +1137,12 @@ public class BasicCSP implements CSP {
         XDIClient xdiClientCloud = new XDIHttpClient(cloudXdiEndpoint);
         xdiClientCloud.send(messageEnvelope, null);
 
-        // done
-        log.debug("In Guardian User Cloud: Creating is Guardian Relationship between " + guardian.toString() + " and " + dependent.toString() );
+        //Done
+        log.debug("In Guardian User Cloud: Creating is Guardian Relationship between "
+            + guardian.toString() + " and " + dependent.toString());
          
         
         // Prepare message to Dependent's Cloud
-
         MessageEnvelope messageEnvelope2 = new MessageEnvelope();
         MessageCollection messageCollection2 = this.createMessageCollectionToCloud(messageEnvelope2, dependent);
 
@@ -1157,8 +1157,7 @@ public class BasicCSP implements CSP {
         //Generating and Adding Dependent Statements
         List<XDI3Statement> dependentStatements =  createDependentXDI3Statements( guardian,  dependent, dependentBirthDate, guardianPrivateSigningKey);
         targetStatements.addAll(dependentStatements);
-        
-        
+              
         
         if (withConsent) {    
       
@@ -1451,6 +1450,7 @@ public class BasicCSP implements CSP {
         MemoryGraph g = MemoryGraphFactory.getInstance().openGraph();
         
         List<XDI3Statement> targetStatements = new ArrayList<XDI3Statement> ();
+        
 
                     
         //Create the Relational Entry in the Dependent Sub Graph
@@ -1462,29 +1462,36 @@ public class BasicCSP implements CSP {
         
         g.setStatement(guardianStatement);
         
-        //([=]!:uuid:3333/+guardian)[=]!:uuid:3333/+guardian/[=]!:uuid:1111
+        //(   [=]!:uuid:3333/  +guardian/  ([=]!:uuid:3333/+guardian/[=]!:uuid:1111) )
+        
+        XDI3SubSegment guardianInnerRoot = XDI3SubSegment.create("(" + dependent.getXri() +"/+guardian" +  guardian.getXri() + ")"); 
+
         XDI3Statement innerGuardianStatement = XDI3Statement.fromRelationComponents(
-                XDI3Util.concatXris(innerGraph, dependent.getXri()),
+                dependent.getXri(),
                 XRI_S_GUARDIAN,
-                guardian.getXri());
+                XDI3Util.concatXris(guardianInnerRoot));
         
         g.setStatement(innerGuardianStatement);
         
-        //Adding Date to  Dependent's SubGraph
+        //Adding Date to Dependent's SubGraph
+        //[=]!:uuid:3333<+birth><$t>&/&/"2000-04-10T22:22:22Z")
+        
+        String xdiDOBFormat = Timestamps.timestampToString(dependentBirthDate);
         XDI3Statement dobStatement = XDI3Statement.fromLiteralComponents(
-                XDI3Util.concatXris(dependent.getXri(), XDI3Segment.create("<+birth><$date>&")), 
-                dependentBirthDate.toString());
+                XDI3Util.concatXris(dependent.getXri(), XDI3Segment.create("<+birth><$t>&")), 
+                xdiDOBFormat);
         
         g.setStatement(dobStatement);
         
-
+        
+        
         
         //Sign the Context: ([=]!:uuid:3333/+guardian)<$sig>&/&/”...”        
         ContextNode signingNode = g.getRootContextNode().getContextNode(innerGraph);
 
         // now create the signature and add it to the graph
-
         KeyPairSignature s = (KeyPairSignature) Signatures.setSignature(signingNode, "sha", 256, "rsa", 2048);
+  
 
         try {
             s.sign(signingKey);
@@ -1492,7 +1499,12 @@ public class BasicCSP implements CSP {
             throw new RuntimeException("Problem Signing Dependent Graph");           
         }
         
+        //@TODO: Add the public Key  to the Signature.
+        //([=]!:uuid:3333/+guardian)<$sig><$public><$key>/$ref/[=]!:uuid:1111+familial$sig$keypair<$public><$key> 
+        //or
+        //([=]!:uuid:3333/+guardian)[<$sig>]<!:uuid:7846><$public><$key>/$ref/[=]!:uuid:1111+familial$sig$keypair<$public><$key>
         
+               
         ContextNode c = g.getRootContextNode();
         
         Iterator<Statement> dependencyStatmentIterator = c.getAllStatements();
