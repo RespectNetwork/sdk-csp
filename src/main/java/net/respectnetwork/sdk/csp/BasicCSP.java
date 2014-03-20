@@ -93,9 +93,6 @@ public class BasicCSP implements CSP {
 
 	public static final XDI3Segment XRI_S_PARAMETER_CLOUDNAME_DISCOUNTCODE = XDI3Segment.create("<+([@]!:uuid:e9b5165b-fa7b-4387-a685-7125d138a872)><+(RNDiscountCode)>");
 	public static final XDI3Segment XRI_S_PARAMETER_RESPECT_NETWORK_MEMBERSHIP_DISCOUNTCODE = XDI3Segment.create("<+([@]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa)><+(RNDiscountCode)>");
-	
-//	public static final CloudNumber AT_RESPECT_CLOUD_NUMBER = CloudNumber.create("[@]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa");
-
 
 	private CSPInformation cspInformation;
 
