@@ -94,7 +94,7 @@ public class BasicCSP implements CSP {
 	public static final XDI3Segment XRI_S_PARAMETER_CLOUDNAME_DISCOUNTCODE = XDI3Segment.create("<+([@]!:uuid:e9b5165b-fa7b-4387-a685-7125d138a872)><+(RNDiscountCode)>");
 	public static final XDI3Segment XRI_S_PARAMETER_RESPECT_NETWORK_MEMBERSHIP_DISCOUNTCODE = XDI3Segment.create("<+([@]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa)><+(RNDiscountCode)>");
 	
-	public static final CloudNumber AT_RESPECT_CLOUD_NUMBER = CloudNumber.create("[@]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa");
+//	public static final CloudNumber AT_RESPECT_CLOUD_NUMBER = CloudNumber.create("[@]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa");
 
 
 	private CSPInformation cspInformation;
@@ -906,7 +906,7 @@ public class BasicCSP implements CSP {
         Message message = messageCollection.createMessage();
         
         XDI3Statement targetStatementGet = XDI3Statement.fromRelationComponents(
-                AT_RESPECT_CLOUD_NUMBER.getXri(),
+        		this.getCspInformation().getRnCloudNumber().getXri(),
                 XRI_S_FIRST_MEMBER,
                 XDIConstants.XRI_S_VARIABLE);
 
@@ -918,7 +918,7 @@ public class BasicCSP implements CSP {
         
         MessageResult messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope, null);
         
-        ReadOnlyIterator<Relation> relations =  (messageResult.getGraph()).getDeepRelations(AT_RESPECT_CLOUD_NUMBER.getXri(), XRI_S_FIRST_MEMBER);
+        ReadOnlyIterator<Relation> relations =  (messageResult.getGraph()).getDeepRelations(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_FIRST_MEMBER);
             
         while (relations.hasNext()) {
             relations.next();
@@ -1401,7 +1401,7 @@ public class BasicCSP implements CSP {
         XDI3Statement consentStatement = XDI3Statement.fromRelationComponents(
                 XDI3Util.concatXris(guardian.getXri(), XDI3Segment.create("[<+consent>]"), XDI3Segment.create(consentUUID)),
                 XDI3Segment.create("$is+"),
-                XDI3Util.concatXris(AT_RESPECT_CLOUD_NUMBER.getXri(), XDI3Segment.create("<+parental><+consent>")));
+                XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XDI3Segment.create("<+parental><+consent>")));
         
         g.setStatement(consentStatement);
         
