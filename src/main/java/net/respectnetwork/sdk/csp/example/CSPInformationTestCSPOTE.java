@@ -14,8 +14,8 @@ public class CSPInformationTestCSPOTE extends BasicCSPInformation {
 
 		super(
 				CloudNumber.create("[@]!:uuid:20e3d77c-5a0e-44d5-b949-85153fbb6577"),
-				"http://mycloud-ote.neustar.biz:14440/testcsp-registry",
-				"http://mycloud-ote.neustar.biz:14440/testcsp-users/",
+				"https://mycloud-ote.neustar.biz/testcsp-registry",
+				"https://mycloud-ote.neustar.biz/testcsp-users/",
 				"whitelabel123",
 				null,
 				CloudNumber.create("[@]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa"),

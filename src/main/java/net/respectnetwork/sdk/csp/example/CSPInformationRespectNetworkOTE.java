@@ -14,8 +14,8 @@ public class CSPInformationRespectNetworkOTE extends BasicCSPInformation {
 
 		super(
 				CloudNumber.create("[@]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa"),
-				"http://mycloud-ote.neustar.biz:14440/registry",
-				"http://mycloud-ote.neustar.biz:14440/users/",
+				"https://mycloud-ote.neustar.biz/testcsp-registry",
+				"https://mycloud-ote.neustar.biz/testcsp-users/",
 				"s3cr3t",
 				null,
 				CloudNumber.create("[@]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa"),
