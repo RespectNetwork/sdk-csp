@@ -45,8 +45,10 @@ public class ExampleRegister {
 
 		try {
 
-			System.out.print("Enter Cloud Name: ");
-			cloudName = CloudName.create(new BufferedReader(new InputStreamReader(System.in)).readLine());
+			System.out.print("Enter Cloud Name (leave blank for a random one): ");
+			String cloudNameString = new BufferedReader(new InputStreamReader(System.in)).readLine();
+			if (cloudNameString.trim().isEmpty()) cloudNameString = "=dev.test." + UUID.randomUUID().toString();
+			cloudName = CloudName.create(cloudNameString);
 
 			if (cloudName == null) {
 
