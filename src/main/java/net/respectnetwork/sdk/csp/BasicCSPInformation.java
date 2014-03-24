@@ -31,13 +31,13 @@ public class BasicCSPInformation implements CSPInformation, Serializable {
 
 	}
 
-	public BasicCSPInformation(CloudNumber cspCloudNumber, String cspRegistryXdiEndpoint, String cspCloudBaseXdiEndpoint, String cspSecretToken, PrivateKey cspPrivateKey, CloudNumber rnCloudNumber, String rnRegistrationServiceXdiEndpoint, XDI3Segment rnCspLinkContract, String rnCspSecretToken, XDIDiscoveryClient xdiDiscoveryClient) {
+	public BasicCSPInformation(CloudNumber cspCloudNumber, String cspRegistryXdiEndpoint, String cspCloudBaseXdiEndpoint, String cspSecretToken, PrivateKey cspSignaturePrivateKey, CloudNumber rnCloudNumber, String rnRegistrationServiceXdiEndpoint, XDI3Segment rnCspLinkContract, String rnCspSecretToken, XDIDiscoveryClient xdiDiscoveryClient) {
 
 		this.cspCloudNumber = cspCloudNumber;
 		this.cspRegistryXdiEndpoint = cspRegistryXdiEndpoint;
 		this.cspCloudBaseXdiEndpoint = cspCloudBaseXdiEndpoint;
 		this.cspSecretToken = cspSecretToken;
-		this.cspSignaturePrivateKey = cspPrivateKey;
+		this.cspSignaturePrivateKey = cspSignaturePrivateKey;
 		this.rnCloudNumber = rnCloudNumber;
 		this.rnRegistrationServiceXdiEndpoint = rnRegistrationServiceXdiEndpoint;
 		this.rnCspLinkContract = rnCspLinkContract;
