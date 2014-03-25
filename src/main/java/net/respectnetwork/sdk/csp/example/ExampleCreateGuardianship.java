@@ -115,8 +115,11 @@ public class ExampleCreateGuardianship {
             String dependentXdiEndpoint = dependentRegistry.getXdiEndpointUri();
 
             guardianPrivateKey = XDIClientUtil.retrieveSignaturePrivateKey(guardianCloudNumber, guardianXdiEndpoint, guardianToken);
-            dependentPrivateKey = XDIClientUtil.retrieveSignaturePrivateKey(dependentCloudNumber, dependentXdiEndpoint, dependentToken);
+            System.out.println("GuardianPrivateKey Algo: " + guardianPrivateKey.getAlgorithm());
 
+            dependentPrivateKey = XDIClientUtil.retrieveSignaturePrivateKey(dependentCloudNumber, dependentXdiEndpoint, dependentToken);
+            System.out.println("DependentPrivateKey Algo: " + dependentPrivateKey.getAlgorithm());
+            
             if (guardianCloudNumber == null || dependentCloudNumber == null) {
                 System.err.println("Un-registered Cloud Name.");
                 System.exit(0);
