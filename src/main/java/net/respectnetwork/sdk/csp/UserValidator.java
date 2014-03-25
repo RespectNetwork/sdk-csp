@@ -1,7 +1,6 @@
 package net.respectnetwork.sdk.csp;
 
 import net.respectnetwork.sdk.csp.validation.CSPValidationException;
-import xdi2.core.xri3.CloudNumber;
 
 public interface UserValidator {
 

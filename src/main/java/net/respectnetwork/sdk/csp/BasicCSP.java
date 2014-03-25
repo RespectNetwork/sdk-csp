@@ -1385,6 +1385,18 @@ public class BasicCSP implements CSP {
     }
     
     
+    /**
+     * Create the XDIStatement that represent a Guardian's Consent and Sign it.
+     * 
+     * [=]!:uuid:1111[<+consent>]<!:uuid:6545>/$is+/[@]:uuid:0000<+parental><+consent>
+     * [=]!:uuid:1111[<+consent>]<!:uuid:6545>/$to/[=]!:uuid:3333
+     * [=]!:uuid:1111[<+consent>]<!:uuid:6545><$sig>&/&/“...”
+     * 
+     * @param guardian
+     * @param dependent
+     * @param signingKey
+     * @return
+     */
     private List<XDI3Statement> createConsentXDI3Statements(CloudNumber guardian, CloudNumber dependent, PrivateKey signingKey) {
         
         
@@ -1442,6 +1454,20 @@ public class BasicCSP implements CSP {
     }
     
     
+    
+    /**
+     * Create Dependent XDI Statements and Sign them with the Guardian's Public Key.
+     * 
+     * ([=]!:uuid:3333/+guardian)[=]!:uuid:3333/+guardian/([=]!:uuid:3333/+guardian)[=]!:uuid:1111
+     * [=]!:uuid:3333<+birth><$t>&/&/"2000-04-10T22:22:22Z"
+     * 
+     * 
+     * @param guardian
+     * @param dependent
+     * @param dependentBirthDate
+     * @param signingKey
+     * @return
+     */
     private List<XDI3Statement> createDependentXDI3Statements(CloudNumber guardian, CloudNumber dependent, Date dependentBirthDate, PrivateKey signingKey) {
         
                 
@@ -1451,7 +1477,6 @@ public class BasicCSP implements CSP {
         
         List<XDI3Statement> targetStatements = new ArrayList<XDI3Statement> ();
         
-
                     
         //Create the Relational Entry in the Dependent Sub Graph
         //[=]!:uuid:3333/+guardian/[=]!:uuid:1111
@@ -1462,14 +1487,13 @@ public class BasicCSP implements CSP {
         
         g.setStatement(guardianStatement);
         
-        //(   [=]!:uuid:3333/  +guardian/  ([=]!:uuid:3333/+guardian/[=]!:uuid:1111) )
+        // ([=]!:uuid:3333/+guardian)[=]!:uuid:3333 /+guardian/([=]!:uuid:3333/+guardian)[=]!:uuid:1111
         
-        XDI3SubSegment guardianInnerRoot = XDI3SubSegment.create("(" + dependent.getXri() +"/+guardian" +  guardian.getXri() + ")"); 
 
         XDI3Statement innerGuardianStatement = XDI3Statement.fromRelationComponents(
-                dependent.getXri(),
+                XDI3Util.concatXris(innerGraph,dependent.getXri()),
                 XRI_S_GUARDIAN,
-                XDI3Util.concatXris(guardianInnerRoot));
+                XDI3Util.concatXris(innerGraph, guardian.getXri()));
         
         g.setStatement(innerGuardianStatement);
         
@@ -1499,17 +1523,22 @@ public class BasicCSP implements CSP {
             throw new RuntimeException("Problem Signing Dependent Graph");           
         }
         
-        //@TODO: Add the public Key  to the Signature.
-        //([=]!:uuid:3333/+guardian)<$sig><$public><$key>/$ref/[=]!:uuid:1111+familial$sig$keypair<$public><$key> 
-        //or
-        //([=]!:uuid:3333/+guardian)[<$sig>]<!:uuid:7846><$public><$key>/$ref/[=]!:uuid:1111+familial$sig$keypair<$public><$key>
+        //Add Public Key to <$sig> 
+        //([=]!:uuid:3333/+guardian)<$sig><$public><$key>/$ref/[=]!:uuid:1111$msg$sig$keypair<$public><$key>         
+        XDI3SubSegment publicKeySubject = XDI3SubSegment.create("(" + dependent.getXri() + "/+guardian" + ")" );
         
+        XDI3Statement  publicKeyStatement = XDI3Statement.fromRelationComponents(
+            XDI3Util.concatXris(publicKeySubject, XDI3Segment.create("<$sig><$public><$key>")), 
+            XDIDictionaryConstants.XRI_S_REF, 
+            XDI3Util.concatXris(guardian.getXri(), XDI3Segment.create("$msg$sig$keypair<$public><$key>")));
+               
+        g.setStatement(publicKeyStatement);
                
         ContextNode c = g.getRootContextNode();
         
         Iterator<Statement> dependencyStatmentIterator = c.getAllStatements();
         
-        //Converting from Statement to  XDI3Statement
+        //Converting from Statement to XDI3Statement
         while(dependencyStatmentIterator.hasNext()){
             Statement next = dependencyStatmentIterator.next();
             XDI3Statement graphStatement = next.getXri();
