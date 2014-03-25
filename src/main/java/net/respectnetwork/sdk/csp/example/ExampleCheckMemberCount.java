@@ -12,7 +12,7 @@ public class ExampleCheckMemberCount {
 	public static void main(String[] args) throws Xdi2ClientException {
 
 
-		CSPInformation cspInformation = new CSPInformationRespectNetworkOTE();
+		CSPInformation cspInformation = new CSPInformationTestCSPOTE();
 
 		CSP csp = new BasicCSP(cspInformation);
         
