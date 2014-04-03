@@ -74,8 +74,8 @@ public class CheckPhoneAndEmailUniqueness extends AbstractTester {
     
     public void init() throws TestException {
         
-        this.setVerifiedEmail("didw3moylu@perftest.com");
-        this.setVerifiedPhone("+80903735698");
+        this.setVerifiedEmail("unm9rktrkb@perftest.com");
+        this.setVerifiedPhone("+98638006275");
     
     }
     

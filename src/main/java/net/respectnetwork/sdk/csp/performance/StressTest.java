@@ -66,24 +66,25 @@ public class StressTest implements Runnable {
      */
     public void run() {
         
-        int suvccessCount = 0;
+        float successCount = 0;
         String name = Thread.currentThread().getName();
         System.out.println("Starting " + name);
         long begin = System.currentTimeMillis();
         
         for ( int i = 0; i < iterations; i++ ){
             if( performTest(i + 1, name)) {
-                suvccessCount++;    
+                successCount++;    
+                //System.out.println("Thread = " + name + " Iteration = " +  i + 1 + " Success Count = " + successCount);
             }
         }
         
         long end = System.currentTimeMillis();
         long average = (end - begin)/iterations;
         long fullduration = (end - begin);
-        float successrate = (suvccessCount/iterations) *100;
+        float successrate = (successCount/iterations) * 100;
 
         System.out.println( "#" + name +  " Finished: Elapsed Time = " + fullduration  +
-            "ms" + " AverageTime = " + average + "ms SuccessRate = " + successrate + "%");
+            "ms" + " AverageTime = " + average + "ms SuccessRate = " + successrate + "%" );
     }
 
     /**
@@ -96,15 +97,17 @@ public class StressTest implements Runnable {
     public boolean performTest(int iteration, String name){
         
         boolean success = false;
+        long begin = 0;
+        long end = 0;
+        long fullduration = 0;
 
         try{
-            long begin = System.currentTimeMillis();
+            begin = System.currentTimeMillis();
             
             //Pick the Environment you want to run  the test in.
             BasicCSPInformation cspInformation = configureEnvironment(TestEnv.valueOf(env), false);   
                    
-            //Pick the tests you want to run.
-            
+            //Pick the tests you want to run.         
             Class c = Class.forName(testClass);
             
             Tester tester = (Tester)c.newInstance();
@@ -120,13 +123,8 @@ public class StressTest implements Runnable {
                 success = false;
             } 
                   
-            //success = testRegister(cspInformation);
-            //success= testCreateDependency(cspInformation);
-
-     
-            long end = System.currentTimeMillis();
-            long fullduration = (end - begin);
-            System.out.println( "#" + name + " Task #" + iteration + " Duration = " + fullduration  + "ms" );
+            end = System.currentTimeMillis();
+            fullduration = (end - begin);
             
         } catch (Exception e){
             e.printStackTrace();
@@ -134,6 +132,9 @@ public class StressTest implements Runnable {
             success = false;
             
         }
+        
+        System.out.println( "#" + name + " Task #" + iteration + " Duration = " + fullduration  + "ms"  + " Success = " + success);
+
         return success;
      }
     
@@ -231,7 +232,5 @@ public class StressTest implements Runnable {
         }
         
     }
-    
-
-
+  
 }
