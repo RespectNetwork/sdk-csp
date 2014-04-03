@@ -4,6 +4,10 @@ import java.io.Serializable;
 import java.security.GeneralSecurityException;
 import java.security.PrivateKey;
 
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import xdi2.client.exceptions.Xdi2ClientException;
 import xdi2.client.util.XDIClientUtil;
 import xdi2.core.xri3.CloudNumber;
@@ -13,6 +17,10 @@ import xdi2.discovery.XDIDiscoveryResult;
 
 public class BasicCSPInformation implements CSPInformation, Serializable {
 
+	/** CLass Logger */
+	private static final Logger logger = LoggerFactory
+			.getLogger(BasicCSPInformation.class);
+	
 	private static final long serialVersionUID = 4621748646529792450L;
 
 	private CloudNumber cspCloudNumber;
@@ -27,6 +35,12 @@ public class BasicCSPInformation implements CSPInformation, Serializable {
 
 	private XDIDiscoveryClient xdiDiscoveryClient;
 
+	@Override
+	public String toString(){
+		
+		return new String("CSP Cloud Number : " + cspCloudNumber.toString() + ", cspRegistryXdiEndpoint : " + cspRegistryXdiEndpoint +
+				", rnRegistrationServiceXdiEndpoint : " + rnRegistrationServiceXdiEndpoint + ", cspCloudBaseXdiEndpoint : " + cspCloudBaseXdiEndpoint);
+	}
 	public BasicCSPInformation() {
 
 	}
@@ -168,4 +182,5 @@ public class BasicCSPInformation implements CSPInformation, Serializable {
 
 		this.xdiDiscoveryClient = xdiDiscoveryClient;
 	}
+	
 }

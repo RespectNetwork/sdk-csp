@@ -169,6 +169,7 @@ public class BasicCSP implements CSP {
 		// send message and read result
 
 		this.prepareMessageToRN(message);
+		
 		MessageResult messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope, null);
 
 		Relation relation = messageResult.getGraph().getDeepRelation(XDI3Segment.fromComponent(cloudName.getPeerRootXri()), XDIDictionaryConstants.XRI_S_REF);
@@ -1585,5 +1586,13 @@ public class BasicCSP implements CSP {
 	public void setXdiClientRNRegistrationService(XDIClient xdiClientRNRegistrationService) {
 
 		this.xdiClientRNRegistrationService = xdiClientRNRegistrationService;
+	}
+	@Override
+	public String toString(){
+		if(this.cspInformation != null){
+			return this.cspInformation.toString();
+		} else {
+			return new String("cspInformation is null");
+		}
 	}
 }
