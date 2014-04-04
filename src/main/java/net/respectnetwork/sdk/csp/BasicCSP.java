@@ -76,23 +76,23 @@ public class BasicCSP implements CSP {
 
 	private static final Logger log = LoggerFactory.getLogger(BasicCSP.class);
 
-	public static final XDI3Segment XRI_S_AC_VERIFIED_DIGEST_PHONE = XDI3Segment.create("<+verified><$digest>[<+phone>]");
-	public static final XDI3Segment XRI_S_AC_VERIFIED_DIGEST_EMAIL = XDI3Segment.create("<+verified><$digest>[<+email>]");
-	public static final XDI3Segment XRI_S_AS_VERIFIED_PHONE = XDI3Segment.create("<+verified><+phone>");
-	public static final XDI3Segment XRI_S_AS_VERIFIED_EMAIL = XDI3Segment.create("<+verified><+email>");
-	public static final XDI3Segment XRI_S_IS_PHONE = XDI3Segment.create("$is+phone");
-	public static final XDI3Segment XRI_S_IS_EMAIL = XDI3Segment.create("$is+email");
+	public static final XDI3Segment XRI_S_AC_VERIFIED_DIGEST_PHONE = XDI3Segment.create("<#verified><$digest>[<#phone>]");
+	public static final XDI3Segment XRI_S_AC_VERIFIED_DIGEST_EMAIL = XDI3Segment.create("<#verified><$digest>[<#email>]");
+	public static final XDI3Segment XRI_S_AS_VERIFIED_PHONE = XDI3Segment.create("<#verified><#phone>");
+	public static final XDI3Segment XRI_S_AS_VERIFIED_EMAIL = XDI3Segment.create("<#verified><#email>");
+	public static final XDI3Segment XRI_S_IS_PHONE = XDI3Segment.create("$is#phone");
+	public static final XDI3Segment XRI_S_IS_EMAIL = XDI3Segment.create("$is#email");
 	
-    public static final XDI3Segment XRI_S_IS_GUARDIAN = XDI3Segment.create("$is+guardian");
-    public static final XDI3Segment XRI_S_GUARDIAN = XDI3Segment.create("+guardian");
+    public static final XDI3Segment XRI_S_IS_GUARDIAN = XDI3Segment.create("$is#guardian");
+    public static final XDI3Segment XRI_S_GUARDIAN = XDI3Segment.create("#guardian");
 
-	public static final XDI3Segment XRI_S_MEMBER = XDI3Segment.create("+member");
-	public static final XDI3Segment XRI_S_AS_MEMBER_EXPIRATION_TIME = XDI3Segment.create("<+member><+expiration><$t>");
+	public static final XDI3Segment XRI_S_MEMBER = XDI3Segment.create("#member");
+	public static final XDI3Segment XRI_S_AS_MEMBER_EXPIRATION_TIME = XDI3Segment.create("<#member><#expiration><$t>");
 
-	public static final XDI3Segment XRI_S_FIRST_MEMBER = XDI3Segment.create("+first+member");
+	public static final XDI3Segment XRI_S_FIRST_MEMBER = XDI3Segment.create("#first#member");
 
-	public static final XDI3Segment XRI_S_PARAMETER_CLOUDNAME_DISCOUNTCODE = XDI3Segment.create("<+([@]!:uuid:e9b5165b-fa7b-4387-a685-7125d138a872)><+(RNDiscountCode)>");
-	public static final XDI3Segment XRI_S_PARAMETER_RESPECT_NETWORK_MEMBERSHIP_DISCOUNTCODE = XDI3Segment.create("<+([@]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa)><+(RNDiscountCode)>");
+	public static final XDI3Segment XRI_S_PARAMETER_CLOUDNAME_DISCOUNTCODE = XDI3Segment.create("<#([+]!:uuid:e9b5165b-fa7b-4387-a685-7125d138a872)><#(RNDiscountCode)>");
+	public static final XDI3Segment XRI_S_PARAMETER_RESPECT_NETWORK_MEMBERSHIP_DISCOUNTCODE = XDI3Segment.create("<#([+]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa)><#(RNDiscountCode)>");
 
 	private CSPInformation cspInformation;
 
@@ -1388,9 +1388,9 @@ public class BasicCSP implements CSP {
     /**
      * Create the XDIStatement that represent a Guardian's Consent and Sign it.
      * 
-     * [=]!:uuid:1111[<+consent>]<!:uuid:6545>/$is+/[@]:uuid:0000<+parental><+consent>
-     * [=]!:uuid:1111[<+consent>]<!:uuid:6545>/$to/[=]!:uuid:3333
-     * [=]!:uuid:1111[<+consent>]<!:uuid:6545><$sig>&/&/“...”
+     * [=]!:uuid:1111[<#consent>]<!:uuid:6545>/$is#/[+]:uuid:0000<#parental><#consent>
+     * [=]!:uuid:1111[<#consent>]<!:uuid:6545>/$to/[=]!:uuid:3333
+     * [=]!:uuid:1111[<#consent>]<!:uuid:6545><$sig>&/&/“...”
      * 
      * @param guardian
      * @param dependent
@@ -1407,17 +1407,17 @@ public class BasicCSP implements CSP {
         MemoryGraph g = MemoryGraphFactory.getInstance().openGraph();
         
 
-        //[=]!:uuid:1111[<+consent>]<!:uuid:6545>/$is+/[@]:uuid:0000<+parental><+consent>
+        //[=]!:uuid:1111[<#consent>]<!:uuid:6545>/$is#/[+]:uuid:0000<#parental><#consent>
         XDI3Statement consentStatement = XDI3Statement.fromRelationComponents(
-                XDI3Util.concatXris(guardian.getXri(), XDI3Segment.create("[<+consent>]"), XDI3Segment.create(consentUUID)),
-                XDI3Segment.create("$is+"),
-                XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XDI3Segment.create("<+parental><+consent>")));
+                XDI3Util.concatXris(guardian.getXri(), XDI3Segment.create("[<#consent>]"), XDI3Segment.create(consentUUID)),
+                XDIDictionaryConstants.XRI_S_IS_TYPE,
+                XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XDI3Segment.create("<#parental><#consent>")));
         
         g.setStatement(consentStatement);
         
-        XDI3Segment consentSubjectTo = XDI3Util.concatXris(guardian.getXri(), XDI3Segment.create("[<+consent>]"), XDI3Segment.create(consentUUID));
+        XDI3Segment consentSubjectTo = XDI3Util.concatXris(guardian.getXri(), XDI3Segment.create("[<#consent>]"), XDI3Segment.create(consentUUID));
      
-        //[=]!:uuid:1111[<+consent>]<!:uuid:6545>/$to/[=]!:uuid:3333
+        //[=]!:uuid:1111[<#consent>]<!:uuid:6545>/$to/[=]!:uuid:3333
         XDI3Statement consentStatementTo = XDI3Statement.fromRelationComponents(
                 consentSubjectTo,
                 XDI3Segment.create("$to"),
@@ -1425,7 +1425,7 @@ public class BasicCSP implements CSP {
         g.setStatement(consentStatementTo);
         
           
-        //Sign the Context: //[=]!:uuid:1111[<+consent>]<!:uuid:6545>        
+        //Sign the Context: //[=]!:uuid:1111[<#consent>]<!:uuid:6545>        
         ContextNode signingNode = g.getRootContextNode().getDeepContextNode(consentSubjectTo);
 
         // now create the signature and add it to the graph
@@ -1457,8 +1457,8 @@ public class BasicCSP implements CSP {
     /**
      * Create Dependent XDI Statements and Sign them with the Guardian's Public Key.
      * 
-     * ([=]!:uuid:3333/+guardian)[=]!:uuid:3333/+guardian/([=]!:uuid:3333/+guardian)[=]!:uuid:1111
-     * [=]!:uuid:3333<+birth><$t>&/&/"2000-04-10T22:22:22Z"
+     * ([=]!:uuid:3333/#guardian)[=]!:uuid:3333/#guardian/([=]!:uuid:3333/#guardian)[=]!:uuid:1111
+     * [=]!:uuid:3333<#birth><$t>&/&/"2000-04-10T22:22:22Z"
      * 
      * 
      * @param guardian
@@ -1470,7 +1470,7 @@ public class BasicCSP implements CSP {
     private List<XDI3Statement> createDependentXDI3Statements(CloudNumber guardian, CloudNumber dependent, Date dependentBirthDate, PrivateKey signingKey) {
         
                 
-        XDI3SubSegment innerGraph = XDI3SubSegment.create("(" + dependent.getXri() +"/+guardian" + ")");
+        XDI3SubSegment innerGraph = XDI3SubSegment.create("(" + dependent.getXri() +"/#guardian" + ")");
         
         MemoryGraph g = MemoryGraphFactory.getInstance().openGraph();
         
@@ -1478,7 +1478,7 @@ public class BasicCSP implements CSP {
         
                     
         //Create the Relational Entry in the Dependent Sub Graph
-        //[=]!:uuid:3333/+guardian/[=]!:uuid:1111
+        //[=]!:uuid:3333/#guardian/[=]!:uuid:1111
         XDI3Statement guardianStatement = XDI3Statement.fromRelationComponents(
                 dependent.getXri(),
                 XRI_S_GUARDIAN,
@@ -1486,7 +1486,7 @@ public class BasicCSP implements CSP {
         
         g.setStatement(guardianStatement);
         
-        // ([=]!:uuid:3333/+guardian)[=]!:uuid:3333 /+guardian/([=]!:uuid:3333/+guardian)[=]!:uuid:1111
+        // ([=]!:uuid:3333/#guardian)[=]!:uuid:3333 /#guardian/([=]!:uuid:3333/#guardian)[=]!:uuid:1111
         
 
         XDI3Statement innerGuardianStatement = XDI3Statement.fromRelationComponents(
@@ -1497,11 +1497,11 @@ public class BasicCSP implements CSP {
         g.setStatement(innerGuardianStatement);
         
         //Adding Date to Dependent's SubGraph
-        //[=]!:uuid:3333<+birth><$t>&/&/"2000-04-10T22:22:22Z")
+        //[=]!:uuid:3333<#birth><$t>&/&/"2000-04-10T22:22:22Z")
         
         String xdiDOBFormat = Timestamps.timestampToString(dependentBirthDate);
         XDI3Statement dobStatement = XDI3Statement.fromLiteralComponents(
-                XDI3Util.concatXris(dependent.getXri(), XDI3Segment.create("<+birth><$t>&")), 
+                XDI3Util.concatXris(dependent.getXri(), XDI3Segment.create("<#birth><$t>&")), 
                 xdiDOBFormat);
         
         g.setStatement(dobStatement);
@@ -1509,7 +1509,7 @@ public class BasicCSP implements CSP {
         
         
         
-        //Sign the Context: ([=]!:uuid:3333/+guardian)<$sig>&/&/”...”        
+        //Sign the Context: ([=]!:uuid:3333/#guardian)<$sig>&/&/”...”        
         ContextNode signingNode = g.getRootContextNode().getContextNode(innerGraph);
 
         // now create the signature and add it to the graph
@@ -1523,7 +1523,7 @@ public class BasicCSP implements CSP {
         }
         
         //Add Public Key to <$sig> 
-        //([=]!:uuid:3333/+guardian)<$sig><$public><$key>/$ref/[=]!:uuid:1111$msg$sig$keypair<$public><$key>         
+        //([=]!:uuid:3333/#guardian)<$sig><$public><$key>/$ref/[=]!:uuid:1111$msg$sig$keypair<$public><$key>         
         XDI3SubSegment publicKeySubject = XDI3SubSegment.create("(" + dependent.getXri() + "/+guardian" + ")" );
         
         XDI3Statement  publicKeyStatement = XDI3Statement.fromRelationComponents(
