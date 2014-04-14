@@ -1052,7 +1052,7 @@ public class BasicCSP implements CSP {
 
 		if (this.getCspInformation().getCspSignaturePrivateKey() != null) {
 
-			KeyPairSignature signature = (KeyPairSignature) message.setSignature(KeyPairSignature.DIGEST_ALGORITHM_SHA, 256, KeyPairSignature.KEY_ALGORITHM_RSA, 2048);
+			KeyPairSignature signature = (KeyPairSignature) message.createSignature(KeyPairSignature.DIGEST_ALGORITHM_SHA, 256, KeyPairSignature.KEY_ALGORITHM_RSA, 2048, true);
 
 			try {
 
@@ -1076,7 +1076,7 @@ public class BasicCSP implements CSP {
 
 		if (this.getCspInformation().getCspSignaturePrivateKey() != null) {
 
-			KeyPairSignature signature = (KeyPairSignature) message.setSignature(KeyPairSignature.DIGEST_ALGORITHM_SHA, 256, KeyPairSignature.KEY_ALGORITHM_RSA, 2048);
+			KeyPairSignature signature = (KeyPairSignature) message.createSignature(KeyPairSignature.DIGEST_ALGORITHM_SHA, 256, KeyPairSignature.KEY_ALGORITHM_RSA, 2048, true);
 
 			try {
 
@@ -1100,7 +1100,7 @@ public class BasicCSP implements CSP {
 
 		if (this.getCspInformation().getCspSignaturePrivateKey() != null) {
 
-			KeyPairSignature signature = (KeyPairSignature) message.setSignature(KeyPairSignature.DIGEST_ALGORITHM_SHA, 256, KeyPairSignature.KEY_ALGORITHM_RSA, 2048);
+			KeyPairSignature signature = (KeyPairSignature) message.createSignature(KeyPairSignature.DIGEST_ALGORITHM_SHA, 256, KeyPairSignature.KEY_ALGORITHM_RSA, 2048, true);
 
 			try {
 
@@ -1448,7 +1448,7 @@ public class BasicCSP implements CSP {
         ContextNode signingNode = g.getRootContextNode().getDeepContextNode(consentSubjectTo);
 
         // now create the signature and add it to the graph
-        KeyPairSignature s = (KeyPairSignature) Signatures.setSignature(signingNode, "sha", 256, "rsa", 2048);
+        KeyPairSignature s = (KeyPairSignature) Signatures.createSignature(signingNode, "sha", 256, "rsa", 2048, true);
 
         try {
             s.sign(signingKey);
@@ -1532,7 +1532,7 @@ public class BasicCSP implements CSP {
         ContextNode signingNode = g.getRootContextNode().getContextNode(innerGraph);
 
         // now create the signature and add it to the graph
-        KeyPairSignature s = (KeyPairSignature) Signatures.setSignature(signingNode, "sha", 256, "rsa", 2048);
+        KeyPairSignature s = (KeyPairSignature) Signatures.createSignature(signingNode, "sha", 256, "rsa", 2048, true);
   
 
         try {
