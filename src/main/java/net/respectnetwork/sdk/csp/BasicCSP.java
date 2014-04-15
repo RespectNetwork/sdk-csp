@@ -1047,7 +1047,7 @@ public class BasicCSP implements CSP {
 		message.setToPeerRootXri(this.getCspInformation().getRnCloudNumber().getPeerRootXri());
 		message.setLinkContractXri(this.getCspInformation().getRnCspLinkContract());
 
-		if (this.getCspInformation().getRnCspSecretToken() != null) {
+		if (this.getCspInformation().getRnCspSecretToken() != null && !this.getCspInformation().getRnCspSecretToken().isEmpty()) {
 
 			message.setSecretToken(this.getCspInformation().getRnCspSecretToken());
 		}
