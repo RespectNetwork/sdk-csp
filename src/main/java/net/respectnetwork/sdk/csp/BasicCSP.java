@@ -1050,9 +1050,29 @@ public class BasicCSP implements CSP {
 		if (this.getCspInformation().getRnCspSecretToken() != null && !this.getCspInformation().getRnCspSecretToken().isEmpty()) {
 
 			message.setSecretToken(this.getCspInformation().getRnCspSecretToken());
+		} else
+		{
+		   log.debug("RN Secret token is null. Will try to retrieve CSP private key for signing messages.");
+		   try
+         {
+		      BasicCSPInformation basicCSP = (BasicCSPInformation) this.getCspInformation();
+		      if(basicCSP.getCspSignaturePrivateKey() == null)
+		      {
+		         basicCSP.retrieveCspSignaturePrivateKey();
+		      }
+         } catch (Xdi2ClientException e)
+         {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+         } catch (GeneralSecurityException e)
+         {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+         }
 		}
 
 		if (this.getCspInformation().getCspSignaturePrivateKey() != null) {
+		   log.debug("CSP Private Key is not null. Signing Messages with it.");
 
 			KeyPairSignature signature = (KeyPairSignature) message.createSignature(KeyPairSignature.DIGEST_ALGORITHM_SHA, 256, KeyPairSignature.KEY_ALGORITHM_RSA, 2048, true);
 
@@ -1063,6 +1083,10 @@ public class BasicCSP implements CSP {
 
 				throw new RuntimeException(ex.getMessage(), ex);
 			}
+		}
+		else
+		{
+		   log.debug("CSP Private Key is null. Cannot sign Messages to RN.");
 		}
 	}
 
