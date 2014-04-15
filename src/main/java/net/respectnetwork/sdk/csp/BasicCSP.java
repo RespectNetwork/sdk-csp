@@ -47,6 +47,7 @@ import xdi2.core.features.signatures.Signatures;
 import xdi2.core.features.timestamps.Timestamps;
 import xdi2.core.impl.memory.MemoryGraph;
 import xdi2.core.impl.memory.MemoryGraphFactory;
+import xdi2.core.io.XDIWriterRegistry;
 import xdi2.core.util.XDI3Util;
 import xdi2.core.util.iterators.IteratorArrayMaker;
 import xdi2.core.util.iterators.MappingCloudNameIterator;
@@ -171,7 +172,8 @@ public class BasicCSP implements CSP {
 
 		this.prepareMessageToRN(message);
 		
-		log.debug("checkCloudNameAvailableInRN :: Message to RN " + messageEnvelope.getGraph().toString());
+		log.debug("checkCloudNameAvailableInRN :: Message envelope to RN \n" );
+		printMessage(messageEnvelope);
 		
 		MessageResult messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope, null);
 
@@ -1612,5 +1614,15 @@ public class BasicCSP implements CSP {
 		} else {
 			return new String("cspInformation is null");
 		}
+	}
+	public static void printMessage(MessageEnvelope messageEnvelope)
+	{
+	   try {
+         XDIWriterRegistry.forFormat("XDI DISPLAY", null).write(
+               messageEnvelope.getGraph(), System.out);
+      } catch (IOException e) {
+         // TODO Auto-generated catch block
+         e.printStackTrace();
+      }
 	}
 }
