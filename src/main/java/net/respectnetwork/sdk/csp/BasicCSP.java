@@ -579,16 +579,19 @@ public class BasicCSP implements CSP {
 				XRI_S_MEMBER,
 				cloudNumber.getXri()));
 
-		targetStatements.add(XDI3Statement.fromComponents(
-				this.getCspInformation().getRnCloudNumber().getXri(),
-				XRI_S_MEMBER,
-				XDI3Segment.fromComponent(
-						XDI3SubSegment.fromComponents(null, false, false, null, 
-								XDI3XRef.fromComponents(XDIConstants.XS_ROOT, null, 
-										XDI3Statement.fromLiteralComponents(
-												XDI3Util.concatXris(cloudNumber.getXri(), XRI_S_AS_MEMBER_EXPIRATION_TIME, XDIConstants.XRI_S_VALUE), 
-												Timestamps.timestampToString(expirationTime)), 
-												null, null, null, null)))));
+		if (expirationTime != null) {
+
+			targetStatements.add(XDI3Statement.fromComponents(
+					this.getCspInformation().getRnCloudNumber().getXri(),
+					XRI_S_MEMBER,
+					XDI3Segment.fromComponent(
+							XDI3SubSegment.fromComponents(null, false, false, null, 
+									XDI3XRef.fromComponents(XDIConstants.XS_ROOT, null, 
+											XDI3Statement.fromLiteralComponents(
+													XDI3Util.concatXris(cloudNumber.getXri(), XRI_S_AS_MEMBER_EXPIRATION_TIME, XDIConstants.XRI_S_VALUE), 
+													Timestamps.timestampToString(expirationTime)), 
+													null, null, null, null)))));
+		}
 
 		Operation operation = message.createSetOperation(targetStatements.iterator());
 
