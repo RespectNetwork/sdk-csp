@@ -858,6 +858,45 @@ public class BasicCSP implements CSP {
 
 		log.debug("In Cloud: For Cloud Number " + cloudNumber + " registered services " + services);
 	}
+	
+	
+	@Override
+	public void setCloudServicesForCSPInCSP(CloudNumber cloudNumber, String secretToken, String cspXdiEndpoint, Map<XDI3Segment, String> services) throws Xdi2ClientException {
+
+		// prepare message to Cloud
+
+		MessageEnvelope messageEnvelope = new MessageEnvelope();
+		MessageCollection messageCollection = this.createMessageCollectionToCloud(messageEnvelope, cloudNumber);
+
+		Message message = messageCollection.createMessage();
+
+		List<XDI3Statement> targetStatementsSet = new ArrayList<XDI3Statement> (services.size() * 2);
+
+		for (Entry<XDI3Segment, String> entry : services.entrySet()) {
+
+			targetStatementsSet.add(XDI3Statement.fromLiteralComponents(
+					XDI3Util.concatXris(cloudNumber.getXri(), entry.getKey(), XDIClientConstants.XRI_S_AS_URI, XDIConstants.XRI_S_VALUE),
+					entry.getValue()));
+
+			targetStatementsSet.add(XDI3Statement.fromRelationComponents(
+					PublicLinkContract.createPublicLinkContractXri(cloudNumber.getXri()),
+					XDILinkContractConstants.XRI_S_GET,
+					XDI3Util.concatXris(cloudNumber.getXri(), entry.getKey(), XDIClientConstants.XRI_S_AS_URI)));
+		}
+
+		this.prepareMessageToCloud(message, cloudNumber, secretToken);
+		message.createSetOperation(targetStatementsSet.iterator());
+
+		// send message
+
+		XDIClient xdiCSPCloud = new XDIHttpClient(cspXdiEndpoint);
+
+		xdiCSPCloud.send(messageEnvelope, null);
+
+		// done
+
+		log.debug("In Cloud: For Cloud Number " + cloudNumber + " registered services " + services);
+	}
 
 	@Override
 	public void setPhoneAndEmailInCloud(CloudNumber cloudNumber, String secretToken, String verifiedPhone, String verifiedEmail) throws Xdi2ClientException {
@@ -1543,7 +1582,7 @@ public class BasicCSP implements CSP {
         
         //Add Public Key to <$sig> 
         //([=]!:uuid:3333/#guardian)<$sig><$public><$key>/$ref/[=]!:uuid:1111$msg$sig$keypair<$public><$key>         
-        XDI3SubSegment publicKeySubject = XDI3SubSegment.create("(" + dependent.getXri() + "/+guardian" + ")" );
+        XDI3SubSegment publicKeySubject = XDI3SubSegment.create("(" + dependent.getXri() + "/#guardian" + ")" );
         
         XDI3Statement  publicKeyStatement = XDI3Statement.fromRelationComponents(
             XDI3Util.concatXris(publicKeySubject, XDI3Segment.create("<$sig><$public><$key>")), 

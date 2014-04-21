@@ -9,6 +9,8 @@ import xdi2.core.xri3.CloudNumber;
 
 public class CheckCloudNameAvaliability extends AbstractTester {
     
+
+    
     /** CloudName */
     private String cloudName;
     
@@ -27,7 +29,9 @@ public class CheckCloudNameAvaliability extends AbstractTester {
         this.cloudName = cloudName;
     }
 
-    public CheckCloudNameAvaliability() {
+
+
+	public CheckCloudNameAvaliability() {
     }
 
     public void execute() throws TestException {

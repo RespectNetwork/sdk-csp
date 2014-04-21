@@ -1,21 +1,10 @@
 package net.respectnetwork.sdk.csp.performance;
 
 import java.security.GeneralSecurityException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Random;
-import java.util.UUID;
 
 import net.respectnetwork.sdk.csp.BasicCSPInformation;
-
-import org.apache.commons.lang.RandomStringUtils;
-
 import xdi2.client.exceptions.Xdi2ClientException;
-import xdi2.client.http.XDIHttpClient;
-import xdi2.core.xri3.CloudName;
-import xdi2.core.xri3.CloudNumber;
-import xdi2.discovery.XDIDiscoveryClient;
-import net.respectnetwork.sdk.csp.performance.CheckCloudNameAvaliability;
 
 public class StressTest implements Runnable {
 
@@ -145,30 +134,36 @@ public class StressTest implements Runnable {
         BasicCSPInformation cspInfo;
 
         // Temp for Old Symbol OTE
-        XDIHttpClient discHTTPCLient = new XDIHttpClient(
-                "http://ec2-23-23-212-149.compute-1.amazonaws.com:12220");
-        XDIDiscoveryClient discCLient = new XDIDiscoveryClient(discHTTPCLient);
+      //  XDIHttpClient discHTTPCLient = new XDIHttpClient(
+        //        "http://ec2-23-23-212-149.compute-1.amazonaws.com:12220");
+        //XDIDiscoveryClient discCLient = new XDIDiscoveryClient(discHTTPCLient);
 
         switch (env) {
 
         case PERFTEST:
             cspInfo = new CSPInformationPERFTestCsp();
-            cspInfo.setXdiDiscoveryClient(discCLient);
+         //   cspInfo.setXdiDiscoveryClient(discCLient);
             // perfCspInformation.setRnRegistrationServiceXdiEndpoint("http://ec2-54-202-23-203.us-west-2.compute.amazonaws.com:8080/graph");
             // perfCspInformation.setRnRegistrationServiceXdiEndpoint("http://ec2-54-185-214-90.us-west-2.compute.amazonaws.com:8080/graph");
             break;
 
         case LOCALTEST:
             cspInfo = new CSPInformationLocalTestCsp();
-            cspInfo.setXdiDiscoveryClient(discCLient);
+           // cspInfo.setXdiDiscoveryClient(discCLient);
+            break;
+
 
         case STAGETEST:
             cspInfo = new CSPInformationSTAGETestCsp();
-            cspInfo.setXdiDiscoveryClient(discCLient);
+           // cspInfo.setXdiDiscoveryClient(discCLient);
+            break;
+
 
         default:
             cspInfo = new CSPInformationLocalTestCsp();
-            cspInfo.setXdiDiscoveryClient(discCLient);
+         //   cspInfo.setXdiDiscoveryClient(discCLient);
+            break;
+
 
         }
         

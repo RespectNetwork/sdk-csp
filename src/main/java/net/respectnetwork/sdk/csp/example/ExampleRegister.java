@@ -82,7 +82,7 @@ public class ExampleRegister {
 
 		Map<XDI3Segment, String> services = new HashMap<XDI3Segment, String> ();
 
-		services.put(XDI3Segment.create("<$https><$connect><$xdi>"), "http://mycloud-ote.neustar.biz:8085/personalclouds/" + URLEncoder.encode(cloudNumber.toString(), "UTF-8") + "/connect/request");
+		services.put(XDI3Segment.create("<$https><$connect><$xdi>"), "https://mycloud-ote.neustar.biz/users/" + URLEncoder.encode(cloudNumber.toString(), "UTF-8") + "/connect/request");
 
 		csp.setCloudServicesInCloud(cloudNumber, secretToken, services);
 
