@@ -335,7 +335,8 @@ public class BasicNotificationService implements Notifier {
             message.setRecipients(Message.RecipientType.TO,
                 InternetAddress.parse(emailTo));
             message.setSubject(emailSubject);
-            message.setText(messageOut);
+            message.setContent(messageOut, "text/html");
+            //message.setText(messageOut);           
             Transport.send(message);
  
         } catch ( AuthenticationFailedException e) { 
