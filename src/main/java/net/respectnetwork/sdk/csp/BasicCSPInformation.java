@@ -58,16 +58,17 @@ public class BasicCSPInformation implements CSPInformation, Serializable {
 		this.rnCspSecretToken = rnCspSecretToken;
 
 		this.xdiDiscoveryClient = xdiDiscoveryClient;
+		
 	}
 
 	public void retrieveCspSignaturePrivateKey() throws Xdi2ClientException, GeneralSecurityException {
 
+	   logger.debug("retrieveCspSignaturePrivateKey");
 		XDIDiscoveryResult xdiDiscoveryResult = this.getXdiDiscoveryClient().discoverFromRegistry(this.getCspCloudNumber().getXri(), null);
 		String cspXdiEndpoint = xdiDiscoveryResult.getXdiEndpointUri();
 
 		PrivateKey cspSignaturePrivateKey = XDIClientUtil.retrieveSignaturePrivateKey(this.getCspCloudNumber(), cspXdiEndpoint, this.getCspSecretToken());
-
-		this.setCspSignaturePrivateKey(cspSignaturePrivateKey);
+		this.setCspSignaturePrivateKey(cspSignaturePrivateKey);	
 	}
 
 	/*
@@ -116,6 +117,21 @@ public class BasicCSPInformation implements CSPInformation, Serializable {
 	public void setCspSecretToken(String cspSecretToken) {
 
 		this.cspSecretToken = cspSecretToken;
+		if(cspSecretToken != null && !cspSecretToken.isEmpty() && (this.cspSignaturePrivateKey == null || this.cspSignaturePrivateKey.toString().isEmpty() ))
+		{
+		   try
+         {
+            this.retrieveCspSignaturePrivateKey();
+         } catch (Xdi2ClientException e)
+         {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+         } catch (GeneralSecurityException e)
+         {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+         }
+		}
 	}
 
 	@Override

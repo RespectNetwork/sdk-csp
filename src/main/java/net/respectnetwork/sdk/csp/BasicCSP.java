@@ -47,6 +47,7 @@ import xdi2.core.features.signatures.Signatures;
 import xdi2.core.features.timestamps.Timestamps;
 import xdi2.core.impl.memory.MemoryGraph;
 import xdi2.core.impl.memory.MemoryGraphFactory;
+import xdi2.core.io.XDIWriterRegistry;
 import xdi2.core.util.XDI3Util;
 import xdi2.core.util.iterators.IteratorArrayMaker;
 import xdi2.core.util.iterators.MappingCloudNameIterator;
@@ -171,7 +172,8 @@ public class BasicCSP implements CSP {
 
 		this.prepareMessageToRN(message);
 		
-		log.debug("checkCloudNameAvailableInRN :: Message to RN " + messageEnvelope.getGraph().toString());
+		log.debug("checkCloudNameAvailableInRN :: Message envelope to RN \n" );
+		printMessage(messageEnvelope);
 		
 		MessageResult messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope, null);
 
@@ -577,16 +579,19 @@ public class BasicCSP implements CSP {
 				XRI_S_MEMBER,
 				cloudNumber.getXri()));
 
-		targetStatements.add(XDI3Statement.fromComponents(
-				this.getCspInformation().getRnCloudNumber().getXri(),
-				XRI_S_MEMBER,
-				XDI3Segment.fromComponent(
-						XDI3SubSegment.fromComponents(null, false, false, null, 
-								XDI3XRef.fromComponents(XDIConstants.XS_ROOT, null, 
-										XDI3Statement.fromLiteralComponents(
-												XDI3Util.concatXris(cloudNumber.getXri(), XRI_S_AS_MEMBER_EXPIRATION_TIME, XDIConstants.XRI_S_VALUE), 
-												Timestamps.timestampToString(expirationTime)), 
-												null, null, null, null)))));
+		if (expirationTime != null) {
+
+			targetStatements.add(XDI3Statement.fromComponents(
+					this.getCspInformation().getRnCloudNumber().getXri(),
+					XRI_S_MEMBER,
+					XDI3Segment.fromComponent(
+							XDI3SubSegment.fromComponents(null, false, false, null, 
+									XDI3XRef.fromComponents(XDIConstants.XS_ROOT, null, 
+											XDI3Statement.fromLiteralComponents(
+													XDI3Util.concatXris(cloudNumber.getXri(), XRI_S_AS_MEMBER_EXPIRATION_TIME, XDIConstants.XRI_S_VALUE), 
+													Timestamps.timestampToString(expirationTime)), 
+													null, null, null, null)))));
+		}
 
 		Operation operation = message.createSetOperation(targetStatements.iterator());
 
@@ -1084,14 +1089,34 @@ public class BasicCSP implements CSP {
 		message.setToPeerRootXri(this.getCspInformation().getRnCloudNumber().getPeerRootXri());
 		message.setLinkContractXri(this.getCspInformation().getRnCspLinkContract());
 
-		if (this.getCspInformation().getRnCspSecretToken() != null) {
+		if (this.getCspInformation().getRnCspSecretToken() != null && !this.getCspInformation().getRnCspSecretToken().isEmpty()) {
 
 			message.setSecretToken(this.getCspInformation().getRnCspSecretToken());
+		} else
+		{
+		   log.debug("RN Secret token is null. Will try to retrieve CSP private key for signing messages.");
+		   try
+         {
+		      BasicCSPInformation basicCSP = (BasicCSPInformation) this.getCspInformation();
+		      if(basicCSP.getCspSignaturePrivateKey() == null)
+		      {
+		         basicCSP.retrieveCspSignaturePrivateKey();
+		      }
+         } catch (Xdi2ClientException e)
+         {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+         } catch (GeneralSecurityException e)
+         {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+         }
 		}
 
 		if (this.getCspInformation().getCspSignaturePrivateKey() != null) {
+		   log.debug("CSP Private Key is not null. Signing Messages with it.");
 
-			KeyPairSignature signature = (KeyPairSignature) message.setSignature(KeyPairSignature.DIGEST_ALGORITHM_SHA, 256, KeyPairSignature.KEY_ALGORITHM_RSA, 2048);
+			KeyPairSignature signature = (KeyPairSignature) message.createSignature(KeyPairSignature.DIGEST_ALGORITHM_SHA, 256, KeyPairSignature.KEY_ALGORITHM_RSA, 2048, true);
 
 			try {
 
@@ -1100,6 +1125,10 @@ public class BasicCSP implements CSP {
 
 				throw new RuntimeException(ex.getMessage(), ex);
 			}
+		}
+		else
+		{
+		   log.debug("CSP Private Key is null. Cannot sign Messages to RN.");
 		}
 	}
 
@@ -1115,7 +1144,7 @@ public class BasicCSP implements CSP {
 
 		if (this.getCspInformation().getCspSignaturePrivateKey() != null) {
 
-			KeyPairSignature signature = (KeyPairSignature) message.setSignature(KeyPairSignature.DIGEST_ALGORITHM_SHA, 256, KeyPairSignature.KEY_ALGORITHM_RSA, 2048);
+			KeyPairSignature signature = (KeyPairSignature) message.createSignature(KeyPairSignature.DIGEST_ALGORITHM_SHA, 256, KeyPairSignature.KEY_ALGORITHM_RSA, 2048, true);
 
 			try {
 
@@ -1139,7 +1168,7 @@ public class BasicCSP implements CSP {
 
 		if (this.getCspInformation().getCspSignaturePrivateKey() != null) {
 
-			KeyPairSignature signature = (KeyPairSignature) message.setSignature(KeyPairSignature.DIGEST_ALGORITHM_SHA, 256, KeyPairSignature.KEY_ALGORITHM_RSA, 2048);
+			KeyPairSignature signature = (KeyPairSignature) message.createSignature(KeyPairSignature.DIGEST_ALGORITHM_SHA, 256, KeyPairSignature.KEY_ALGORITHM_RSA, 2048, true);
 
 			try {
 
@@ -1487,7 +1516,7 @@ public class BasicCSP implements CSP {
         ContextNode signingNode = g.getRootContextNode().getDeepContextNode(consentSubjectTo);
 
         // now create the signature and add it to the graph
-        KeyPairSignature s = (KeyPairSignature) Signatures.setSignature(signingNode, "sha", 256, "rsa", 2048);
+        KeyPairSignature s = (KeyPairSignature) Signatures.createSignature(signingNode, "sha", 256, "rsa", 2048, true);
 
         try {
             s.sign(signingKey);
@@ -1571,7 +1600,7 @@ public class BasicCSP implements CSP {
         ContextNode signingNode = g.getRootContextNode().getContextNode(innerGraph);
 
         // now create the signature and add it to the graph
-        KeyPairSignature s = (KeyPairSignature) Signatures.setSignature(signingNode, "sha", 256, "rsa", 2048);
+        KeyPairSignature s = (KeyPairSignature) Signatures.createSignature(signingNode, "sha", 256, "rsa", 2048, true);
   
 
         try {
@@ -1651,5 +1680,15 @@ public class BasicCSP implements CSP {
 		} else {
 			return new String("cspInformation is null");
 		}
+	}
+	public static void printMessage(MessageEnvelope messageEnvelope)
+	{
+	   try {
+         XDIWriterRegistry.forFormat("XDI DISPLAY", null).write(
+               messageEnvelope.getGraph(), System.out);
+      } catch (IOException e) {
+         // TODO Auto-generated catch block
+         e.printStackTrace();
+      }
 	}
 }
