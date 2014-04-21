@@ -64,45 +64,47 @@ public class RegisterUser extends AbstractTester {
             System.out.println("Creating: cloudName: " + cloudName + " cloudNumber: " + cloudNumber + " verifiedEmail: " +  verifiedEmail + " verifiedPhone: " + verifiedPhone);
 
 
-            // Step 1: Register Cloud with Cloud Number and Shared Secret
 
-            //csp.registerCloudInCSP(cloudNumber, secretToken);
+    		// Step 1: Register Cloud with Cloud Number and Shared Secret
 
-            // step 2: Set Cloud Services in Cloud
+    		csp.registerCloudInCSP(cloudNumber, secretToken);
 
-            Map<XDI3Segment, String> services = new HashMap<XDI3Segment, String> ();
+    		// step 2: Set Cloud Services in Cloud
 
-            services.put(XDI3Segment.create("<$https><$connect><$xdi>"), "http://mycloud-ote.neustar.biz:8085/personalclouds/" + URLEncoder.encode(cloudNumber.toString(), "UTF-8") + "/connect/request");
+    		Map<XDI3Segment, String> services = new HashMap<XDI3Segment, String> ();
 
-           // csp.setCloudServicesInCloud(cloudNumber, secretToken, services);
+    		services.put(XDI3Segment.create("<$https><$connect><$xdi>"), "https://mycloud-ote.neustar.biz/users/" + URLEncoder.encode(cloudNumber.toString(), "UTF-8") + "/connect/request");
 
-            // step 3: Check if the Cloud Name is available
+    		csp.setCloudServicesInCloud(cloudNumber, secretToken, services);
 
-            CloudNumber existingCloudNumber = csp.checkCloudNameAvailableInRN(cloudName);
+    		// step 3: Check if the Cloud Name is available
 
-            if (existingCloudNumber != null) throw new RuntimeException("Cloud Name " + cloudName + " is already registered with Cloud Number " + existingCloudNumber + ".");
+    		CloudNumber existingCloudNumber = csp.checkCloudNameAvailableInRN(cloudName);
 
-            // Step 4: Check if the phone number and e-mail address are available
+    		if (existingCloudNumber != null) throw new RuntimeException("Cloud Name " + cloudName + " is already registered with Cloud Number " + existingCloudNumber + ".");
 
-            CloudNumber[] existingCloudNumbers = csp.checkPhoneAndEmailAvailableInRN(verifiedPhone, verifiedEmail);
+    		// Step 4: Check if the phone number and e-mail address are available
 
-            if (existingCloudNumbers[0] != null) throw new RuntimeException("This verified phone number is already registered with Cloud Number " + existingCloudNumbers[0] + ".");
-            if (existingCloudNumbers[1] != null) throw new RuntimeException("This verified e-mail address is already registered with Cloud Number " + existingCloudNumbers[1] + ".");
+    		CloudNumber[] existingCloudNumbers = csp.checkPhoneAndEmailAvailableInRN(verifiedPhone, verifiedEmail);
 
-            // step 5: Register Cloud Name
+    		if (existingCloudNumbers[0] != null) throw new RuntimeException("This verified phone number is already registered with Cloud Number " + existingCloudNumbers[0] + ".");
+    		if (existingCloudNumbers[1] != null) throw new RuntimeException("This verified e-mail address is already registered with Cloud Number " + existingCloudNumbers[1] + ".");
 
-            csp.registerCloudNameInRN(cloudName, cloudNumber, verifiedPhone, verifiedEmail, cloudNameDiscountCode);
-           // csp.registerCloudNameInCSP(cloudName, cloudNumber);
-            //csp.registerCloudNameInCloud(cloudName, cloudNumber, secretToken);
+    		// step 5: Register Cloud Name
 
-            // step 6: Set phone number and e-mail address
+    		csp.registerCloudNameInRN(cloudName, cloudNumber, verifiedPhone, verifiedEmail, cloudNameDiscountCode);
+    		csp.registerCloudNameInCSP(cloudName, cloudNumber);
+    		csp.registerCloudNameInCloud(cloudName, cloudNumber, secretToken);
 
-            //csp.setPhoneAndEmailInCloud(cloudNumber, secretToken, verifiedPhone, verifiedEmail);
+    		// step 6: Set phone number and e-mail address
 
-            // step 7: Set RN/RF membership
+    		csp.setPhoneAndEmailInCloud(cloudNumber, secretToken, verifiedPhone, verifiedEmail);
 
-            csp.setRespectNetworkMembershipInRN(cloudNumber, new Date(), respectNetworkMembershipDiscountCode);
-            csp.setRespectFirstMembershipInRN(cloudNumber);
+    		// step 7: Set RN/RF membership
+
+    		csp.setRespectNetworkMembershipInRN(cloudNumber, new Date(), respectNetworkMembershipDiscountCode);
+    		csp.setRespectFirstMembershipInRN(cloudNumber);
+
 
             // done
 
@@ -179,7 +181,8 @@ public class RegisterUser extends AbstractTester {
         this.verifiedEmail =  randAN + "@perftest.com";
         this.verifiedPhone = "+" + randN;
         
-        String cloudNameString = "=dev.test." + UUID.randomUUID().toString();
+        String cloudNameString = "=perf.test." + UUID.randomUUID().toString();
+        //cloudNameString = "=perf.test.1";
         CloudName cloudName = CloudName.create(cloudNameString);
         this.setCloudName(cloudName);
         CloudNumber cloudNumber = CloudNumber.createRandom(cloudName.getCs());

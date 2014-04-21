@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 import net.respectnetwork.sdk.csp.BasicCSP;
+import net.respectnetwork.sdk.csp.BasicCSPInformation;
 import net.respectnetwork.sdk.csp.CSP;
 import net.respectnetwork.sdk.csp.CSPInformation;
 import xdi2.core.xri3.CloudName;
@@ -37,9 +38,11 @@ public class ExampleCheckCloudNameAvailable {
 
 		// Step 0: Set up CSP
 
-		CSPInformation cspInformation = new CSPInformationTestCSPOTE();
+		BasicCSPInformation cspInformation = new CSPInformationTestCSPOTE();
 
 		CSP csp = new BasicCSP(cspInformation);
+		cspInformation.retrieveCspSignaturePrivateKey();
+		cspInformation.setRnCspSecretToken(null);
 
 		// step 1: Check if the Cloud Name is available
 

@@ -1,236 +1,205 @@
 package net.respectnetwork.sdk.csp.performance;
 
 import java.security.GeneralSecurityException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Random;
-import java.util.UUID;
 
 import net.respectnetwork.sdk.csp.BasicCSPInformation;
-
-import org.apache.commons.lang.RandomStringUtils;
-
 import xdi2.client.exceptions.Xdi2ClientException;
-import xdi2.client.http.XDIHttpClient;
-import xdi2.core.xri3.CloudName;
-import xdi2.core.xri3.CloudNumber;
-import xdi2.discovery.XDIDiscoveryClient;
-import net.respectnetwork.sdk.csp.performance.CheckCloudNameAvaliability;
 
 public class StressTest implements Runnable {
 
+	/** Number Of Threads in the test */
+	private static int threads;
 
-    /** Number Of Threads in the test */
-    private static int threads;
-    
-    /** Number of iterations to  run per test */
-    private static int iterations;
-    
-    /** Test to Run */
-    private static String testClass;
-    
-    /** Env to Run In */
-    private static String env;
-    
- 
-    /**
-     * Simple Multi Threaded Test Harness
-     */
-    public static void main(String[] args) {
+	/** Number of iterations to run per test */
+	private static int iterations;
 
-        String USAGE = "USAGE: StressTest  [number of  threads] [number of iterations] [test]  [environment] ";
-        if (args.length != 4 ){
-            System.out.println(USAGE);
-            return;
-        }
+	/** Test to Run */
+	private static String testClass;
 
-        threads = new Integer(args[0]).intValue();
-        iterations =  new Integer(args[1]).intValue();
-        testClass = args[2];
-        env = args[3];
+	/** Env to Run In */
+	private static String env;
 
-        Thread[] myThreads = new Thread[threads];
-        for ( int i = 0; i < threads; i++){
-            myThreads[i] = (new Thread(new StressTest()));
-        }
+	/**
+	 * Simple Multi Threaded Test Harness
+	 */
+	public static void main(String[] args) {
 
-        for ( int i = 0; i < threads; i++){
-            myThreads[i].start();
-        }
-    }
+		String USAGE = "USAGE: StressTest  [number of  threads] [number of iterations] [test]  [environment] ";
+		if (args.length != 4) {
+			System.out.println(USAGE);
+			return;
+		}
 
+		threads = new Integer(args[0]).intValue();
+		iterations = new Integer(args[1]).intValue();
+		testClass = args[2];
+		env = args[3];
 
-    
-    /**
-     * Thread Run Method
-     */
-    public void run() {
-        
-        float successCount = 0;
-        String name = Thread.currentThread().getName();
-        System.out.println("Starting " + name);
-        long begin = System.currentTimeMillis();
-        
-        for ( int i = 0; i < iterations; i++ ){
-            if( performTest(i + 1, name)) {
-                successCount++;    
-                //System.out.println("Thread = " + name + " Iteration = " +  i + 1 + " Success Count = " + successCount);
-            }
-        }
-        
-        long end = System.currentTimeMillis();
-        long average = (end - begin)/iterations;
-        long fullduration = (end - begin);
-        float successrate = (successCount/iterations) * 100;
+		Thread[] myThreads = new Thread[threads];
+		for (int i = 0; i < threads; i++) {
+			myThreads[i] = (new Thread(new StressTest()));
+		}
 
-        System.out.println( "#" + name +  " Finished: Elapsed Time = " + fullduration  +
-            "ms" + " AverageTime = " + average + "ms SuccessRate = " + successrate + "%" );
-    }
+		for (int i = 0; i < threads; i++) {
+			myThreads[i].start();
+		}
+	}
 
-    /**
-     * Perform the Test Details.
-     *  
-     * @param iteration
-     * @param name
-     * @return
-     */
-    public boolean performTest(int iteration, String name){
-        
-        boolean success = false;
-        long begin = 0;
-        long end = 0;
-        long fullduration = 0;
+	/**
+	 * Thread Run Method
+	 */
+	public void run() {
 
-        try{
-            begin = System.currentTimeMillis();
-            
-            //Pick the Environment you want to run  the test in.
-            BasicCSPInformation cspInformation = configureEnvironment(TestEnv.valueOf(env), false);   
-                   
-            //Pick the tests you want to run.         
-            Class c = Class.forName(testClass);
-            
-            Tester tester = (Tester)c.newInstance();
-            tester.setCspInformation(cspInformation);
-            tester.init();
-            
-            try {
-                Thread.sleep(randomDelay(0, 50));
-                tester.execute();
-                success = true;
-            } catch (TestException e) {
-                System.out.println("Stress Test Exception: " + e.getMessage());   
-                success = false;
-            } 
-                  
-            end = System.currentTimeMillis();
-            fullduration = (end - begin);
-            
-        } catch (Exception e){
-            e.printStackTrace();
-            System.out.println(e.getMessage());
-            success = false;
-            
-        }
-        
-        System.out.println( "#" + name + " Task #" + iteration + " Duration = " + fullduration  + "ms"  + " Success = " + success);
+		float successCount = 0;
+		String name = Thread.currentThread().getName();
+		System.out.println("Starting " + name);
+		long begin = System.currentTimeMillis();
 
-        return success;
-     }
-    
-    
-    public BasicCSPInformation configureEnvironment(TestEnv env, boolean signing)
-        throws TestException {
+		for (int i = 0; i < iterations; i++) {
+			if (performTest(i + 1, name)) {
+				successCount++;
+			}
+		}
 
-        BasicCSPInformation cspInfo;
+		long end = System.currentTimeMillis();
+		long average = (end - begin) / iterations;
+		long fullduration = (end - begin);
+		float successrate = (successCount / iterations) * 100;
 
-        // Temp for Old Symbol OTE
-        XDIHttpClient discHTTPCLient = new XDIHttpClient(
-                "http://ec2-23-23-212-149.compute-1.amazonaws.com:12220");
-        XDIDiscoveryClient discCLient = new XDIDiscoveryClient(discHTTPCLient);
+		System.out.println("#" + name + " Finished: Elapsed Time = "
+				+ fullduration + "ms" + " AverageTime = " + average
+				+ "ms SuccessRate = " + successrate + "%");
+	}
 
-        switch (env) {
+	/**
+	 * Perform the Test Details.
+	 * 
+	 * @param iteration
+	 * @param name
+	 * @return
+	 */
+	public boolean performTest(int iteration, String name) {
 
-        case PERFTEST:
-            cspInfo = new CSPInformationPERFTestCsp();
-            cspInfo.setXdiDiscoveryClient(discCLient);
-            // perfCspInformation.setRnRegistrationServiceXdiEndpoint("http://ec2-54-202-23-203.us-west-2.compute.amazonaws.com:8080/graph");
-            // perfCspInformation.setRnRegistrationServiceXdiEndpoint("http://ec2-54-185-214-90.us-west-2.compute.amazonaws.com:8080/graph");
-            break;
+		boolean success = false;
+		long begin = 0;
+		long end = 0;
+		long fullduration = 0;
 
-        case LOCALTEST:
-            cspInfo = new CSPInformationLocalTestCsp();
-            cspInfo.setXdiDiscoveryClient(discCLient);
+		try {
+			begin = System.currentTimeMillis();
 
-        case STAGETEST:
-            cspInfo = new CSPInformationSTAGETestCsp();
-            cspInfo.setXdiDiscoveryClient(discCLient);
+			// Pick the Environment you want to run the test in.
+			BasicCSPInformation cspInformation = configureEnvironment(
+					TestEnv.valueOf(env), false);
 
-        default:
-            cspInfo = new CSPInformationLocalTestCsp();
-            cspInfo.setXdiDiscoveryClient(discCLient);
+			// Pick the tests you want to run.
+			Class c = Class.forName(testClass);
 
-        }
-        
-        //Configure for Signed Messaging.
-        if (signing) {
-            try {
-            cspInfo.setRnCspSecretToken(null);
-            cspInfo.retrieveCspSignaturePrivateKey();
-            } catch ( GeneralSecurityException e) {
-                throw new TestException();
-            } catch (Xdi2ClientException e) {
-                throw new TestException();
-            }
-        }
+			Tester tester = (Tester) c.newInstance();
+			tester.setCspInformation(cspInformation);
+			tester.init();
 
-        return cspInfo;
-    }
-    
+			try {
+				Thread.sleep(randomDelay(0, 50));
+				tester.execute();
+				success = true;
+			} catch (TestException e) {
+				System.out.println("Stress Test Exception: " + e.getMessage());
+				success = false;
+			}
 
+			end = System.currentTimeMillis();
+			fullduration = (end - begin);
 
-    /**
-     * Random Number Generator for use in creating ramdom delay.
-     * 
-     * @param min
-     * @param max
-     * @return
-     */
-    public int randomDelay(int min, int max) {
-        
-        Random rand = new Random();
-        int randomNum = rand.nextInt((max - min) + 1) + min;
-        return randomNum;
-    }
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println(e.getMessage());
+			success = false;
 
-        
-    /** 
-     * Enum to describe Test Config
-     * 
-     */
-    enum TestEnv {
-        
-        DEVTEST ( "DEV", "testcsp"),
-        PERFTEST ( "PERF", "testcsp"),
-        LOCALTEST ( "LOCAL", "testcsp"),
-        STAGETEST ( "STAGE", "testcsp");
-     
-        private final String env;  
-        private final String csp; 
-        
-        TestEnv(String env, String csp) {
-            this.env = env;
-            this.csp = csp;
-        }
-        
-        public String getEnv() {
-            return env;
-        }
-        
-        public String getCsp() {
-            return csp;
-        }
-        
-    }
-  
+		}
+
+		System.out.println("#" + name + " Task #" + iteration + " Duration = "
+				+ fullduration + "ms" + " Success = " + success);
+
+		return success;
+	}
+
+	public BasicCSPInformation configureEnvironment(TestEnv env, boolean signing)
+			throws TestException {
+
+		BasicCSPInformation cspInfo;
+
+		switch (env) {
+
+		case PERFTEST:
+			cspInfo = new CSPInformationPERFTestCsp();
+			break;
+
+		case STAGETEST:
+			cspInfo = new CSPInformationSTAGETestCsp();
+			break;
+
+		default:
+			cspInfo = new CSPInformationPERFTestCsp();
+			break;
+
+		}
+
+		// Configure for Signed Messaging.
+		if (signing) {
+			try {
+				cspInfo.setRnCspSecretToken(null);
+				cspInfo.retrieveCspSignaturePrivateKey();
+			} catch (GeneralSecurityException e) {
+				throw new TestException();
+			} catch (Xdi2ClientException e) {
+				throw new TestException();
+			}
+		}
+
+		return cspInfo;
+	}
+
+	/**
+	 * Random Number Generator for use in creating ramdom delay.
+	 * 
+	 * @param min
+	 * @param max
+	 * @return
+	 */
+	public int randomDelay(int min, int max) {
+
+		Random rand = new Random();
+		int randomNum = rand.nextInt((max - min) + 1) + min;
+		return randomNum;
+	}
+
+	/**
+	 * Enum to describe Test Config
+	 * 
+	 */
+	enum TestEnv {
+
+		DEVTEST("DEV", "testcsp"), PERFTEST("PERF", "testcsp"), LOCALTEST(
+				"LOCAL", "testcsp"), STAGETEST("STAGE", "testcsp");
+
+		private final String env;
+		private final String csp;
+
+		TestEnv(String env, String csp) {
+			this.env = env;
+			this.csp = csp;
+		}
+
+		public String getEnv() {
+			return env;
+		}
+
+		public String getCsp() {
+			return csp;
+		}
+
+	}
+
 }

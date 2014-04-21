@@ -207,6 +207,12 @@ public interface CSP {
 	 */
 	public void setCloudServicesInCloud(CloudNumber cloudNumber, String secretToken, Map<XDI3Segment, String> services) throws Xdi2ClientException;
 
+	
+	/**
+	 * Management Utility for setting CSP Service EndPoints in the CSP  Cloud
+     */
+	public void setCloudServicesForCSPInCSP(CloudNumber cloudNumber, String secretToken, String cspXdiEndpoint, Map<XDI3Segment, String> services) throws Xdi2ClientException;
+
 	/**
 	 * This method registers or updates a verified phone number and verified e-mail address in the User's Cloud.
 	 * Used in:
