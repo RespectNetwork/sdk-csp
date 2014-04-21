@@ -1593,9 +1593,7 @@ public class BasicCSP implements CSP {
         
         g.setStatement(dobStatement);
         
-        
-        
-        
+       
         //Sign the Context: ([=]!:uuid:3333/#guardian)<$sig>&/&/”...”        
         ContextNode signingNode = g.getRootContextNode().getContextNode(innerGraph);
 

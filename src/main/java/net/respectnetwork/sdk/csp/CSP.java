@@ -209,7 +209,7 @@ public interface CSP {
 
 	
 	/**
-	 * Management Utility for setting CSP Service EndPojts in the CSP  Cloud
+	 * Management Utility for setting CSP Service EndPoints in the CSP  Cloud
      */
 	public void setCloudServicesForCSPInCSP(CloudNumber cloudNumber, String secretToken, String cspXdiEndpoint, Map<XDI3Segment, String> services) throws Xdi2ClientException;
 
