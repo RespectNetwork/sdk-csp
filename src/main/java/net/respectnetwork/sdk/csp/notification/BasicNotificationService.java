@@ -334,7 +334,18 @@ public class BasicNotificationService implements Notifier {
             message.setFrom(new InternetAddress(emailFrom));
             message.setRecipients(Message.RecipientType.TO,
                 InternetAddress.parse(emailTo));
-            message.setSubject(emailSubject);
+            //this is a hack
+            if(emailSubject.contains("verify your email"))
+            {
+               message.setSubject("Verification code for validation of email address"); 
+            }
+            else if (emailSubject.contains("Gift Code"))
+            {
+               message.setSubject("Gift Code to claim a Personal Cloud in Respect Network");
+            } else 
+            {
+               message.setSubject(emailSubject);
+            }
             message.setContent(messageOut, "text/html");
             //message.setText(messageOut);           
             Transport.send(message);

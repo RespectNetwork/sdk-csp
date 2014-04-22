@@ -19,9 +19,9 @@ public class CSPInformationTestCSPOTE extends BasicCSPInformation {
 				"whitelabel123",
 				null,
 				CloudNumber.create("[+]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa"),
-				"http://registration-dev.respectnetwork.net/registration",
+				"https://registration-stage.respectnetwork.net/registration",
 				XDI3Segment.create("[+]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa$to#registrar$from$do"),
-				"testcsp",
+				null,
 				XDIDiscoveryClient.NEUSTAR_OTE_DISCOVERY_CLIENT
 				);
 
