@@ -5,7 +5,7 @@
 	<groupId>net.respectnetwork</groupId>
 	<artifactId>sdk-csp</artifactId>
 	<packaging>jar</packaging>
-	<version>0.2</version>
+	<version>0.2.1</version>
 	<name>sdk-csp</name>
 	<description>Respect Network SDK for CSPs</description>
 
@@ -118,12 +118,6 @@
 			<scope>compile</scope>
 		</dependency>
         
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.1.2</version>
-        </dependency>
-
         <!-- Twilio SDK -->
         <dependency>
             <groupId>com.twilio.sdk</groupId>
