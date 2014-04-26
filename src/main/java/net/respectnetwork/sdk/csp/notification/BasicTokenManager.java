@@ -41,7 +41,22 @@ public class BasicTokenManager implements TokenManager {
     public String createToken(TokenKey tokenKey)
             throws TokenException {
         
-        String randAN = RandomStringUtils.randomAlphanumeric(TOKEN_SIZE).toUpperCase();       
+        String randAN = RandomStringUtils.randomAlphanumeric(TOKEN_SIZE).toUpperCase();
+        int i = 0;
+        do
+        {
+           if(randAN.contains("0")|| 
+                 (randAN.contains("1") && randAN.contains("I")) ||
+                 randAN.contains("O") )
+           {
+              randAN = RandomStringUtils.randomAlphanumeric(TOKEN_SIZE).toUpperCase();             
+           } else
+           {
+              break ;
+           }
+           i++;
+        } while(i < 5);
+        
         logger.debug("Generating new Token: {}", randAN);
         
         // Add the token to  the cache : key =  cloudnumber;
