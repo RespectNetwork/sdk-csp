@@ -1222,7 +1222,7 @@ public class BasicCSP implements CSP {
 
         // done
         log.debug("In Guardian User Cloud: Creating is Guardian Relationship between " + guardian.toString() + " and " + dependent.toString() );
-         
+        
         
         // Prepare message to Dependent's Cloud
 
@@ -1239,7 +1239,7 @@ public class BasicCSP implements CSP {
      
         //Generating and Adding Dependent Statements
         List<XDI3Statement> dependentStatements =  createDependentXDI3Statements( guardian,  dependent, dependentBirthDate, guardianPrivateSigningKey);
-        targetStatements.addAll(dependentStatements);
+        targetStatements2.addAll(dependentStatements);
         
         
         
@@ -1247,7 +1247,7 @@ public class BasicCSP implements CSP {
       
             //Generating and Adding Consent Statements
             List<XDI3Statement> consentStatements =  createConsentXDI3Statements(guardian,  dependent, guardianPrivateSigningKey);
-            targetStatements.addAll(consentStatements);
+            targetStatements2.addAll(consentStatements);
         } else {
             throw new Xdi2ClientException("Consent required for this operation", new ErrorMessageResult());
         }
@@ -1598,7 +1598,7 @@ public class BasicCSP implements CSP {
         ContextNode signingNode = g.getRootContextNode().getContextNode(innerGraph);
 
         // now create the signature and add it to the graph
-        KeyPairSignature s = (KeyPairSignature) Signatures.createSignature(signingNode, "sha", 256, "rsa", 2048, true);
+        KeyPairSignature s = (KeyPairSignature) Signatures.createSignature(signingNode, "sha", 256, "rsa", 2048, false);
   
 
         try {
