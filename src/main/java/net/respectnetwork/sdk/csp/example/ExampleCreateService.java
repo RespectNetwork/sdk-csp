@@ -67,7 +67,12 @@ public class ExampleCreateService {
 		// Step 0: Set up CSP
 
 		BasicCSPInformation cspInformation = new CSPInformationTestCSPOTE();
-
+		//BasicCSPInformation cspInformation = new  CSPInformationRespectNetworkOTE();
+		//BasicCSPInformation cspInformation = new  CSPInformationTTCCOTE();
+		//BasicCSPInformation cspInformation = new CSPInformationEmmettOTE();
+		//BasicCSPInformation cspInformation = new  CSPInformationOnexusOTE();
+		//BasicCSPInformation cspInformation = new CSPInformationPaogaOTE();
+		
 		cspInformation.retrieveCspSignaturePrivateKey();
 		cspInformation.setRnCspSecretToken(null);
 

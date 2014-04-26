@@ -63,8 +63,6 @@ public class RegisterUser extends AbstractTester {
             }
             System.out.println("Creating: cloudName: " + cloudName + " cloudNumber: " + cloudNumber + " verifiedEmail: " +  verifiedEmail + " verifiedPhone: " + verifiedPhone);
 
-
-
     		// Step 1: Register Cloud with Cloud Number and Shared Secret
 
     		csp.registerCloudInCSP(cloudNumber, secretToken);
@@ -96,6 +94,7 @@ public class RegisterUser extends AbstractTester {
     		csp.registerCloudNameInCSP(cloudName, cloudNumber);
     		csp.registerCloudNameInCloud(cloudName, cloudNumber, secretToken);
 
+
     		// step 6: Set phone number and e-mail address
 
     		csp.setPhoneAndEmailInCloud(cloudNumber, secretToken, verifiedPhone, verifiedEmail);
@@ -104,7 +103,6 @@ public class RegisterUser extends AbstractTester {
 
     		csp.setRespectNetworkMembershipInRN(cloudNumber, new Date(), respectNetworkMembershipDiscountCode);
     		csp.setRespectFirstMembershipInRN(cloudNumber);
-
 
             // done
 
