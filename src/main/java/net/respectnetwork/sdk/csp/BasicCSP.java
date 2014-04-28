@@ -1594,7 +1594,7 @@ public class BasicCSP implements CSP {
         g.setStatement(dobStatement);
         
        
-        //Sign the Context: ([=]!:uuid:3333/#guardian)<$sig>&/&/”...”        
+        //Sign the Context: ([=]!:uuid:3333/#guardian)[<$sig>]<[=]!:uuid:6666>&/&/”...”        
         ContextNode signingNode = g.getRootContextNode().getContextNode(innerGraph);
 
         // now create the signature and add it to the graph
@@ -1607,29 +1607,31 @@ public class BasicCSP implements CSP {
             throw new RuntimeException("Problem Signing Dependent Graph");           
         }
         
+        
+        
         //Add Public Key to <$sig> 
         //([=]!:uuid:3333/#guardian)<$sig><$public><$key>/$ref/[=]!:uuid:1111$msg$sig$keypair<$public><$key>         
-        XDI3SubSegment publicKeySubject = XDI3SubSegment.create("(" + dependent.getXri() + "/#guardian" + ")" );
-        
-        XDI3Statement  publicKeyStatement = XDI3Statement.fromRelationComponents(
-            XDI3Util.concatXris(publicKeySubject, XDI3Segment.create("<$sig><$public><$key>")), 
-            XDIDictionaryConstants.XRI_S_REF, 
-            XDI3Util.concatXris(guardian.getXri(), XDI3Segment.create("$msg$sig$keypair<$public><$key>")));
+
+        ContextNode signatureContextNode = s.getContextNode();
+
+        signatureContextNode
+           .setContextNode(XDI3SubSegment.create("<$public><$key>"))
+           .setRelation(
+                XDIDictionaryConstants.XRI_S_REF,
+                XDI3Util.concatXris(guardian.getXri(), XDIAuthenticationConstants.XRI_S_MSG_SIG_KEYPAIR_PUBLIC_KEY));
                
-        g.setStatement(publicKeyStatement);
                
         ContextNode c = g.getRootContextNode();
         
-        Iterator<Statement> dependencyStatmentIterator = c.getAllStatements();
+        Iterator<Statement> dependencyStatementIterator = c.getAllStatements();
         
         //Converting from Statement to XDI3Statement
-        while(dependencyStatmentIterator.hasNext()){
-            Statement next = dependencyStatmentIterator.next();
+        while(dependencyStatementIterator.hasNext()){
+            Statement next = dependencyStatementIterator.next();
             XDI3Statement graphStatement = next.getXri();
             targetStatements.add(graphStatement);
         }
-        
-      
+         
         return targetStatements;
               
     }
