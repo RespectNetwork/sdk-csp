@@ -42,6 +42,7 @@ import xdi2.core.constants.XDILinkContractConstants;
 import xdi2.core.features.linkcontracts.PublicLinkContract;
 import xdi2.core.features.linkcontracts.RootLinkContract;
 import xdi2.core.features.nodetypes.XdiAbstractMemberUnordered;
+import xdi2.core.features.nodetypes.XdiSubGraph;
 import xdi2.core.features.signatures.KeyPairSignature;
 import xdi2.core.features.signatures.Signatures;
 import xdi2.core.features.timestamps.Timestamps;
@@ -1614,8 +1615,10 @@ public class BasicCSP implements CSP {
 
         ContextNode signatureContextNode = s.getContextNode();
 
+        XDI3Segment pk =  XDI3Segment.create("<$public><$key>");
+        
         signatureContextNode
-           .setContextNode(XDI3SubSegment.create("<$public><$key>"))
+           .setDeepContextNode(pk)
            .setRelation(
                 XDIDictionaryConstants.XRI_S_REF,
                 XDI3Util.concatXris(guardian.getXri(), XDIAuthenticationConstants.XRI_S_MSG_SIG_KEYPAIR_PUBLIC_KEY));
