@@ -133,7 +133,7 @@ public class ExampleCreateGuardianship {
              
         try {
             // Set User Cloud Data
-    	    csp.setGuardianshipInCloud(cspInformation, guardianCloudNumber, dependentCloudNumber, dependentBirthDate, withConsent, guardianToken, guardianPrivateKey);
+    	    csp.setGuardianshipInCloud(cspInformation, guardianCloudNumber, dependentCloudNumber, dependentBirthDate, withConsent, guardianToken, guardianPrivateKey,dependentToken);
     		
     		// Set CSP Cloud Data
     	    csp.setGuardianshipInCSP(cspInformation, guardianCloudNumber, dependentCloudNumber, dependentBirthDate, withConsent, guardianPrivateKey);

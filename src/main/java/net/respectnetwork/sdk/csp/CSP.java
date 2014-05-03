@@ -258,7 +258,7 @@ public interface CSP {
      */
     public void setGuardianshipInCloud(CSPInformation cspInformation, CloudNumber guardian,
         CloudNumber dependent, Date dependentBirthDate, boolean withConsent, String secretToken,
-        PrivateKey guardianPrivateSigningKey)
+        PrivateKey guardianPrivateSigningKey , String dependentToken)
             throws Xdi2ClientException;   
       
       
