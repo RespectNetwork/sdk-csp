@@ -60,7 +60,7 @@ public class ExampleCreateService {
 
 		// Step 0: Set up CSP
 
-		BasicCSPInformation cspInformation = new CSPInformation();
+		BasicCSPInformation cspInformation = new CSPInformationTestCSPOTE();
 
 		cspInformation.retrieveCspSignaturePrivateKey();
 		cspInformation.setRnCspSecretToken(null);
