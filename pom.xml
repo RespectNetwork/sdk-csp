@@ -5,7 +5,7 @@
 	<groupId>net.respectnetwork</groupId>
 	<artifactId>sdk-csp</artifactId>
 	<packaging>jar</packaging>
-	<version>0.2.3</version>
+	<version>0.2.4</version>
 	<name>sdk-csp</name>
 	<description>Respect Network SDK for CSPs</description>
 
