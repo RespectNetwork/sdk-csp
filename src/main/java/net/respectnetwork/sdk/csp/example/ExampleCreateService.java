@@ -1,19 +1,13 @@
 package net.respectnetwork.sdk.csp.example;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.URLEncoder;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import net.respectnetwork.sdk.csp.BasicCSP;
 import net.respectnetwork.sdk.csp.BasicCSPInformation;
 import net.respectnetwork.sdk.csp.CSP;
-import net.respectnetwork.sdk.csp.discount.CloudNameDiscountCode;
-import net.respectnetwork.sdk.csp.discount.RespectNetworkMembershipDiscountCode;
 import xdi2.core.xri3.CloudName;
 import xdi2.core.xri3.CloudNumber;
 import xdi2.core.xri3.XDI3Segment;
@@ -67,12 +61,7 @@ public class ExampleCreateService {
 		// Step 0: Set up CSP
 
 		BasicCSPInformation cspInformation = new CSPInformationTestCSPOTE();
-		//BasicCSPInformation cspInformation = new  CSPInformationRespectNetworkOTE();
-		//BasicCSPInformation cspInformation = new  CSPInformationTTCCOTE();
-		//BasicCSPInformation cspInformation = new CSPInformationEmmettOTE();
-		//BasicCSPInformation cspInformation = new  CSPInformationOnexusOTE();
-		//BasicCSPInformation cspInformation = new CSPInformationPaogaOTE();
-		
+
 		cspInformation.retrieveCspSignaturePrivateKey();
 		cspInformation.setRnCspSecretToken(null);
 

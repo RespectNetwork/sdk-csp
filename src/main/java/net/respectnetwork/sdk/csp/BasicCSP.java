@@ -892,6 +892,9 @@ public class BasicCSP implements CSP {
 
 		this.prepareMessageToCloud(message, cloudNumber, secretToken);
 		message.createSetOperation(targetStatementsSet.iterator());
+		
+		log.debug("setCloudServicesForCSPInCSP :: Message envelope to CSP \n" );
+      printMessage(messageEnvelope);
 
 		// send message
 
@@ -1191,7 +1194,7 @@ public class BasicCSP implements CSP {
      * {@inheritDoc}
      */
     public void setGuardianshipInCloud(CSPInformation cspInformation, CloudNumber guardian,
-        CloudNumber dependent, Date dependentBirthDate, boolean withConsent, String secretToken, PrivateKey guardianPrivateSigningKey)
+        CloudNumber dependent, Date dependentBirthDate, boolean withConsent, String secretToken, PrivateKey guardianPrivateSigningKey, String dependentToken)
             throws Xdi2ClientException {
         
         // Prepare message to guardian Cloud
@@ -1234,7 +1237,7 @@ public class BasicCSP implements CSP {
         
         //Update Dependent's Graph
 
-        this.prepareMessageToCloud(message2, dependent, secretToken);        
+        this.prepareMessageToCloud(message2, dependent, dependentToken);        
         List<XDI3Statement> targetStatements2 = new ArrayList<XDI3Statement> ();
         
      
