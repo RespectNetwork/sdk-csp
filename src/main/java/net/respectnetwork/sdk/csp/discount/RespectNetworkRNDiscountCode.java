@@ -1,6 +1,6 @@
 package net.respectnetwork.sdk.csp.discount;
 
-public enum RespectNetworkMembershipDiscountCode {
+public enum RespectNetworkRNDiscountCode {
 
 	IIW16,
 	IIW17,
