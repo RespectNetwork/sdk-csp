@@ -1065,9 +1065,9 @@ public class BasicCSP implements CSP {
 	private String makeCloudXdiEndpoint(CloudNumber cloudNumber) {
 
 		try {
-
-			return cspInformation.getCspCloudBaseXdiEndpoint() + URLEncoder.encode(cloudNumber.toString(), "UTF-8");
-		} catch (UnsupportedEncodingException ex) {
+             return cspInformation.getCspRegistryXdiEndpoint();
+			//return cspInformation.getCspCloudBaseXdiEndpoint() + URLEncoder.encode(cloudNumber.toString(), "UTF-8");
+		} catch (Exception ex) {
 
 			throw new RuntimeException(ex.getMessage(), ex);
 		}
@@ -1696,5 +1696,29 @@ public class BasicCSP implements CSP {
          // TODO Auto-generated catch block
          e.printStackTrace();
       }
+	}
+
+	
+	
+	@Override
+	public void registerAdditionCloudNameInRN(CloudName cloudName,
+			CloudNumber cloudNumber, CloudNameDiscountCode cloudNameDiscountCode)
+			throws Xdi2ClientException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void registerAdditionalCloudNameInCSP(CloudName cloudName,
+			CloudNumber cloudNumber) throws Xdi2ClientException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void registerAdditionalCloudNameInCloud(CloudName cloudName,
+			CloudNumber cloudNumber) throws Xdi2ClientException {
+		// TODO Auto-generated method stub
+		
 	}
 }

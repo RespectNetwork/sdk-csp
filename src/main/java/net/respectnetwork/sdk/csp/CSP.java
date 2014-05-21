@@ -305,4 +305,43 @@ public interface CSP {
     public CloudNumber[] getMyGuardiansInCSP(CSPInformation cspInformation, CloudNumber dependent)
         throws Xdi2ClientException;
     
+    
+    //####  Methods for adding Additional CloudNames ####
+      
+	/**
+	 * Add Additional Cloud Name to Existing Respect Network Account.
+	 * The CloudNumber has to exist as an existing 
+	 * The Discount Code Provided has to  be XXXXX
+	 * 
+	 * @param cloudName
+	 * @param cloudNumber
+	 * @param cloudNameDiscountCode
+	 * @throws Xdi2ClientException
+	 */
+	public void registerAdditionCloudNameInRN(CloudName cloudName, CloudNumber cloudNumber, CloudNameDiscountCode cloudNameDiscountCode) throws Xdi2ClientException;
+	
+	/**
+	 * Register Addition of New CloudName to Existing CloudNumber in CSP Graph
+	 * 
+	 * @param cloudName
+	 * @param cloudNumber
+	 * @throws Xdi2ClientException
+	 */
+	public void registerAdditionalCloudNameInCSP(CloudName cloudName, CloudNumber cloudNumber) throws Xdi2ClientException;
+	
+	
+	/**
+	 * Register Addition of New CloudName to Existing CloudNumber in User Graph
+	 * 
+	 * @param cloudName
+	 * @param cloudNumber
+	 * @throws Xdi2ClientException
+	 */
+	public void registerAdditionalCloudNameInCloud(CloudName cloudName, CloudNumber cloudNumber) throws Xdi2ClientException;
+
+    
+    
+    
+    
+    
 }
