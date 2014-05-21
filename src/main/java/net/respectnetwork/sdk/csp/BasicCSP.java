@@ -17,8 +17,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 
-import net.respectnetwork.sdk.csp.discount.CloudNameDiscountCode;
-import net.respectnetwork.sdk.csp.discount.RespectNetworkMembershipDiscountCode;
+import net.respectnetwork.sdk.csp.discount.NeustarRNDiscountCode;
+import net.respectnetwork.sdk.csp.discount.RespectNetworkRNDiscountCode;
 import net.respectnetwork.sdk.csp.exception.CoreRNServiceException;
 
 import org.apache.http.HttpResponse;
@@ -42,7 +42,6 @@ import xdi2.core.constants.XDILinkContractConstants;
 import xdi2.core.features.linkcontracts.PublicLinkContract;
 import xdi2.core.features.linkcontracts.RootLinkContract;
 import xdi2.core.features.nodetypes.XdiAbstractMemberUnordered;
-import xdi2.core.features.nodetypes.XdiSubGraph;
 import xdi2.core.features.signatures.KeyPairSignature;
 import xdi2.core.features.signatures.Signatures;
 import xdi2.core.features.timestamps.Timestamps;
@@ -289,7 +288,7 @@ public class BasicCSP implements CSP {
 	}
 
 	@Override
-	public void registerCloudNameInRN(CloudName cloudName, CloudNumber cloudNumber, String verifiedPhone, String verifiedEmail, CloudNameDiscountCode cloudNameDiscountCode) throws Xdi2ClientException {
+	public void registerCloudNameInRN(CloudName cloudName, CloudNumber cloudNumber, String verifiedPhone, String verifiedEmail, NeustarRNDiscountCode neustarRNDiscountCode) throws Xdi2ClientException {
 
 		// prepare message 1 to RN
 
@@ -312,9 +311,9 @@ public class BasicCSP implements CSP {
 
 		Operation operation1 = message1.createSetOperation(targetStatementsSet.iterator());
 
-		if (cloudNameDiscountCode != null) {
+		if (neustarRNDiscountCode != null) {
 
-			operation1.setParameter(XRI_S_PARAMETER_CLOUDNAME_DISCOUNTCODE, cloudNameDiscountCode.toString());
+			operation1.setParameter(XRI_S_PARAMETER_CLOUDNAME_DISCOUNTCODE, neustarRNDiscountCode.toString());
 		}
 
 		// prepare message 2 to RN
@@ -564,7 +563,7 @@ public class BasicCSP implements CSP {
 	}
 
 	@Override
-	public void setRespectNetworkMembershipInRN(CloudNumber cloudNumber, Date expirationTime, RespectNetworkMembershipDiscountCode respectNetworkMembershipDiscountCode)  throws Xdi2ClientException {
+	public void setRespectNetworkMembershipInRN(CloudNumber cloudNumber, Date expirationTime, RespectNetworkRNDiscountCode respectNetworkRNDiscountCode)  throws Xdi2ClientException {
 
 		// prepare message to RN
 
@@ -596,9 +595,9 @@ public class BasicCSP implements CSP {
 
 		Operation operation = message.createSetOperation(targetStatements.iterator());
 
-		if (respectNetworkMembershipDiscountCode != null) {
+		if (respectNetworkRNDiscountCode != null) {
 
-			operation.setParameter(XRI_S_PARAMETER_RESPECT_NETWORK_MEMBERSHIP_DISCOUNTCODE, respectNetworkMembershipDiscountCode.toString());
+			operation.setParameter(XRI_S_PARAMETER_RESPECT_NETWORK_MEMBERSHIP_DISCOUNTCODE, respectNetworkRNDiscountCode.toString());
 		}
 
 		// send message

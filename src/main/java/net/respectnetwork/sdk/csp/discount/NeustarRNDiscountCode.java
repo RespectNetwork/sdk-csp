@@ -1,7 +1,7 @@
 package net.respectnetwork.sdk.csp.discount;
 
-public enum CloudNameDiscountCode {
+public enum NeustarRNDiscountCode {
 
 	OnePersonOneName,
-	RespectFirst;
+	FirstMillion;
 }

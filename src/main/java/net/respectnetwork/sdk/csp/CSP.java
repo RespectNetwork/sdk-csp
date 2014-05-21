@@ -4,8 +4,8 @@ import java.security.PrivateKey;
 import java.util.Date;
 import java.util.Map;
 
-import net.respectnetwork.sdk.csp.discount.CloudNameDiscountCode;
-import net.respectnetwork.sdk.csp.discount.RespectNetworkMembershipDiscountCode;
+import net.respectnetwork.sdk.csp.discount.NeustarRNDiscountCode;
+import net.respectnetwork.sdk.csp.discount.RespectNetworkRNDiscountCode;
 import xdi2.client.exceptions.Xdi2ClientException;
 import xdi2.core.xri3.CloudName;
 import xdi2.core.xri3.CloudNumber;
@@ -72,7 +72,7 @@ public interface CSP {
 	 *   [A] 5.1.1.3
 	 *   [B] Not used
 	 */
-	public void registerCloudNameInRN(CloudName cloudName, CloudNumber cloudNumber, String verifiedPhone, String verifiedEmail, CloudNameDiscountCode cloudNameDiscountCode) throws Xdi2ClientException;
+	public void registerCloudNameInRN(CloudName cloudName, CloudNumber cloudNumber, String verifiedPhone, String verifiedEmail, NeustarRNDiscountCode neustarRNDiscountCode) throws Xdi2ClientException;
 
 	/**
 	 * This method registers a new Cloud Name and Cloud Number in the CSP Cloud.
@@ -128,7 +128,7 @@ public interface CSP {
 	 *   [A] Not used
 	 *   [B] Not used
 	 */
-	public void setRespectNetworkMembershipInRN(CloudNumber cloudNumber, Date expirationTime, RespectNetworkMembershipDiscountCode respectNetworkMembershipDiscountCode)  throws Xdi2ClientException;
+	public void setRespectNetworkMembershipInRN(CloudNumber cloudNumber, Date expirationTime, RespectNetworkRNDiscountCode respectNetworkRNDiscountCode)  throws Xdi2ClientException;
 
 	/**
 	 * This method retrieves a flag for a Cloud Number in the RN Member Graph Service to indicate whether it is a member of
