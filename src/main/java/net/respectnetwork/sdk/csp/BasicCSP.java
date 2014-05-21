@@ -3,9 +3,7 @@ package net.respectnetwork.sdk.csp;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
-import java.net.URLEncoder;
 import java.security.GeneralSecurityException;
 import java.security.PrivateKey;
 import java.util.ArrayList;
@@ -17,6 +15,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 
+import net.respectnetwork.sdk.csp.discount.NeustarRNCampaignCode;
 import net.respectnetwork.sdk.csp.discount.NeustarRNDiscountCode;
 import net.respectnetwork.sdk.csp.discount.RespectNetworkRNDiscountCode;
 import net.respectnetwork.sdk.csp.exception.CoreRNServiceException;
@@ -1700,9 +1699,10 @@ public class BasicCSP implements CSP {
 	
 	
 	@Override
-	public void registerAdditionCloudNameInRN(CloudName cloudName,
-			CloudNumber cloudNumber, CloudNameDiscountCode cloudNameDiscountCode)
-			throws Xdi2ClientException {
+	public void registerAdditionalCloudNameInRN(CloudName cloudName, CloudNumber cloudNumber,
+			NeustarRNDiscountCode cloudNameDiscountCode, NeustarRNCampaignCode cloudNameCampaignCode)
+					throws Xdi2ClientException {
+	
 		// TODO Auto-generated method stub
 		
 	}
@@ -1716,7 +1716,7 @@ public class BasicCSP implements CSP {
 
 	@Override
 	public void registerAdditionalCloudNameInCloud(CloudName cloudName,
-			CloudNumber cloudNumber) throws Xdi2ClientException {
+			CloudNumber cloudNumber, String userToken) throws Xdi2ClientException {
 		// TODO Auto-generated method stub
 		
 	}

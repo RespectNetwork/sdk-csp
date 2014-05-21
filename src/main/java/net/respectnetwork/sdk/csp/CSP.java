@@ -4,6 +4,7 @@ import java.security.PrivateKey;
 import java.util.Date;
 import java.util.Map;
 
+import net.respectnetwork.sdk.csp.discount.NeustarRNCampaignCode;
 import net.respectnetwork.sdk.csp.discount.NeustarRNDiscountCode;
 import net.respectnetwork.sdk.csp.discount.RespectNetworkRNDiscountCode;
 import xdi2.client.exceptions.Xdi2ClientException;
@@ -306,25 +307,32 @@ public interface CSP {
         throws Xdi2ClientException;
     
     
-    //####  Methods for adding Additional CloudNames ####
-      
+	/*
+	 * Methods for adding additional CloudNames
+	 */
+          
 	/**
-	 * Add Additional Cloud Name to Existing Respect Network Account.
-	 * The CloudNumber has to exist as an existing 
-	 * The Discount Code Provided has to  be XXXXX
+	 * Add an additional Cloud Name to an Existing Respect Network Account.
+	 * The CloudNumber has to exist as an existing RespectNetwork Member.
+	 * The Discount Code Provided has to be NeustarRNDiscountCode.FirstMillion
+	 * The Campaign Code has to be NeustarRNCampaignCode.FirstFiveNames
+	 * It is up to the calling CSP to track the number of Names associated
+	 * with a Cloud Number and to limit existing Names to five.
 	 * 
-	 * @param cloudName
-	 * @param cloudNumber
-	 * @param cloudNameDiscountCode
+	 * @param cloudName previously unRegistered ClouldName
+	 * @param cloudNumber existing RN Member Cloud Number registered by the calling registrar.
+	 * @param cloudNameDiscountCode 
+	 * @param cloudNameCampaignCode
 	 * @throws Xdi2ClientException
 	 */
-	public void registerAdditionCloudNameInRN(CloudName cloudName, CloudNumber cloudNumber, CloudNameDiscountCode cloudNameDiscountCode) throws Xdi2ClientException;
+	public void registerAdditionalCloudNameInRN(CloudName cloudName, CloudNumber cloudNumber,
+			NeustarRNDiscountCode cloudNameDiscountCode, NeustarRNCampaignCode cloudNameCampaignCode) throws Xdi2ClientException;
 	
 	/**
-	 * Register Addition of New CloudName to Existing CloudNumber in CSP Graph
+	 * Register an additional of New CloudName to Existing CloudNumber in CSP Graph
 	 * 
-	 * @param cloudName
-	 * @param cloudNumber
+	 * @param cloudName previously unRegistered ClouldName
+	 * @param cloudNumber existing RN Member Cloud Number registered by the calling registrar.
 	 * @throws Xdi2ClientException
 	 */
 	public void registerAdditionalCloudNameInCSP(CloudName cloudName, CloudNumber cloudNumber) throws Xdi2ClientException;
@@ -333,15 +341,11 @@ public interface CSP {
 	/**
 	 * Register Addition of New CloudName to Existing CloudNumber in User Graph
 	 * 
-	 * @param cloudName
-	 * @param cloudNumber
+	 * @param cloudName  previously unRegistered ClouldName
+	 * @param cloudNumber existing RN Member Cloud Number registered by the calling registrar.
+	 * @param userSecretToken secret token for user to allow updates to their graph.
 	 * @throws Xdi2ClientException
 	 */
-	public void registerAdditionalCloudNameInCloud(CloudName cloudName, CloudNumber cloudNumber) throws Xdi2ClientException;
-
-    
-    
-    
-    
+	public void registerAdditionalCloudNameInCloud(CloudName cloudName, CloudNumber cloudNumber, String userSecretToken) throws Xdi2ClientException;
     
 }
