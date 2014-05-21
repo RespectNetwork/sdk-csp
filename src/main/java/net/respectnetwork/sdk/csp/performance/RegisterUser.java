@@ -9,8 +9,8 @@ import java.util.UUID;
 
 import net.respectnetwork.sdk.csp.BasicCSP;
 import net.respectnetwork.sdk.csp.CSP;
-import net.respectnetwork.sdk.csp.discount.CloudNameDiscountCode;
-import net.respectnetwork.sdk.csp.discount.RespectNetworkMembershipDiscountCode;
+import net.respectnetwork.sdk.csp.discount.NeustarRNDiscountCode;
+import net.respectnetwork.sdk.csp.discount.RespectNetworkRNDiscountCode;
 
 import org.apache.commons.lang.RandomStringUtils;
 
@@ -37,11 +37,11 @@ public class RegisterUser extends AbstractTester {
     /* CHOOSE THE INDIVIDUAL's VERIFIED EMAIL HERE */
     private  String verifiedEmail; 
 
-    /* CHOOSE A CLOUD NAME DISCOUNT CODE */
-    private  CloudNameDiscountCode cloudNameDiscountCode = CloudNameDiscountCode.OnePersonOneName;
+	/* CHOOSE A NEUSTAR DISCOUNT CODE */
+	private static NeustarRNDiscountCode neustarRNDiscountCode = NeustarRNDiscountCode.OnePersonOneName;
 
-    /* CHOOSE A RESPECT NETWORK MEMBERSHIP DISCOUNT CODE */
-    private  RespectNetworkMembershipDiscountCode respectNetworkMembershipDiscountCode = RespectNetworkMembershipDiscountCode.IIW17;
+	/* CHOOSE A RESPECT NETWORK DISCOUNT CODE */
+	private static RespectNetworkRNDiscountCode respectNetworkMembershipDiscountCode = RespectNetworkRNDiscountCode.IIW17;
 
     
 
@@ -90,7 +90,7 @@ public class RegisterUser extends AbstractTester {
 
     		// step 5: Register Cloud Name
 
-    		csp.registerCloudNameInRN(cloudName, cloudNumber, verifiedPhone, verifiedEmail, cloudNameDiscountCode);
+    		csp.registerCloudNameInRN(cloudName, cloudNumber, verifiedPhone, verifiedEmail, neustarRNDiscountCode);
     		csp.registerCloudNameInCSP(cloudName, cloudNumber);
     		csp.registerCloudNameInCloud(cloudName, cloudNumber, secretToken);
 
