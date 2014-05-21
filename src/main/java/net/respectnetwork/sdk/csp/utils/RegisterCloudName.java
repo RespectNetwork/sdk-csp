@@ -1,7 +1,6 @@
 package net.respectnetwork.sdk.csp.utils;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -14,8 +13,8 @@ import java.util.UUID;
 import net.respectnetwork.sdk.csp.BasicCSP;
 import net.respectnetwork.sdk.csp.BasicCSPInformation;
 import net.respectnetwork.sdk.csp.CSP;
-import net.respectnetwork.sdk.csp.discount.CloudNameDiscountCode;
-import net.respectnetwork.sdk.csp.discount.RespectNetworkMembershipDiscountCode;
+import net.respectnetwork.sdk.csp.discount.NeustarRNDiscountCode;
+import net.respectnetwork.sdk.csp.discount.RespectNetworkRNDiscountCode;
 import net.respectnetwork.sdk.csp.exception.CSPRegistrationException;
 import net.respectnetwork.sdk.csp.ssl.TLSv1Support;
 import xdi2.client.exceptions.Xdi2ClientException;
@@ -36,10 +35,10 @@ public class RegisterCloudName
 
    
    /* CHOOSE A CLOUD NAME DISCOUNT CODE */
-   private CloudNameDiscountCode                       cloudNameDiscountCode                = CloudNameDiscountCode.RespectFirst;
+   private NeustarRNDiscountCode                       cloudNameDiscountCode                = NeustarRNDiscountCode.OnePersonOneName;
 
    /* CHOOSE A RESPECT NETWORK MEMBERSHIP DISCOUNT CODE */
-   private static RespectNetworkMembershipDiscountCode respectNetworkMembershipDiscountCode = RespectNetworkMembershipDiscountCode.IIW17;
+   private static RespectNetworkRNDiscountCode respectNetworkMembershipDiscountCode = RespectNetworkRNDiscountCode.IIW17;
 
    public void register(String env, String cspName,
          String cspPassword, String cloudNameString, String cloudNumberString, String secretToken,String verifiedPhone, String verifiedEmail )
