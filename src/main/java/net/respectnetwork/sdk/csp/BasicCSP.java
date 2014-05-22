@@ -93,6 +93,7 @@ public class BasicCSP implements CSP {
 
 	public static final XDI3Segment XRI_S_PARAMETER_CLOUDNAME_DISCOUNTCODE = XDI3Segment.create("<#([+]!:uuid:e9b5165b-fa7b-4387-a685-7125d138a872)><#(RNDiscountCode)>");
 	public static final XDI3Segment XRI_S_PARAMETER_RESPECT_NETWORK_MEMBERSHIP_DISCOUNTCODE = XDI3Segment.create("<#([+]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa)><#(RNDiscountCode)>");
+	public static final XDI3Segment XRI_S_PARAMETER_NEUSTAR_RN_CAMPAIGNCODE = XDI3Segment.create("<#([+]!:uuid:e9b5165b-fa7b-4387-a685-7125d138a872)><#(RNCampaignCode)>");
 
 	private CSPInformation cspInformation;
 
@@ -1700,24 +1701,123 @@ public class BasicCSP implements CSP {
 	
 	@Override
 	public void registerAdditionalCloudNameInRN(CloudName cloudName, CloudNumber cloudNumber,
-			NeustarRNDiscountCode cloudNameDiscountCode, NeustarRNCampaignCode cloudNameCampaignCode)
-					throws Xdi2ClientException {
+	    NeustarRNDiscountCode cloudNameDiscountCode, NeustarRNCampaignCode cloudNameCampaignCode)
+			throws Xdi2ClientException {
 	
-		// TODO Auto-generated method stub
+        /* Call the Registration Service to 
+           1) Register the Cloud Name ( with the Cloud Number)
+           2) Create a Member Graph Billing Record
+           
+           CSP Cloud Number: [+]!:uuid:9999
+           Respect Network Cloud Number: [+]!:uuid:0000
+           Message Id: [=]!:uuid:1234
+           User Cloud Number: [=]!:uuid:1111
+                       
+           [+]!:uuid:0000[#billing]!:uuid:1234/$from/[+]!:uuid:0000
+           [+]!:uuid:0000[#billing]!:uuid:1234/$to/[+]!:uuid:9999
+           [+]!:uuid:0000[#billing]!:uuid:1234/#member/[=]!:uuid:1111
+           [+]!:uuid:0000[#billing]!:uuid:1234<$t>&/&/"2014-02-01T21:25:04Z"
+           [+]!:uuid:0000[#billing]!:uuid:1234/$is#/#debit
+           [+]!:uuid:0000[#billing]!:uuid:1234<#action><#name>&/&/"Additional lifetime name"
+           [+]!:uuid:0000[#billing]!:uuid:1234<#action><#code>&/&/"0010"
+           [+]!:uuid:0000[#billing]!:uuid:1234<#amount>&/&/19
+           [+]!:uuid:0000[#billing]!:uuid:1234<#currency>&/&/"USD"
+           [+]!:uuid:0000[#billing]!:uuid:1234[#status]@0<#status>&/&/"pending"
+           [+]!:uuid:0000[#billing]!:uuid:1234[#status]@0<$t>&/&/"2014-..."
+           [+]!:uuid:0000[#billing]!:uuid:1234[#status]@0/$from/[+]!:uuid:9999
+           [+]!:uuid:0000[#billing]!:uuid:1234[#status]@1<#status>&/&/"pending"
+           [+]!:uuid:0000[#billing]!:uuid:1234[#status]@1<$t>&/&/"2014-..."
+           [+]!:uuid:0000[#billing]!:uuid:1234[#status]@1/$from/[+]!:uuid:9999
+         */
+		
+		
+		// prepare message 1 to RN
+
+		MessageEnvelope messageEnvelope = new MessageEnvelope();
+		MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
+
+		Message message1 = messageCollection.createMessage(-1);
+
+		List<XDI3Statement> targetStatementsSet = new ArrayList<XDI3Statement> ();
+
+		
+		//These statements should be processed by the RegistrationCloudNameRefContributor on the Reg Service.
+		// Need to update the Contributor to deal with  the Additional CloudName Logic.
+		targetStatementsSet.add(XDI3Statement.fromRelationComponents(
+				XDI3Segment.fromComponent(cloudName.getPeerRootXri()), 
+				XDIDictionaryConstants.XRI_S_REF, 
+				XDI3Segment.fromComponent(cloudNumber.getPeerRootXri())));
+
+		targetStatementsSet.add(XDI3Statement.fromRelationComponents(
+				XDI3Segment.fromComponent(cloudNumber.getPeerRootXri()),
+				XDIDictionaryConstants.XRI_S_IS_REF, 
+				XDI3Segment.fromComponent(cloudName.getPeerRootXri())));
+
+		Operation operation1 = message1.createSetOperation(targetStatementsSet.iterator());
+
+		if (cloudNameDiscountCode != null) {
+			operation1.setParameter(XRI_S_PARAMETER_CLOUDNAME_DISCOUNTCODE, cloudNameDiscountCode.toString());
+		}
+		if (cloudNameCampaignCode != null) {
+			operation1.setParameter(XRI_S_PARAMETER_NEUSTAR_RN_CAMPAIGNCODE, cloudNameCampaignCode.toString());
+		}
+		
+		
+		this.prepareMessageToRN(message1);
+
+		
+		log.debug("registerAdditionalCloudNameInRN :: Message " + messageEnvelope.getGraph().toString());
+		MessageResult messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope, null);
+
+		log.debug("registerAdditionalCloudNameInRN :: Message Response " + messageResult.getGraph().toString());
+		Relation relation = messageResult.getGraph().getDeepRelation(XDI3Segment.fromComponent(cloudName.getPeerRootXri()), XDIDictionaryConstants.XRI_S_REF);
+		
+		if (relation == null) throw new RuntimeException("Additional Cloud Name not registered.");
+
+		CloudNumber registeredCloudNumber = CloudNumber.fromPeerRootXri(relation.getTargetContextNodeXri());
+		if (! registeredCloudNumber.equals(cloudNumber)) throw new RuntimeException("Registered Cloud Number "
+		    + registeredCloudNumber + " does not match requested Cloud Number " + cloudNumber);
+
+		// done
+
+		log.debug("In RN: Additional Cloud Name " + cloudName + " registered with Cloud Number " + cloudNumber);
+		
+
 		
 	}
 
 	@Override
 	public void registerAdditionalCloudNameInCSP(CloudName cloudName,
-			CloudNumber cloudNumber) throws Xdi2ClientException {
-		// TODO Auto-generated method stub
+	    CloudNumber cloudNumber) throws Xdi2ClientException {
+		
+		/* 
+		  We are adding the following to the CSP Graph 
+		  (=alice.new)/$ref/([=]!:uuid:1111)
+          ([=]!:uuid:1111)/$is$ref/(=alice.new)
+		 */
+		
+		this.registerCloudNameInCSP(cloudName, cloudNumber);
+		
 		
 	}
 
 	@Override
 	public void registerAdditionalCloudNameInCloud(CloudName cloudName,
-			CloudNumber cloudNumber, String userToken) throws Xdi2ClientException {
-		// TODO Auto-generated method stub
+	    CloudNumber cloudNumber, String userToken) throws Xdi2ClientException {
 		
+		/*
+		 (=alice.new)/$ref/([=]!:uuid:1111)
+         =alice.new/$ref/[=]!:uuid:1111
+         
+         [=]!:uuid:1111/$is$ref/=alice.new
+         [=]!:uuid:1111$to$anon$from$public$do/$get/(=alice/$ref/[=]!:uuid:1111))
+		 */
+		
+	    this.registerCloudNameInCloud(cloudName, cloudNumber, userToken);
+	    
+		log.debug("Added Additional CloudName: " + cloudName + " to Cloud Number " + cloudNumber);
+		
+		
+           		
 	}
 }
