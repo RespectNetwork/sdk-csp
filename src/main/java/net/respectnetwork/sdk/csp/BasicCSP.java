@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
+import java.net.URLEncoder;
 import java.security.GeneralSecurityException;
 import java.security.PrivateKey;
 import java.util.ArrayList;
@@ -812,6 +813,8 @@ public class BasicCSP implements CSP {
 		// send message
 
 		String cloudXdiEndpoint = this.makeCloudXdiEndpoint(cloudNumber);
+		
+		log.debug("authenticateInCloud :: cloudXdiEndpoint  :" + cloudXdiEndpoint );
 
 		XDIClient xdiClientCloud = new XDIHttpClient(cloudXdiEndpoint);
 
@@ -1064,8 +1067,7 @@ public class BasicCSP implements CSP {
 	private String makeCloudXdiEndpoint(CloudNumber cloudNumber) {
 
 		try {
-             return cspInformation.getCspRegistryXdiEndpoint();
-			//return cspInformation.getCspCloudBaseXdiEndpoint() + URLEncoder.encode(cloudNumber.toString(), "UTF-8");
+			return cspInformation.getCspCloudBaseXdiEndpoint() + URLEncoder.encode(cloudNumber.toString(), "UTF-8");
 		} catch (Exception ex) {
 
 			throw new RuntimeException(ex.getMessage(), ex);
