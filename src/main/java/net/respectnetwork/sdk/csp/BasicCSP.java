@@ -971,7 +971,7 @@ public class BasicCSP implements CSP {
         
         XDI3Statement targetStatementGet = XDI3Statement.fromRelationComponents(
         		this.getCspInformation().getRnCloudNumber().getXri(),
-                XRI_S_FIRST_MEMBER,
+                XRI_S_MEMBER,
                 XDIConstants.XRI_S_VARIABLE);
 
         message.createGetOperation(targetStatementGet);
@@ -982,7 +982,7 @@ public class BasicCSP implements CSP {
         
         MessageResult messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope, null);
         
-        ReadOnlyIterator<Relation> relations =  (messageResult.getGraph()).getDeepRelations(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_FIRST_MEMBER);
+        ReadOnlyIterator<Relation> relations =  (messageResult.getGraph()).getDeepRelations(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_MEMBER);
             
         while (relations.hasNext()) {
             relations.next();
