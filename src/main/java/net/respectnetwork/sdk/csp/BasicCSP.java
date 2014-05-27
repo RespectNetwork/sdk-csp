@@ -814,6 +814,8 @@ public class BasicCSP implements CSP {
 		// send message
 
 		String cloudXdiEndpoint = this.makeCloudXdiEndpoint(cloudNumber);
+		
+		log.debug("authenticateInCloud :: cloudXdiEndpoint  :" + cloudXdiEndpoint );
 
 		XDIClient xdiClientCloud = new XDIHttpClient(cloudXdiEndpoint);
 
