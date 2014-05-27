@@ -20,6 +20,7 @@ import java.util.UUID;
 import net.respectnetwork.sdk.csp.discount.NeustarRNCampaignCode;
 import net.respectnetwork.sdk.csp.discount.NeustarRNDiscountCode;
 import net.respectnetwork.sdk.csp.discount.RespectNetworkRNDiscountCode;
+import net.respectnetwork.sdk.csp.discount.XDIDiscountCodeConstants;
 import net.respectnetwork.sdk.csp.exception.CoreRNServiceException;
 
 import org.apache.http.HttpResponse;
@@ -92,10 +93,6 @@ public class BasicCSP implements CSP {
 	public static final XDI3Segment XRI_S_AS_MEMBER_EXPIRATION_TIME = XDI3Segment.create("<#member><#expiration><$t>");
 
 	public static final XDI3Segment XRI_S_FIRST_MEMBER = XDI3Segment.create("#first#member");
-
-	public static final XDI3Segment XRI_S_PARAMETER_NEUSTAR_RN_DISCOUNTCODE = XDI3Segment.create("<#([+]!:uuid:e9b5165b-fa7b-4387-a685-7125d138a872)><#(RNDiscountCode)>");
-	public static final XDI3Segment XRI_S_PARAMETER_NEUSTAR_RN_CAMPAIGNCODE = XDI3Segment.create("<#([+]!:uuid:e9b5165b-fa7b-4387-a685-7125d138a872)><#(RNCampaignCode)>");
-	public static final XDI3Segment XRI_S_PARAMETER_RESPECTNETWORK_RN_DISCOUNTCODE = XDI3Segment.create("<#([+]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa)><#(RNDiscountCode)>");
 
 	private CSPInformation cspInformation;
 
@@ -315,7 +312,7 @@ public class BasicCSP implements CSP {
 
 		if (neustarRNDiscountCode != null) {
 
-			operation1.setParameter(XRI_S_PARAMETER_NEUSTAR_RN_DISCOUNTCODE, neustarRNDiscountCode.toString());
+			operation1.setParameter(XDIDiscountCodeConstants.XRI_S_PARAMETER_NEUSTAR_RN_DISCOUNTCODE, neustarRNDiscountCode.toString());
 		}
 
 		// prepare message 2 to RN
@@ -599,7 +596,7 @@ public class BasicCSP implements CSP {
 
 		if (respectNetworkRNDiscountCode != null) {
 
-			operation.setParameter(XRI_S_PARAMETER_RESPECTNETWORK_RN_DISCOUNTCODE, respectNetworkRNDiscountCode.toString());
+			operation.setParameter(XDIDiscountCodeConstants.XRI_S_PARAMETER_RESPECTNETWORK_RN_DISCOUNTCODE, respectNetworkRNDiscountCode.toString());
 		}
 
 		// send message
@@ -1704,7 +1701,7 @@ public class BasicCSP implements CSP {
 	
 	@Override
 	public void registerAdditionalCloudNameInRN(CloudName cloudName, CloudNumber cloudNumber,
-	    NeustarRNDiscountCode cloudNameDiscountCode, NeustarRNCampaignCode cloudNameCampaignCode)
+	    NeustarRNDiscountCode neustarRNDiscountCode, NeustarRNCampaignCode neustarRNCampaignCode)
 			throws Xdi2ClientException {
 	
         /* Call the Registration Service to 
@@ -1758,11 +1755,11 @@ public class BasicCSP implements CSP {
 
 		Operation operation1 = message1.createSetOperation(targetStatementsSet.iterator());
 
-		if (cloudNameDiscountCode != null) {
-			operation1.setParameter(XRI_S_PARAMETER_NEUSTAR_RN_DISCOUNTCODE, cloudNameDiscountCode.toString());
+		if (neustarRNDiscountCode != null) {
+			operation1.setParameter(XDIDiscountCodeConstants.XRI_S_PARAMETER_NEUSTAR_RN_DISCOUNTCODE, neustarRNDiscountCode.toString());
 		}
-		if (cloudNameCampaignCode != null) {
-			operation1.setParameter(XRI_S_PARAMETER_NEUSTAR_RN_CAMPAIGNCODE, cloudNameCampaignCode.toString());
+		if (neustarRNCampaignCode != null) {
+			operation1.setParameter(XDIDiscountCodeConstants.XRI_S_PARAMETER_NEUSTAR_RN_CAMPAIGNCODE, neustarRNCampaignCode.toString());
 		}
 		
 		

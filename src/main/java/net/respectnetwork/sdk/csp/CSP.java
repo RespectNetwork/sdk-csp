@@ -321,12 +321,12 @@ public interface CSP {
 	 * 
 	 * @param cloudName previously unRegistered ClouldName
 	 * @param cloudNumber existing RN Member Cloud Number registered by the calling registrar.
-	 * @param cloudNameDiscountCode 
-	 * @param cloudNameCampaignCode
+	 * @param neustarRNDiscountCode 
+	 * @param neustarRNCampaignCode
 	 * @throws Xdi2ClientException
 	 */
 	public void registerAdditionalCloudNameInRN(CloudName cloudName, CloudNumber cloudNumber,
-			NeustarRNDiscountCode cloudNameDiscountCode, NeustarRNCampaignCode cloudNameCampaignCode) throws Xdi2ClientException;
+			NeustarRNDiscountCode neustarRNDiscountCode, NeustarRNCampaignCode neustarRNCampaignCode) throws Xdi2ClientException;
 	
 	/**
 	 * Register an additional of New CloudName to Existing CloudNumber in CSP Graph
