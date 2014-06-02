@@ -390,5 +390,58 @@ public class BasicNotificationService implements Notifier {
         }
     }
     
+    /**
+     * Method to send email notification.
+     * @param toEmail Message recipient type TO.
+     * @param bccEmail Message recipient type BCC.
+     * @param Message Email content.
+     * @throws NotificationException
+     */
+    @Override
+    public void sendEmailNotification(String toEmail,
+            String bccEmail, String messageOut) throws NotificationException {
+        Properties props = new Properties();
 
+        props.put("mail.smtp.auth", mailSMTPAuth);
+        props.put("mail.smtp.starttls.enable", mailStartTLS);
+        props.put("mail.smtp.host", mailSMTPHost);
+        props.put("mail.smtp.port", mailSMTPPort);
+        props.put("mail.debug", mailDebug);
+        props.put("mail.transport.protocol", mailTransport);
+
+        Session session = Session.getInstance(props,
+          new javax.mail.Authenticator() {
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(mailAccountUsername, mailAccountPassword);
+            }
+          });
+
+        String errorInEmail = null;
+        try {
+
+            Message message = new MimeMessage(session);
+            message.setFrom(new InternetAddress(emailFrom));
+            if(toEmail != null) {
+                errorInEmail = toEmail;
+                message.setRecipients(Message.RecipientType.TO,
+                InternetAddress.parse(toEmail));
+            }
+            if(bccEmail != null) {
+                errorInEmail = bccEmail;
+                message.setRecipients(Message.RecipientType.BCC,
+                InternetAddress.parse(bccEmail));
+            }
+            message.setSubject(emailSubject);
+            message.setContent(messageOut, "text/html");
+            Transport.send(message);
+
+        } catch ( AuthenticationFailedException e) {
+            String errorMsg = "Problem Sending eMail to {} : Issue:Authentication Failed at  mail Service";
+            LOG.warn(errorMsg);
+            throw new NotificationException(errorMsg);
+        } catch (MessagingException e) {
+            LOG.warn("Problem Sending eMail to {} : Issue: {}", errorInEmail, e.getMessage());
+            throw new NotificationException(e.getMessage());
+        }
+    }
 }
