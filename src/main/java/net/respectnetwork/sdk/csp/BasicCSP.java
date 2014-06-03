@@ -89,6 +89,9 @@ public class BasicCSP implements CSP {
 	
     public static final XDI3Segment XRI_S_IS_GUARDIAN = XDI3Segment.create("$is#guardian");
     public static final XDI3Segment XRI_S_GUARDIAN = XDI3Segment.create("#guardian");
+    
+    public static final XDI3Segment XRI_S_IS_BILLING_CONTACT = XDI3Segment.create("$is#billing#contact");
+    public static final XDI3Segment XRI_S_BILLING_CONTACT = XDI3Segment.create("#billing#contact");
 
 	public static final XDI3Segment XRI_S_MEMBER = XDI3Segment.create("#member");
 	public static final XDI3Segment XRI_S_AS_MEMBER_EXPIRATION_TIME = XDI3Segment.create("<#member><#expiration><$t>");
@@ -1034,72 +1037,6 @@ public class BasicCSP implements CSP {
     }
 	
 
-    public long getRespectFirstMemberCountJSON(String secretToken)
-        throws CoreRNServiceException {
-
-        long numberOfMembers = 0;
-
-        String jsonMessage = "{\"([@]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa[$msg]!:uuid:1234$do/$get)[@]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa/+first+member\":[\"([@]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa[$msg]!:uuid:1234$do/$get){}\"],\"[@]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa[$msg]!:uuid:1234/$do\":[\"[@]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa$to+registrar$from$do\"],\"[@]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa[$msg]!:uuid:1234/$is()\":[\"([@]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa)\"],\"[@]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa[$msg]!:uuid:1234<$secret><$token>&/&\":\"" + secretToken  + "\"}";
-
-        try {
-            DefaultHttpClient httpClient = new DefaultHttpClient();
-            HttpPost postRequest = new HttpPost(
-                    cspInformation.getRnRegistrationServiceXdiEndpoint());
-
-            StringEntity input = new StringEntity(jsonMessage);
-            input.setContentType("application/xdi+json");
-            postRequest.setEntity(input);
-
-            HttpResponse response = httpClient.execute(postRequest);
-
-            if (response.getStatusLine().getStatusCode() != 200) {
-                throw new CoreRNServiceException("Failed getRespectFirstMemberCount JSON Request : HTTP error code : "
-                        + response.getStatusLine().getStatusCode());
-            }
-
-            BufferedReader br = new BufferedReader(new InputStreamReader(
-                    (response.getEntity().getContent())));
-
-            String output;
-            
-            while ((output = br.readLine()) != null) {
-                System.out.println(output);
-                log.debug("Output for  Registration Service: {}", output);
-
-                JsonElement jelement = new JsonParser().parse(output);
-                JsonObject jobject = jelement.getAsJsonObject();
-                String lookupKey = "[@]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa/+first+member";
-                JsonArray jarray = jobject.getAsJsonArray(lookupKey);
-                
-                
-                if (jarray.equals(null)) {
-                    numberOfMembers = 0;
-                } else {
-                    numberOfMembers = jarray.size();
-                }
-                
-            }
-            httpClient.getConnectionManager().shutdown();
-
-        } catch (MalformedURLException e) {
-            String errorMessage = String.format("Exception Processing JSON Message to Reg. Service: %s", e.getMessage());
-            log.warn(errorMessage);
-            throw new CoreRNServiceException(errorMessage);
-        } catch (IOException e) {
-            String errorMessage = String.format("Exception Processing JSON Message to Reg. Service: %s", e.getMessage());
-            log.warn(errorMessage);
-            throw new CoreRNServiceException(errorMessage);            
-        } catch (IllegalStateException e) {
-            String errorMessage = String.format("Exception Processing JSON Message to Reg. Service: %s", e.getMessage());
-            log.warn(errorMessage);
-            throw new CoreRNServiceException(errorMessage);            
-        }
-
-        return numberOfMembers;
-    }
-	
-	
-
 	/*
 	 * Helper methods
 	 */
@@ -1783,8 +1720,6 @@ public class BasicCSP implements CSP {
 		List<XDI3Statement> targetStatementsSet = new ArrayList<XDI3Statement> ();
 
 		
-		//These statements should be processed by the RegistrationCloudNameRefContributor on the Reg Service.
-		// Need to update the Contributor to deal with  the Additional CloudName Logic.
 		targetStatementsSet.add(XDI3Statement.fromRelationComponents(
 				XDI3Segment.fromComponent(cloudName.getPeerRootXri()), 
 				XDIDictionaryConstants.XRI_S_REF, 
@@ -1862,4 +1797,406 @@ public class BasicCSP implements CSP {
 		
            		
 	}
+	
+	
+	@Override
+	public void registerBusinessNameInRN(CloudName businessCloudName, CloudNumber businessCloudNumber,
+			CloudNumber contactCloudNumber) throws Xdi2ClientException {
+		
+	
+		// Validate that we are dealing with "+" Names and Numbers.
+		char nameCS = businessCloudName.getCs();
+		
+		if ( nameCS != XDIConstants.CS_AUTHORITY_LEGAL ) {
+			throw new Xdi2ClientException("Invalid CS in CloudName: Expecting " + XDIConstants.CS_AUTHORITY_LEGAL , new ErrorMessageResult());
+		}
+		
+		char numberCS = businessCloudNumber.getCs();
+
+		if ( numberCS != XDIConstants.CS_AUTHORITY_LEGAL ) {
+			throw new Xdi2ClientException("Invalid CS in CloudNumber: Expecting " + XDIConstants.CS_AUTHORITY_LEGAL , new ErrorMessageResult());
+		}
+		
+		//@TODO  Does the Contact have to  be an "=" Number 
+		
+	
+		// prepare message 1 to RN
+		
+		/*
+	         [+]!:uuid:9999[$msg]!:uuid:1234$do/$set/((+biz.name)/$ref/([+]!:uuid:5555))
+             [+]!:uuid:9999[$msg]!:uuid:1234$do/$set/(([+]!:uuid:5555)/$is$ref/(+biz.name))
+         
+		 */
+		
+		MessageEnvelope messageEnvelope = new MessageEnvelope();
+		MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
+
+		Message message1 = messageCollection.createMessage(-1);
+
+		List<XDI3Statement> targetStatementsSet = new ArrayList<XDI3Statement> ();
+
+		targetStatementsSet.add(XDI3Statement.fromRelationComponents(
+				XDI3Segment.fromComponent(businessCloudName.getPeerRootXri()), 
+				XDIDictionaryConstants.XRI_S_REF, 
+				XDI3Segment.fromComponent(businessCloudNumber.getPeerRootXri())));
+
+		targetStatementsSet.add(XDI3Statement.fromRelationComponents(
+				XDI3Segment.fromComponent(businessCloudNumber.getPeerRootXri()),
+				XDIDictionaryConstants.XRI_S_IS_REF, 
+				XDI3Segment.fromComponent(businessCloudName.getPeerRootXri())));
+
+		message1.createSetOperation(targetStatementsSet.iterator());
+				
+			
+		/*
+		Set Billing Records
+		   
+        [+]!:uuid:9999[$msg]!:uuid:1234$do/$set/([+]!:uuid:5555/#billing#contact/[=]!:uuid:1111)
+        [+]!:uuid:9999[$msg]!:uuid:1234$do/$set/([=]!:uuid:1111/$is#billing#contact/[+]!:uuid:5555) 
+		 */
+		
+
+		Message message2 = messageCollection.createMessage(-1);
+
+		List<XDI3Statement> targetStatementBillingSet = new ArrayList<XDI3Statement> ();
+
+		
+		targetStatementBillingSet.add(XDI3Statement.fromRelationComponents(
+				XDI3Segment.fromComponent(businessCloudNumber.getPeerRootXri()), 
+				XRI_S_BILLING_CONTACT, 
+				XDI3Segment.fromComponent(contactCloudNumber.getPeerRootXri())));
+
+		targetStatementBillingSet.add(XDI3Statement.fromRelationComponents(
+				XDI3Segment.fromComponent(contactCloudNumber.getPeerRootXri()),
+				XRI_S_IS_BILLING_CONTACT, 
+				XDI3Segment.fromComponent(businessCloudNumber.getPeerRootXri())));
+
+		message2.createSetOperation(targetStatementBillingSet.iterator());
+
+				
+		this.prepareMessageToRN(message1);
+		this.prepareMessageToRN(message2);
+		
+		
+		log.debug("registerBusinessCloudNameInRN :: Message " + messageEnvelope.getGraph().toString());
+		MessageResult messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope, null);
+
+		log.debug("registerBusinessCloudNameInRN :: Message Response " + messageResult.getGraph().toString());
+		
+		Relation relation = messageResult.getGraph().getDeepRelation(
+				XDI3Segment.fromComponent(businessCloudName.getPeerRootXri()), XDIDictionaryConstants.XRI_S_REF);
+		
+		if (relation == null) throw new RuntimeException("Additional Cloud Name not registered.");
+		
+		
+		CloudNumber registeredCloudNumber = CloudNumber.fromPeerRootXri(relation.getTargetContextNodeXri());
+		if (! registeredCloudNumber.equals(businessCloudNumber)) throw new RuntimeException("Registered Cloud Number "
+		    + registeredCloudNumber + " does not match requested Cloud Number " + businessCloudNumber);
+
+		// done
+
+		log.debug("In RN: Business Cloud Name " + businessCloudName + " registered with Cloud Number " + businessCloudNumber);
+		
+	}
+	
+	@Override
+	public void registerBusinessNameInCSP(CloudName businessCloudName, CloudNumber businessCloudNumber,
+			CloudNumber contactCloudNumber) throws Xdi2ClientException {
+		
+	
+		// Validate that we are dealing with "+" Names and Numbers.
+		char nameCS = businessCloudName.getCs();
+		
+		if ( nameCS != XDIConstants.CS_AUTHORITY_LEGAL ) {
+			throw new Xdi2ClientException("Invalid CS in CloudName: Expecting " + XDIConstants.CS_AUTHORITY_LEGAL , new ErrorMessageResult());
+		}
+		
+		char numberCS = businessCloudNumber.getCs();
+
+		if ( numberCS != XDIConstants.CS_AUTHORITY_LEGAL ) {
+			throw new Xdi2ClientException("Invalid CS in CloudNumber: Expecting " + XDIConstants.CS_AUTHORITY_LEGAL , new ErrorMessageResult());
+		}
+		
+		//@TODO  Does the Contact have to  be an "=" Number 
+		
+	
+		// prepare message 1 to RN
+		
+		/*
+	         [+]!:uuid:9999[$msg]!:uuid:1234$do/$set/((+biz.name)/$ref/([+]!:uuid:5555))
+             [+]!:uuid:9999[$msg]!:uuid:1234$do/$set/(([+]!:uuid:5555)/$is$ref/(+biz.name))
+         
+		 */
+		
+		MessageEnvelope messageEnvelope = new MessageEnvelope();
+		MessageCollection messageCollection = this.createMessageCollectionToCSP(messageEnvelope);
+
+		Message message1 = messageCollection.createMessage(-1);
+
+		List<XDI3Statement> targetStatementsSet = new ArrayList<XDI3Statement> ();
+
+		targetStatementsSet.add(XDI3Statement.fromRelationComponents(
+				XDI3Segment.fromComponent(businessCloudName.getPeerRootXri()), 
+				XDIDictionaryConstants.XRI_S_REF, 
+				XDI3Segment.fromComponent(businessCloudNumber.getPeerRootXri())));
+
+		targetStatementsSet.add(XDI3Statement.fromRelationComponents(
+				XDI3Segment.fromComponent(businessCloudNumber.getPeerRootXri()),
+				XDIDictionaryConstants.XRI_S_IS_REF, 
+				XDI3Segment.fromComponent(businessCloudName.getPeerRootXri())));
+
+		message1.createSetOperation(targetStatementsSet.iterator());
+				
+			
+		/*
+		Set Billing Records
+		   
+        [+]!:uuid:9999[$msg]!:uuid:1234$do/$set/([+]!:uuid:5555/#billing#contact/[=]!:uuid:1111)
+        [+]!:uuid:9999[$msg]!:uuid:1234$do/$set/([=]!:uuid:1111/$is#billing#contact/[+]!:uuid:5555) 
+		 */
+		
+
+		Message message2 = messageCollection.createMessage(-1);
+
+		List<XDI3Statement> targetStatementBillingSet = new ArrayList<XDI3Statement> ();
+
+		
+		targetStatementBillingSet.add(XDI3Statement.fromRelationComponents(
+				XDI3Segment.fromComponent(businessCloudNumber.getPeerRootXri()), 
+				XRI_S_BILLING_CONTACT, 
+				XDI3Segment.fromComponent(contactCloudNumber.getPeerRootXri())));
+
+		targetStatementBillingSet.add(XDI3Statement.fromRelationComponents(
+				XDI3Segment.fromComponent(contactCloudNumber.getPeerRootXri()),
+				XRI_S_IS_BILLING_CONTACT, 
+				XDI3Segment.fromComponent(businessCloudNumber.getPeerRootXri())));
+
+		message2.createSetOperation(targetStatementBillingSet.iterator());
+
+				
+		this.prepareMessageToRN(message1);
+		this.prepareMessageToRN(message2);
+		
+		
+		log.debug("registerBusinessCloudNameInRN :: Message " + messageEnvelope.getGraph().toString());
+		MessageResult messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope, null);
+
+		log.debug("registerBusinessCloudNameInRN :: Message Response " + messageResult.getGraph().toString());
+		
+		Relation relation = messageResult.getGraph().getDeepRelation(
+				XDI3Segment.fromComponent(businessCloudName.getPeerRootXri()), XDIDictionaryConstants.XRI_S_REF);
+		
+		if (relation == null) throw new RuntimeException("Additional Cloud Name not registered in CSP Graph.");
+		
+		
+		CloudNumber registeredCloudNumber = CloudNumber.fromPeerRootXri(relation.getTargetContextNodeXri());
+		if (! registeredCloudNumber.equals(businessCloudNumber)) throw new RuntimeException("Registered Cloud Number "
+		    + registeredCloudNumber + " does not match requested Cloud Number " + businessCloudNumber);
+
+		// done
+
+		log.debug("In CSP: Business Cloud Name " + businessCloudName + " registered with Cloud Number " + businessCloudNumber);
+		
+	}
+	
+	
+	@Override
+	public void registerBusinessNameInCloud(CloudName businessCloudName, CloudNumber businessCloudNumber,
+			CloudNumber contactCloudNumber) throws Xdi2ClientException {
+		
+
+		
+		// Validate that we are dealing with "+" Names and Numbers.
+		char nameCS = businessCloudName.getCs();
+		
+		if ( nameCS != XDIConstants.CS_AUTHORITY_LEGAL ) {
+			throw new Xdi2ClientException("Invalid CS in CloudName: Expecting " + XDIConstants.CS_AUTHORITY_LEGAL , new ErrorMessageResult());
+		}
+		
+		char numberCS = businessCloudNumber.getCs();
+
+		if ( numberCS != XDIConstants.CS_AUTHORITY_LEGAL ) {
+			throw new Xdi2ClientException("Invalid CS in CloudNumber: Expecting " + XDIConstants.CS_AUTHORITY_LEGAL , new ErrorMessageResult());
+		}
+		
+		//@TODO  Does the Contact have to  be an "=" Number 
+		
+	
+		// prepare message 1 to RN
+		
+		/*
+	    	(+biz.name)/$ref/([+]!:uuid:5555)
+		    ([+]!:uuid:5555)/$is$ref/(+biz.name)
+         
+		 */
+		
+		MessageEnvelope messageEnvelope = new MessageEnvelope();
+		MessageCollection messageCollection = this.createMessageCollectionToCSP(messageEnvelope);
+
+		Message message1 = messageCollection.createMessage(-1);
+
+		List<XDI3Statement> targetStatementsSet = new ArrayList<XDI3Statement> ();
+
+		targetStatementsSet.add(XDI3Statement.fromRelationComponents(
+				XDI3Segment.fromComponent(businessCloudName.getPeerRootXri()), 
+				XDIDictionaryConstants.XRI_S_REF, 
+				XDI3Segment.fromComponent(businessCloudNumber.getPeerRootXri())));
+
+		targetStatementsSet.add(XDI3Statement.fromRelationComponents(
+				XDI3Segment.fromComponent(businessCloudNumber.getPeerRootXri()),
+				XDIDictionaryConstants.XRI_S_IS_REF, 
+				XDI3Segment.fromComponent(businessCloudName.getPeerRootXri())));
+
+		message1.createSetOperation(targetStatementsSet.iterator());
+				
+			
+		/*
+		    Set Billing Records
+		    [=]!:uuid:1111/$is#billing#contact/[+]!:uuid:5555
+	    */
+		 
+		
+		Message message2 = messageCollection.createMessage(-1);
+
+		List<XDI3Statement> targetStatementBillingSet = new ArrayList<XDI3Statement> ();
+
+		/* [=]!:uuid:1111/$is#billing#contact/[+]!:uuid:5555 */
+		targetStatementBillingSet.add(XDI3Statement.fromRelationComponents(
+				XDI3Segment.fromComponent(contactCloudNumber.getPeerRootXri()),
+				XRI_S_IS_BILLING_CONTACT, 
+				XDI3Segment.fromComponent(businessCloudNumber.getPeerRootXri())));
+		
+		
+		List<XDI3Statement> signedBillingStatments = createSignedBillingXDI3Statements(businessCloudNumber,
+	    		 contactCloudNumber);
+		targetStatementBillingSet.addAll(signedBillingStatments);
+		
+			
+		message2.createSetOperation(targetStatementBillingSet.iterator());
+			
+		this.prepareMessageToRN(message1);
+		this.prepareMessageToRN(message2);
+		
+		
+		log.debug("registerBusinessCloudNameInRN :: Message " + messageEnvelope.getGraph().toString());
+		MessageResult messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope, null);
+
+		log.debug("registerBusinessCloudNameInRN :: Message Response " + messageResult.getGraph().toString());
+		
+		Relation relation = messageResult.getGraph().getDeepRelation(
+				XDI3Segment.fromComponent(businessCloudName.getPeerRootXri()), XDIDictionaryConstants.XRI_S_REF);
+		
+		if (relation == null) throw new RuntimeException("Additional Cloud Name not registered in CSP Graph.");
+		
+		
+		CloudNumber registeredCloudNumber = CloudNumber.fromPeerRootXri(relation.getTargetContextNodeXri());
+		if (! registeredCloudNumber.equals(businessCloudNumber)) throw new RuntimeException("Registered Cloud Number "
+		    + registeredCloudNumber + " does not match requested Cloud Number " + businessCloudNumber);
+
+		// done
+
+		log.debug("In CSP: Business Cloud Name " + businessCloudName + " registered with Cloud Number " + businessCloudNumber);
+		
+	}
+	
+	
+    /**
+     * Create the XDIStatement that represent a Billing Contact and Sign it.
+     * 
+     * 
+     * @param businessCloudNumber uuid:5555
+     * @param contactCloudNumber uuid:1111
+     * @param signingKey 
+     * @return XDI3 Statements
+     */ 
+    private List<XDI3Statement> createSignedBillingXDI3Statements(CloudNumber businessCloudNumber,
+    		CloudNumber contactCloudNumber) throws Xdi2ClientException {
+        
+    	/*
+		([=]!:uuid:1111/$is#billing#contact)[=]!:uuid:1111/
+		$is#billing#contact/
+		([=]!:uuid:1111/$is#billing#contact)[+]!:uuid:5555
+		
+		
+		([=]!:uuid:1111/$is#billing#contact)[<$sig>]<!:uuid:7846>&/&/”...”
+		([=]!:uuid:1111/$is#billing#contact)[<$sig>]<!:uuid:7846>/$is#/([=]!:uuid:1111/$is#billing#contact)$sha$256$rsa$2048	
+		([=]!:uuid:1111/$is#billing#contact)[<$sig>]<!:uuid:7846><$public><$key>/$ref/([=]!:uuid:1111/$is#billing#contact)[+]!:uuid:9999$sig$keypair<$public><$key>
+		*/
+    	
+    	PrivateKey signingKey;
+    	
+    	try
+    	{
+    		BasicCSPInformation basicCSP = (BasicCSPInformation) this.getCspInformation();
+    		if(basicCSP.getCspSignaturePrivateKey() == null)
+    		{
+    			basicCSP.retrieveCspSignaturePrivateKey();
+    		}
+    		
+    	} catch (Xdi2ClientException e) {
+    		String errorMsg = "Problem Retrieving CSP Private Key" + e.getMessage();
+    		log.warn(errorMsg);
+    		throw new Xdi2ClientException(errorMsg, new ErrorMessageResult());
+    	} catch (GeneralSecurityException e){
+    		String errorMsg = "Problem Retrieving CSP Private Key" + e.getMessage();
+    		log.warn(errorMsg);
+    		throw new Xdi2ClientException(errorMsg, new ErrorMessageResult());
+        }
+  
+
+        if (this.getCspInformation().getCspSignaturePrivateKey() != null) {
+    	    log.debug("CSP Private Key is not null. Signing Messages with it.");
+    	    signingKey = this.getCspInformation().getCspSignaturePrivateKey();
+        } else {
+    		String errorMsg = "Problem Retrieving CSP Private Key: Key is Null";
+    		log.warn(errorMsg);
+    		throw new Xdi2ClientException(errorMsg, new ErrorMessageResult());
+        }
+        
+        List<XDI3Statement> targetStatements = new ArrayList<XDI3Statement> ();
+        
+                        
+        MemoryGraph g = MemoryGraphFactory.getInstance().openGraph();
+        
+        /* ([=]!:uuid:1111/$is#billing#contact) */
+        XDI3Segment contactIsBC = XDI3Segment.create("(" + contactCloudNumber.getXri() +"/" + XRI_S_IS_BILLING_CONTACT +")");
+        
+
+        XDI3Statement contactBillingStatement = XDI3Statement.fromRelationComponents(
+                XDI3Util.concatXris( contactIsBC, XDI3Segment.create(contactCloudNumber.toString())),
+                XRI_S_IS_BILLING_CONTACT,
+                XDI3Util.concatXris(contactIsBC, this.getCspInformation().getRnCloudNumber().getXri()));
+        
+        g.setStatement(contactBillingStatement);
+        
+
+        //Sign the Context: //[=]!:uuid:1111[<#consent>]<!:uuid:6545>        
+        ContextNode signingNode = g.getRootContextNode().getDeepContextNode(contactIsBC);
+
+        // now create the signature and add it to the graph
+        KeyPairSignature s = (KeyPairSignature) Signatures.createSignature(signingNode, "sha", 256, "rsa", 2048, true);
+
+        try {
+            s.sign(signingKey);
+        } catch (GeneralSecurityException e) {
+            throw new RuntimeException("Problem Signing Billing Contact  Graph");           
+        }
+        
+        ContextNode c = g.getRootContextNode();
+        
+        Iterator<Statement> billingContactStatmentIterator = c.getAllStatements();
+        
+        //Converting from Statement to  XDI3Statement
+        while(billingContactStatmentIterator.hasNext()){
+            Statement next = billingContactStatmentIterator.next();
+            XDI3Statement graphStatement = next.getXri();
+            targetStatements.add(graphStatement);
+        }
+        
+        return targetStatements;
+       
+        
+    }
+	
+	
 }

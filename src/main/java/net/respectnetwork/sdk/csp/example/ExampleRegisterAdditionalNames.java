@@ -3,10 +3,6 @@ package net.respectnetwork.sdk.csp.example;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.URLEncoder;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 import net.respectnetwork.sdk.csp.BasicCSP;
@@ -14,11 +10,8 @@ import net.respectnetwork.sdk.csp.BasicCSPInformation;
 import net.respectnetwork.sdk.csp.CSP;
 import net.respectnetwork.sdk.csp.discount.NeustarRNCampaignCode;
 import net.respectnetwork.sdk.csp.discount.NeustarRNDiscountCode;
-import net.respectnetwork.sdk.csp.discount.RespectNetworkRNDiscountCode;
-import xdi2.client.exceptions.Xdi2ClientException;
 import xdi2.core.xri3.CloudName;
 import xdi2.core.xri3.CloudNumber;
-import xdi2.core.xri3.XDI3Segment;
 
 public class ExampleRegisterAdditionalNames {
 
@@ -43,7 +36,7 @@ public class ExampleRegisterAdditionalNames {
 
 		try {
 
-			System.out.print("Enter Cloud Name (leave blank for a random one): ");
+			System.out.print("Enter Existing CloudNumber ( To add name to ): ");
 			
 			String cloudNumberString = new BufferedReader(new InputStreamReader(System.in)).readLine();
 			existingCloudNumber = CloudNumber.create(cloudNumberString);
@@ -55,7 +48,8 @@ public class ExampleRegisterAdditionalNames {
 				System.exit(0);
 			}
 			
-			
+		    System.out.print("Enter Additional CloudName: ");
+
 			String cloudNameString = new BufferedReader(new InputStreamReader(System.in)).readLine();
 			if (cloudNameString.trim().isEmpty()) cloudNameString = "=dev.test." + UUID.randomUUID().toString();
 			additionalCloudName = CloudName.create(cloudNameString);

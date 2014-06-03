@@ -335,7 +335,8 @@ public interface CSP {
 	 * @throws Xdi2ClientException
 	 */
 	public void registerAdditionalCloudNameInRN(CloudName cloudName, CloudNumber cloudNumber,
-			NeustarRNDiscountCode neustarRNDiscountCode, NeustarRNCampaignCode neustarRNCampaignCode) throws Xdi2ClientException;
+			NeustarRNDiscountCode neustarRNDiscountCode, NeustarRNCampaignCode neustarRNCampaignCode)
+					throws Xdi2ClientException;
 	
 	/**
 	 * Register an additional of New CloudName to Existing CloudNumber in CSP Graph
@@ -344,7 +345,8 @@ public interface CSP {
 	 * @param cloudNumber existing RN Member Cloud Number registered by the calling registrar.
 	 * @throws Xdi2ClientException
 	 */
-	public void registerAdditionalCloudNameInCSP(CloudName cloudName, CloudNumber cloudNumber) throws Xdi2ClientException;
+	public void registerAdditionalCloudNameInCSP(CloudName cloudName, CloudNumber cloudNumber)
+			throws Xdi2ClientException;
 	
 	
 	/**
@@ -355,6 +357,49 @@ public interface CSP {
 	 * @param userSecretToken secret token for user to allow updates to their graph.
 	 * @throws Xdi2ClientException
 	 */
-	public void registerAdditionalCloudNameInCloud(CloudName cloudName, CloudNumber cloudNumber, String userSecretToken) throws Xdi2ClientException;
+	public void registerAdditionalCloudNameInCloud(CloudName cloudName, CloudNumber cloudNumber,
+			String userSecretToken) throws Xdi2ClientException;
+	
+	
+	/*
+	 * Methods for Adding/Registering Business Name
+	 */
+	
+	/**
+     * Register a Business Cloud Name associated with a CloudNumber
+     * 
+	 * @param businessCloudName  the name that should be registered on the authority
+	 * @param businessCloudNumber the authority that should be created or added to
+	 * @param contactCloudNumber the billing contact for the business cloud
+	 * @throws Xdi2ClientException
+	 */
+	public void registerBusinessNameInRN(CloudName businessCloudName, CloudNumber businessCloudNumber,
+			CloudNumber contactCloudNumber) throws Xdi2ClientException;
+	
+	
+	/**
+     * Register a Business Cloud Name associated with a CloudNumber in the CSP Graph
+     * 
+	 * @param businessCloudName  the name that should be registered on the authority
+	 * @param businessCloudNumber the authority that should be created or added to
+ 	 * @param contactCloudNumber the billing contact for the business cloud
+	 * @throws Xdi2ClientException
+	 */
+	public void registerBusinessNameInCSP(CloudName businessCloudName, CloudNumber businessCloudNumber,
+			CloudNumber contactCloudNumber) throws Xdi2ClientException;
+	
+	
+	/**
+     * Register a Business Cloud Name associated with a CloudNumber in the User Graph
+     * 
+	 * @param businessCloudName  the name that should be registered on the authority
+	 * @param businessCloudNumber the authority that should be created or added to
+ 	 * @param contactCloudNumber the billing contact for the business cloud
+	 * @throws Xdi2ClientException
+	 */
+	public void registerBusinessNameInCloud(CloudName businessCloudName, CloudNumber businessCloudNumber,
+			CloudNumber contactCloudNumber) throws Xdi2ClientException;
+	
+	
     
 }
