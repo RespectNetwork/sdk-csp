@@ -45,13 +45,22 @@ public interface CSP {
 	 */
 
 	/**
-	 * This method checks if a Cloud Name has been registered in the RN Registration Service.
-	 * @return A Cloud Number if the Cloud Name has been registered, otherwise null.
+	 * This method checks if a Cloud Name is available in the RN Registration Service.
+	 * @return True, if the Cloud Name is available, false otherwise.
 	 * Used in:
 	 *   [A] Not used
 	 *   [B] Not used
 	 */
-	public CloudNumber checkCloudNameAvailableInRN(CloudName cloudName) throws Xdi2ClientException;
+	public boolean checkCloudNameAvailableInRN(CloudName cloudName) throws Xdi2ClientException;
+
+	/**
+	 * This method checks if a Cloud Name has been registered in the RN Registration Service.
+	 * @return The Cloud Number if the Cloud Name has been registered, false otherwise.
+	 * Used in:
+	 *   [A] Not used
+	 *   [B] Not used
+	 */
+	public CloudNumber checkCloudNameInRN(CloudName cloudName) throws Xdi2ClientException;
 
 	/**
 	 * This method checks if a verified phone number and verified e-mail address have been registered in the RN Member Graph Service.

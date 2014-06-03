@@ -77,9 +77,9 @@ public class RegisterUser extends AbstractTester {
 
     		// step 3: Check if the Cloud Name is available
 
-    		CloudNumber existingCloudNumber = csp.checkCloudNameAvailableInRN(cloudName);
+    		boolean available = csp.checkCloudNameAvailableInRN(cloudName);
 
-    		if (existingCloudNumber != null) throw new RuntimeException("Cloud Name " + cloudName + " is already registered with Cloud Number " + existingCloudNumber + ".");
+    		if (! available) throw new RuntimeException("Cloud Name " + cloudName + " is not available.");
 
     		// Step 4: Check if the phone number and e-mail address are available
 

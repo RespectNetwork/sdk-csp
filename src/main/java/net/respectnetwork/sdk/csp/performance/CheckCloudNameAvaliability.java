@@ -36,24 +36,24 @@ public class CheckCloudNameAvaliability extends AbstractTester {
 
     public void execute() throws TestException {
         
-        CloudNumber cloudNumber;
+        boolean available;
         
         try {
 
             BasicCSPInformation cspInformation = super.getCspInformation();          
             
             CSP csp = new BasicCSP(cspInformation);
-            cloudNumber = csp.checkCloudNameAvailableInRN(CloudName
+            available = csp.checkCloudNameAvailableInRN(CloudName
                     .create(this.cloudName));
             
         } catch (Xdi2ClientException e) {
             throw new TestException(e.getMessage());
         }
 
-        if (cloudNumber == null) {
-            System.out.println("Cloud Name " + this.cloudName + " does not exist.");
+        if (! available) {
+            System.out.println("Cloud Name " + this.cloudName + " is not available.");
         } else {
-            System.out.println("Cloud Name " + this.cloudName + " with Cloud Number = " + cloudNumber );
+            System.out.println("Cloud Name " + this.cloudName + " is available.");
         }
 
 	}

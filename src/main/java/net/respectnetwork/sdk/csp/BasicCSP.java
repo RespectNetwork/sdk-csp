@@ -35,6 +35,7 @@ import xdi2.client.constants.XDIClientConstants;
 import xdi2.client.exceptions.Xdi2ClientException;
 import xdi2.client.http.XDIHttpClient;
 import xdi2.core.ContextNode;
+import xdi2.core.Literal;
 import xdi2.core.Relation;
 import xdi2.core.Statement;
 import xdi2.core.constants.XDIAuthenticationConstants;
@@ -94,6 +95,8 @@ public class BasicCSP implements CSP {
 
 	public static final XDI3Segment XRI_S_FIRST_MEMBER = XDI3Segment.create("#first#member");
 
+	public static final XDI3Segment XRI_S_AVAILABLE = XDI3Segment.create("#available");
+
 	private CSPInformation cspInformation;
 
 	private XDIClient xdiClientCSPRegistry;
@@ -152,9 +155,9 @@ public class BasicCSP implements CSP {
 	}
 
 	@Override
-	public CloudNumber checkCloudNameAvailableInRN(CloudName cloudName) throws Xdi2ClientException {
+	public boolean checkCloudNameAvailableInRN(CloudName cloudName) throws Xdi2ClientException {
 
-		CloudNumber cloudNumber = null;
+		boolean available;
 
 		// prepare message to RN
 
@@ -166,6 +169,45 @@ public class BasicCSP implements CSP {
 		XDI3Segment targetAddress = XDI3Segment.fromComponent(cloudName.getPeerRootXri());
 
 		message.createGetOperation(targetAddress);
+
+		// send message and read result
+
+		this.prepareMessageToRN(message);
+		
+		log.debug("checkCloudNameAvailableInRN :: Message envelope to RN \n" );
+		printMessage(messageEnvelope);
+		
+		MessageResult messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope, null);
+
+		Literal literal = messageResult.getGraph().getDeepLiteral(XDI3Util.concatXris(XDI3Segment.fromComponent(cloudName.getPeerRootXri()), XRI_S_AVAILABLE, XDIConstants.XRI_S_VALUE));
+		if (literal == null) throw new Xdi2ClientException("No availability literal found in result.", null);
+
+		Boolean literalDataBoolean = literal.getLiteralDataBoolean();
+		if (literalDataBoolean == null) throw new Xdi2ClientException("No availability boolean value found in result.", null);
+
+		available = literalDataBoolean.booleanValue();
+		
+		// done
+
+		log.debug("In RN: For Cloud Name " + cloudName + " found availability " + available);
+		return available;
+	}
+
+	@Override
+	public CloudNumber checkCloudNameInRN(CloudName cloudName) throws Xdi2ClientException {
+
+		CloudNumber cloudNumber = null;
+
+		// prepare message to RN
+
+		MessageEnvelope messageEnvelope = new MessageEnvelope();
+		MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
+
+		Message message = messageCollection.createMessage();
+
+		XDI3Statement targetStatement = XDI3Statement.fromComponents(XDI3Segment.fromComponent(cloudName.getPeerRootXri()), XDIDictionaryConstants.XRI_S_IS_REF, XDIConstants.XRI_S_VARIABLE);
+
+		message.createGetOperation(targetStatement);
 
 		// send message and read result
 

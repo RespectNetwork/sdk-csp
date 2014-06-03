@@ -88,7 +88,7 @@ public class ExampleRegister {
 
 		// step 3: Check if the Cloud Name is available
 
-		CloudNumber existingCloudNumber = csp.checkCloudNameAvailableInRN(cloudName);
+		CloudNumber existingCloudNumber = csp.checkCloudNameInRN(cloudName);
 
 		if (existingCloudNumber != null) throw new RuntimeException("Cloud Name " + cloudName + " is already registered with Cloud Number " + existingCloudNumber + ".");
 

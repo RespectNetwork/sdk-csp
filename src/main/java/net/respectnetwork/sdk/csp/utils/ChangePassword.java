@@ -94,7 +94,7 @@ public class ChangePassword
                   .create("[+]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa"),
             registrationSvcURL,
             XDI3Segment
-                  .create("[+]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa$to#registrar$from$do"),
+                  .create("([+]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa/#registrar)$do"),
             null, discoveryClient);
 
       System.out.println("CSP Information:\n" + cspInformation.toString());

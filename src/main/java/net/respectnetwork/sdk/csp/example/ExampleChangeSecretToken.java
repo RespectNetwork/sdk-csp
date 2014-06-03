@@ -50,7 +50,7 @@ public class ExampleChangeSecretToken {
 		// Step 1: Look for the Cloud Name's Cloud Number
 		// If we already know the Cloud Number, then this step can be omitted.
 
-		cloudNumber = csp.checkCloudNameAvailableInRN(cloudName);
+		cloudNumber = csp.checkCloudNameInRN(cloudName);
 
 		if (cloudNumber == null) throw new RuntimeException("Cloud Name " + cloudName + " does not exist.");
 

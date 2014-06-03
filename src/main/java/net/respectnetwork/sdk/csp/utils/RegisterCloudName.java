@@ -101,7 +101,7 @@ public class RegisterCloudName
                   .create("[+]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa"),
             registrationSvcURL,
             XDI3Segment
-                  .create("[+]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa$to#registrar$from$do"),
+                  .create("([+]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa/#registrar)$do"),
             null, discoveryClient);
 
       System.out.println("CSP Information:\n" +cspInformation.toString());
@@ -171,13 +171,12 @@ public class RegisterCloudName
 
          // step 3: Check if the Cloud Name is available
 
-         CloudNumber existingCloudNumber = csp
+         boolean cloudNameAvailable = csp
                .checkCloudNameAvailableInRN(cloudName);
 
-         if (existingCloudNumber != null)
+         if (! cloudNameAvailable)
             throw new RuntimeException("Cloud Name " + cloudName
-                  + " is already registered with Cloud Number "
-                  + existingCloudNumber + ".");
+                  + " is not available.");
 
          // Step 4: Check if the phone number and e-mail address are available
 

@@ -46,7 +46,7 @@ public class ExampleDelete {
 
 		// step 1: Retrieve the Cloud Number
 
-		cloudNumber = csp.checkCloudNameAvailableInRN(cloudName);
+		cloudNumber = csp.checkCloudNameInRN(cloudName);
 
 		// Step 2: Delete Cloud Name
 

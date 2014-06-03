@@ -89,7 +89,7 @@ public class ExampleRegisterAdditionalNames {
 		
 		
 		// Question: Is this sufficient? There are Non RN CloudNumbers
-		CloudNumber registeredCloudNumber = csp.checkCloudNameAvailableInRN(additionalCloudName);
+		CloudNumber registeredCloudNumber = csp.checkCloudNameInRN(additionalCloudName);
 		
 		if (registeredCloudNumber != null ) {
 			System.out.println(additionalCloudName + " is already  registered.");

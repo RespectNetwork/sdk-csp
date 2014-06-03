@@ -46,7 +46,7 @@ public class ExampleCheckCloudNameAvailable {
 
 		// step 1: Check if the Cloud Name is available
 
-		CloudNumber existingCloudNumber = csp.checkCloudNameAvailableInRN(cloudName);
+		CloudNumber existingCloudNumber = csp.checkCloudNameInRN(cloudName);
 
 		// done
 
