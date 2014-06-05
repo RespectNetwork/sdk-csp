@@ -208,7 +208,7 @@ public class BasicCSP implements CSP {
 
 		Message message = messageCollection.createMessage();
 
-		XDI3Statement targetStatement = XDI3Statement.fromComponents(XDI3Segment.fromComponent(cloudName.getPeerRootXri()), XDIDictionaryConstants.XRI_S_IS_REF, XDIConstants.XRI_S_VARIABLE);
+		XDI3Statement targetStatement = XDI3Statement.fromComponents(XDI3Segment.fromComponent(cloudName.getPeerRootXri()), XDIDictionaryConstants.XRI_S_REF, XDIConstants.XRI_S_VARIABLE);
 
 		message.createGetOperation(targetStatement);
 
