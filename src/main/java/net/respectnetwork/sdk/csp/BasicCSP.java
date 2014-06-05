@@ -480,7 +480,7 @@ public class BasicCSP implements CSP {
 		targetStatementsSet.add(XDI3Statement.fromRelationComponents(
 				PublicLinkContract.createPublicLinkContractXri(cloudNumber.getXri()),
 				XDILinkContractConstants.XRI_S_GET,
-				XDI3Segment.fromComponent(XDI3SubSegment.fromComponents(null, false, false, null, XDI3XRef.fromComponents(XDIConstants.XS_ROOT, null, XDI3Statement.fromRelationComponents(cloudName.getXri(), XDIDictionaryConstants.XRI_S_REF, cloudNumber.getXri()), null, null, null, null)))));
+				XDI3Util.concatXris(XDI3Segment.fromComponent(PublicLinkContract.createPublicLinkContractXri(cloudNumber.getXri()).getFirstSubSegment()), XDI3Segment.fromComponent(XDI3SubSegment.fromComponents(null, false, false, null, XDI3XRef.fromComponents(XDIConstants.XS_ROOT, null, XDI3Statement.fromRelationComponents(cloudName.getXri(), XDIDictionaryConstants.XRI_S_REF, cloudNumber.getXri()), null, null, null, null))))));
 
 		message.createSetOperation(targetStatementsSet.iterator());
 
@@ -891,7 +891,7 @@ public class BasicCSP implements CSP {
 			targetStatementsSet.add(XDI3Statement.fromRelationComponents(
 					PublicLinkContract.createPublicLinkContractXri(cloudNumber.getXri()),
 					XDILinkContractConstants.XRI_S_GET,
-					XDI3Util.concatXris(cloudNumber.getXri(), entry.getKey(), XDIClientConstants.XRI_S_AS_URI)));
+					XDI3Util.concatXris(XDI3Segment.fromComponent(PublicLinkContract.createPublicLinkContractXri(cloudNumber.getXri()).getFirstSubSegment()), cloudNumber.getXri(), entry.getKey(), XDIClientConstants.XRI_S_AS_URI)));
 		}
 
 		this.prepareMessageToCloud(message, cloudNumber, secretToken);
@@ -932,7 +932,7 @@ public class BasicCSP implements CSP {
 			targetStatementsSet.add(XDI3Statement.fromRelationComponents(
 					PublicLinkContract.createPublicLinkContractXri(cloudNumber.getXri()),
 					XDILinkContractConstants.XRI_S_GET,
-					XDI3Util.concatXris(cloudNumber.getXri(), entry.getKey(), XDIClientConstants.XRI_S_AS_URI)));
+					XDI3Util.concatXris(XDI3Segment.fromComponent(PublicLinkContract.createPublicLinkContractXri(cloudNumber.getXri()).getFirstSubSegment()), cloudNumber.getXri(), entry.getKey(), XDIClientConstants.XRI_S_AS_URI)));
 		}
 
 		this.prepareMessageToCloud(message, cloudNumber, secretToken);
