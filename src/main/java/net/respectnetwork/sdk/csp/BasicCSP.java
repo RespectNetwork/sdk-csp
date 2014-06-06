@@ -480,7 +480,7 @@ public class BasicCSP implements CSP {
 		targetStatementsSet.add(XDI3Statement.fromRelationComponents(
 				PublicLinkContract.createPublicLinkContractXri(cloudNumber.getXri()),
 				XDILinkContractConstants.XRI_S_GET,
-				XDI3Util.concatXris(XDI3Segment.fromComponent(PublicLinkContract.createPublicLinkContractXri(cloudNumber.getXri()).getFirstSubSegment()), XDI3Segment.fromComponent(XDI3SubSegment.fromComponents(null, false, false, null, XDI3XRef.fromComponents(XDIConstants.XS_ROOT, null, XDI3Statement.fromRelationComponents(cloudName.getXri(), XDIDictionaryConstants.XRI_S_REF, cloudNumber.getXri()), null, null, null, null))))));
+				XDI3Segment.fromComponent(XDI3SubSegment.fromComponents(null, false, false, null, XDI3XRef.fromComponents(XDIConstants.XS_ROOT, null, XDI3Statement.fromRelationComponents(cloudName.getXri(), XDIDictionaryConstants.XRI_S_REF, cloudNumber.getXri()), null, null, null, null)))));
 
 		message.createSetOperation(targetStatementsSet.iterator());
 
