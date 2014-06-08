@@ -3,21 +3,14 @@ package net.respectnetwork.sdk.csp.example;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.URLEncoder;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 import net.respectnetwork.sdk.csp.BasicCSP;
 import net.respectnetwork.sdk.csp.BasicCSPInformation;
 import net.respectnetwork.sdk.csp.CSP;
-import net.respectnetwork.sdk.csp.discount.NeustarRNDiscountCode;
-import net.respectnetwork.sdk.csp.discount.RespectNetworkRNDiscountCode;
 import xdi2.core.constants.XDIConstants;
 import xdi2.core.xri3.CloudName;
 import xdi2.core.xri3.CloudNumber;
-import xdi2.core.xri3.XDI3Segment;
 
 public class ExampleRegisterBusinessName {
 
@@ -59,9 +52,14 @@ public class ExampleRegisterBusinessName {
 			}
 			
 			System.out.print("Enter Business Contact  Cloud Number (leave blank for a random one): ");
+			
 			String contactCloudNumberString = new BufferedReader(new InputStreamReader(System.in)).readLine();
-			if (contactCloudNumberString.trim().isEmpty()) contactCloudNumber = CloudNumber.createRandom(XDIConstants.CS_AUTHORITY_PERSONAL);
-           
+			
+			if (contactCloudNumberString.trim().isEmpty()) {
+				contactCloudNumber = CloudNumber.createRandom(XDIConstants.CS_AUTHORITY_PERSONAL);
+			} else {
+			    contactCloudNumber = CloudNumber.create(contactCloudNumberString);
+			}
 
 			if (contactCloudNumber == null) {
 

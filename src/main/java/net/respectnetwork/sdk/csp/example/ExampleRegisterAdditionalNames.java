@@ -26,10 +26,10 @@ public class ExampleRegisterAdditionalNames {
 
 
 	/* Discount Code */
-	private static NeustarRNDiscountCode additionalNameDiscountCode = NeustarRNDiscountCode.OnePersonOneName;
+	private static NeustarRNDiscountCode additionalNameDiscountCode = NeustarRNDiscountCode.FirstFiveNames;
 	
 	/* Campaign Code */
-	private static NeustarRNCampaignCode additionalNameRNCampaignCode = NeustarRNCampaignCode.FirstFiveNames;
+	private static NeustarRNCampaignCode additionalNameRNCampaignCode = NeustarRNCampaignCode.FirstMillion;
 
 
 	static {
