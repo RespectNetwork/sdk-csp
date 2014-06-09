@@ -79,16 +79,14 @@ public class ExampleRegisterBusinessName {
 
 		BasicCSPInformation cspInformation = new CSPInformationTestCSPOTE();
 
+		CSP csp = new BasicCSP(cspInformation);
 		cspInformation.retrieveCspSignaturePrivateKey();
 		cspInformation.setRnCspSecretToken(null);
 
-		CSP csp = new BasicCSP(cspInformation);
+		// step 1: Check if the Cloud Name is available
 
-		// Step 1: Register Business Cloud Name and Create Member Graph Entry.
-		
-		// @TODO Question: Is this sufficient? There are Non RN CloudNumbers!!
-		// Call Check Availability  Instead for  more Valid Test!!!
-		boolean available = csp.checkCloudNameAvailableInRN(businessCloudName);
+		//CloudNumber existingCloudNumber = csp.checkCloudNameInRN(cloudName);
+		boolean available =  csp.checkCloudNameAvailableInRN(businessCloudName);
 		
 		if (! available) {
 			System.out.println(businessCloudName + " is not available.");

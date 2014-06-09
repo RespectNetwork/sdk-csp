@@ -98,7 +98,7 @@ public class BasicCSP implements CSP {
 
 	public static final XDI3Segment XRI_S_FIRST_MEMBER = XDI3Segment.create("#first#member");
 
-	public static final XDI3Segment XRI_S_AVAILABLE = XDI3Segment.create("#available");
+	public static final XDI3Segment XRI_S_AVAILABLE = XDI3Segment.create("<#available>");
 
 	private CSPInformation cspInformation;
 
@@ -181,8 +181,13 @@ public class BasicCSP implements CSP {
 		printMessage(messageEnvelope);
 		
 		MessageResult messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope, null);
+		
+		//{"(=cloudname)<#available>&/&":false}
+		
+		XDI3Segment availableSegment = XDI3Util.concatXris(XDI3Segment.fromComponent(cloudName.getPeerRootXri()), XRI_S_AVAILABLE, XDIConstants.XRI_S_VALUE);
 
-		Literal literal = messageResult.getGraph().getDeepLiteral(XDI3Util.concatXris(XDI3Segment.fromComponent(cloudName.getPeerRootXri()), XRI_S_AVAILABLE, XDIConstants.XRI_S_VALUE));
+		Literal literal = messageResult.getGraph().getDeepLiteral(availableSegment);
+		
 		if (literal == null) throw new Xdi2ClientException("No availability literal found in result.", null);
 
 		Boolean literalDataBoolean = literal.getLiteralDataBoolean();
