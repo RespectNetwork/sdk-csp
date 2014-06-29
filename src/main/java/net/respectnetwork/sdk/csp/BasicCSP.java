@@ -967,14 +967,14 @@ public class BasicCSP implements CSP {
 		if (verifiedPhone != null) {
 
 			targetStatementsSet.add(XDI3Statement.fromLiteralComponents(
-					XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_AS_VERIFIED_PHONE, XDIConstants.XRI_S_VALUE),
+					XDI3Util.concatXris(cloudNumber.getXri(), XRI_S_AS_VERIFIED_PHONE, XDIConstants.XRI_S_VALUE),
 					verifiedPhone));
 		}
 
 		if (verifiedEmail != null) {
 
 			targetStatementsSet.add(XDI3Statement.fromLiteralComponents(
-					XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_AS_VERIFIED_EMAIL, XDIConstants.XRI_S_VALUE),
+					XDI3Util.concatXris(cloudNumber.getXri(), XRI_S_AS_VERIFIED_EMAIL, XDIConstants.XRI_S_VALUE),
 					verifiedEmail));
 		}
 
