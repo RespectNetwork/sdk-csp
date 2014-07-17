@@ -1,10 +1,7 @@
 package net.respectnetwork.sdk.csp;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 import java.net.URLEncoder;
 import java.security.GeneralSecurityException;
 import java.security.PrivateKey;
@@ -21,12 +18,7 @@ import net.respectnetwork.sdk.csp.discount.NeustarRNCampaignCode;
 import net.respectnetwork.sdk.csp.discount.NeustarRNDiscountCode;
 import net.respectnetwork.sdk.csp.discount.RespectNetworkRNDiscountCode;
 import net.respectnetwork.sdk.csp.discount.XDIDiscountCodeConstants;
-import net.respectnetwork.sdk.csp.exception.CoreRNServiceException;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,11 +62,6 @@ import xdi2.messaging.MessageEnvelope;
 import xdi2.messaging.MessageResult;
 import xdi2.messaging.Operation;
 import xdi2.messaging.error.ErrorMessageResult;
-
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 public class BasicCSP implements CSP {
 
@@ -1146,19 +1133,6 @@ public class BasicCSP implements CSP {
 		if (secretToken != null) {
 
 			message.setSecretToken(secretToken);
-		}
-
-		if (this.getCspInformation().getCspSignaturePrivateKey() != null) {
-
-			KeyPairSignature signature = (KeyPairSignature) message.createSignature(KeyPairSignature.DIGEST_ALGORITHM_SHA, 256, KeyPairSignature.KEY_ALGORITHM_RSA, 2048, true);
-
-			try {
-
-				signature.sign(this.getCspInformation().getCspSignaturePrivateKey());
-			} catch (GeneralSecurityException ex) {
-
-				throw new RuntimeException(ex.getMessage(), ex);
-			}
 		}
 	}
 	
