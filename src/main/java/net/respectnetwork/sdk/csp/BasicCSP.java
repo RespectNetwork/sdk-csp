@@ -46,13 +46,16 @@ import xdi2.core.features.timestamps.Timestamps;
 import xdi2.core.impl.memory.MemoryGraph;
 import xdi2.core.impl.memory.MemoryGraphFactory;
 import xdi2.core.io.XDIWriterRegistry;
+import xdi2.core.util.GraphUtil;
 import xdi2.core.util.XDI3Util;
 import xdi2.core.util.iterators.IteratorArrayMaker;
 import xdi2.core.util.iterators.MappingCloudNameIterator;
 import xdi2.core.util.iterators.MappingCloudNumberIterator;
 import xdi2.core.util.iterators.MappingRelationTargetContextNodeXriIterator;
+import xdi2.core.util.iterators.MappingStatementXriIterator;
 import xdi2.core.util.iterators.NotNullIterator;
 import xdi2.core.util.iterators.ReadOnlyIterator;
+import xdi2.core.util.iterators.SelectingNotImpliedStatementIterator;
 import xdi2.core.xri3.CloudName;
 import xdi2.core.xri3.CloudNumber;
 import xdi2.core.xri3.XDI3Segment;
@@ -471,12 +474,13 @@ public class BasicCSP implements CSP {
 				cloudName.getXri()));
 
 		Graph publicLinkContractGraph = MemoryGraphFactory.getInstance().openGraph();
+		GraphUtil.setOwnerXri(publicLinkContractGraph, cloudNumber.getXri());
 		PublicLinkContract publicLinkContract = PublicLinkContract.findPublicLinkContract(publicLinkContractGraph, true);
 		publicLinkContract.setPermissionTargetStatement(XDILinkContractConstants.XRI_S_GET, XDI3Statement.fromRelationComponents(cloudName.getXri(), XDIDictionaryConstants.XRI_S_REF, cloudNumber.getXri()));
 
-		for (Statement publicLinkContractStatement : publicLinkContractGraph.getAllStatements()) {
+		for (XDI3Statement publicLinkContractStatementXri : new MappingStatementXriIterator(new SelectingNotImpliedStatementIterator(publicLinkContractGraph.getAllStatements()))) {
 
-			targetStatementsSet.add(publicLinkContractStatement.getXri());
+			targetStatementsSet.add(publicLinkContractStatementXri);
 		}
 
 		message.createSetOperation(targetStatementsSet.iterator());
@@ -626,9 +630,9 @@ public class BasicCSP implements CSP {
 			XdiInnerRoot expirationTimeXdiInnerRoot = XdiLocalRoot.findLocalRoot(expirationTimeGraph).getInnerRoot(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_MEMBER, true);
 			expirationTimeXdiInnerRoot.getContextNode().setStatement(XDI3Statement.fromLiteralComponents(XDI3Util.concatXris(cloudNumber.getXri(), XRI_S_AS_MEMBER_EXPIRATION_TIME, XDIConstants.XRI_S_VALUE), Timestamps.timestampToString(expirationTime)));
 
-			for (Statement expirationTimeStatement : expirationTimeGraph.getAllStatements()) {
+			for (XDI3Statement expirationTimeStatementXri : new MappingStatementXriIterator(new SelectingNotImpliedStatementIterator(expirationTimeGraph.getAllStatements()))) {
 
-				targetStatements.add(expirationTimeStatement.getXri());
+				targetStatements.add(expirationTimeStatementXri);
 			}
 		}
 
