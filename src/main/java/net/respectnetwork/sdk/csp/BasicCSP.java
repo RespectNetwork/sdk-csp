@@ -2184,5 +2184,70 @@ public class BasicCSP implements CSP {
 
 	}
 
+	@Override
+	public void updatePhoneInRN(CloudNumber cloudNumber, String verifiedPhone, String oldVerifiedPhone) throws Xdi2ClientException {
+
+		// prepare message to RN
+
+		MessageEnvelope messageEnvelope = new MessageEnvelope();
+		MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
+
+		Message message = messageCollection.createMessage();
+
+		List<XDI3Statement> targetStatementsSet = new ArrayList<XDI3Statement> ();
+
+		if (oldVerifiedPhone != null) {
+			targetStatementsSet.add(XDI3Statement.fromRelationComponents(
+					XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_AC_VERIFIED_DIGEST_PHONE, XDI3Segment.fromComponent(XdiAbstractMemberUnordered.createDigestArcXri(oldVerifiedPhone, true))),
+					XRI_S_IS_PHONE,
+					cloudNumber.getXri()));
+		}
+
+		this.prepareMessageToRN(message);
+		message.createDelOperation(targetStatementsSet.iterator());
+
+		// send message
+		this.getXdiClientRNRegistrationService().send(messageEnvelope, null);
+
+		//update(set) new phone number
+		setPhoneAndEmailInRN(cloudNumber, verifiedPhone, null);
+		// done
+
+		log.debug("Updated RN: Verified phone " + oldVerifiedPhone + " with new  Verified phone " + verifiedPhone + " for Cloud Number " + cloudNumber);		
+	}
+
+	@Override
+	public void updateEmailInRN(CloudNumber cloudNumber, String verifiedEmail, String oldVerifiedEmail) throws Xdi2ClientException {
+
+		// prepare message to RN
+
+		MessageEnvelope messageEnvelope = new MessageEnvelope();
+		MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
+
+		Message message = messageCollection.createMessage();
+
+		List<XDI3Statement> targetStatementsSet = new ArrayList<XDI3Statement> ();
+
+		if (oldVerifiedEmail != null) {
+			targetStatementsSet.add(XDI3Statement.fromRelationComponents(
+					XDI3Util.concatXris(this.getCspInformation().getRnCloudNumber().getXri(), XRI_S_AC_VERIFIED_DIGEST_EMAIL, XDI3Segment.fromComponent(XdiAbstractMemberUnordered.createDigestArcXri(oldVerifiedEmail, true))),
+					XRI_S_IS_EMAIL,
+					cloudNumber.getXri()));
+		}
+
+		this.prepareMessageToRN(message);
+		message.createDelOperation(targetStatementsSet.iterator());
+
+		// send message
+		this.getXdiClientRNRegistrationService().send(messageEnvelope, null);
+
+		//update(set) new email
+		setPhoneAndEmailInRN(cloudNumber, null, verifiedEmail);
+		// done
+
+		log.debug("Updated RN: Verified phone " + oldVerifiedEmail + " with new  Verified phone " + verifiedEmail + " for Cloud Number " + cloudNumber);	
+		
+	}
+
 
 }

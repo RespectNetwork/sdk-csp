@@ -400,6 +400,22 @@ public interface CSP {
 	public void registerBusinessNameInCloud(CloudName businessCloudName, CloudNumber businessCloudNumber,
 			CloudNumber contactCloudNumber) throws Xdi2ClientException;
 	
+	/**
+	 * updates phone number for a given cloud number with new phone number
+	 * @param cloudNumber
+	 * @param verifiedPhone
+	 * @param oldVerifiedPhone
+	 * @throws Xdi2ClientException
+	 */
+	public void updatePhoneInRN(CloudNumber cloudNumber, String verifiedPhone, String oldVerifiedPhone ) throws Xdi2ClientException;	
 	
+	/**
+	 * updates email for a given cloud number with new email
+	 * @param cloudNumber
+	 * @param verifiedEmail
+	 * @param oldVerifiedEmail
+	 * @throws Xdi2ClientException
+	 */
+	public void updateEmailInRN(CloudNumber cloudNumber, String verifiedEmail, String oldVerifiedEmail ) throws Xdi2ClientException;	
     
 }
