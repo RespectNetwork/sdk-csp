@@ -2249,5 +2249,38 @@ public class BasicCSP implements CSP {
 		
 	}
 
+	@Override
+	public CloudNumber getMemberRegistrar(CloudNumber cloudNumber) throws Xdi2ClientException {
+
+		// prepare message to CSP
+
+		MessageEnvelope messageEnvelope = new MessageEnvelope();
+		MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
+
+		Message message = messageCollection.createMessage();
+
+
+		XDI3Statement targetAddress = XDI3Statement.fromRelationComponents(cloudNumber.getXri(), XDIDictionaryConstants.XRI_S_REGISTRAR, XDIConstants.XRI_S_VARIABLE);
+		message.createGetOperation(targetAddress);
+
+		// send message and read results
+
+		this.prepareMessageToRN(message);
+		
+		MessageResult messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope, null);
+
+		Relation relation = messageResult.getGraph().getDeepRelation(cloudNumber.getXri(), XDIDictionaryConstants.XRI_S_REGISTRAR);
+		CloudNumber cspCloudNumber = null;
+		if (relation != null) {
+			cspCloudNumber = CloudNumber.fromXri(relation.getTargetContextNodeXri());
+		}
+
+		// done
+
+		log.debug("In RN: For Cloud Number " + cloudNumber + " found CSP Cloud Number " + cspCloudNumber);
+		return cspCloudNumber;
+	
+	}
+
 
 }

@@ -417,5 +417,14 @@ public interface CSP {
 	 * @throws Xdi2ClientException
 	 */
 	public void updateEmailInRN(CloudNumber cloudNumber, String verifiedEmail, String oldVerifiedEmail ) throws Xdi2ClientException;	
+	
+	/**
+	 * retrieves csp cloudNumber for a member
+	 * @param cloudNumber
+	 * @return
+	 * @throws Xdi2ClientException
+	 */
+	public CloudNumber getMemberRegistrar(CloudNumber cloudNumber) throws Xdi2ClientException;
+	
     
 }
