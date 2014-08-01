@@ -91,6 +91,8 @@ public class BasicCSP implements CSP {
 	public static final XDI3Segment XRI_S_FIRST_MEMBER = XDI3Segment.create("#first#member");
 
 	public static final XDI3Segment XRI_S_AS_AVAILABLE = XDI3Segment.create("<#available>");
+	
+	public static final XDI3Segment XRI_S_REGISTRAR = XDI3Segment.create("#registrar");
 
 	private CSPInformation cspInformation;
 
@@ -2260,7 +2262,7 @@ public class BasicCSP implements CSP {
 		Message message = messageCollection.createMessage();
 
 
-		XDI3Statement targetAddress = XDI3Statement.fromRelationComponents(cloudNumber.getXri(), XDIDictionaryConstants.XRI_S_REGISTRAR, XDIConstants.XRI_S_VARIABLE);
+		XDI3Statement targetAddress = XDI3Statement.fromRelationComponents(cloudNumber.getXri(),XRI_S_REGISTRAR, XDIConstants.XRI_S_VARIABLE);
 		message.createGetOperation(targetAddress);
 
 		// send message and read results
@@ -2269,7 +2271,7 @@ public class BasicCSP implements CSP {
 		
 		MessageResult messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope, null);
 
-		Relation relation = messageResult.getGraph().getDeepRelation(cloudNumber.getXri(), XDIDictionaryConstants.XRI_S_REGISTRAR);
+		Relation relation = messageResult.getGraph().getDeepRelation(cloudNumber.getXri(), XRI_S_REGISTRAR);
 		CloudNumber cspCloudNumber = null;
 		if (relation != null) {
 			cspCloudNumber = CloudNumber.fromXri(relation.getTargetContextNodeXri());
