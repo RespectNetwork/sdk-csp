@@ -2284,5 +2284,51 @@ public class BasicCSP implements CSP {
 	
 	}
 
+	@Override
+	public void transferCloudInCSP(CloudNumber cloudNumber, CloudName[] cloudNames, String secretToken) throws Xdi2ClientException{		
+		//register cloud in CSP
+		registerCloudInCSP(cloudNumber, secretToken);
+		
+		//register cloudNames in CSP
+		MessageEnvelope messageEnvelope = new MessageEnvelope();
+		MessageCollection messageCollection = this.createMessageCollectionToCSP(messageEnvelope);
 
+		Message message = messageCollection.createMessage();
+		List<XDI3Statement> targetStatementsSet = new ArrayList<XDI3Statement> ();
+		for(CloudName cloudName:cloudNames){
+			targetStatementsSet.add(XDI3Statement.fromRelationComponents(
+					XDI3Segment.fromComponent(cloudName.getPeerRootXri()), 
+					XDIDictionaryConstants.XRI_S_REF, 
+					XDI3Segment.fromComponent(cloudNumber.getPeerRootXri())));
+
+			targetStatementsSet.add(XDI3Statement.fromRelationComponents(
+					XDI3Segment.fromComponent(cloudNumber.getPeerRootXri()),
+					XDIDictionaryConstants.XRI_S_IS_REF, 
+					XDI3Segment.fromComponent(cloudName.getPeerRootXri())));
+		}
+		message.createSetOperation(targetStatementsSet.iterator());
+		// send message
+
+		this.prepareMessageToCSP(message);
+		log.debug("registerCloudNamesInCSP :: Message  "+ messageEnvelope.getGraph().toString());
+		this.getXdiClientCSPRegistry().send(messageEnvelope, null);
+
+		//set registrar
+		setCloudXdiEndpointInCSP(cloudNumber, null);
+	}
+	
+	@Override
+	public void deleteCloudInCSP(CloudNumber cloudNumber, String secretToken) throws Xdi2ClientException{
+		// prepare message to CSP
+		MessageEnvelope messageEnvelope = new MessageEnvelope();
+		MessageCollection messageCollection = this.createMessageCollectionToCSP(messageEnvelope);
+		Message message = messageCollection.createMessage();
+		
+		XDI3Segment targetAddress = XDI3Segment.fromComponent(cloudNumber.getPeerRootXri());
+		message.createDelOperation(targetAddress);
+
+		// send message
+		this.prepareMessageToCSP(message);
+		this.getXdiClientCSPRegistry().send(messageEnvelope, null);
+	}
 }

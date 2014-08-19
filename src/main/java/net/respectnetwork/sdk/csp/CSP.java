@@ -425,6 +425,23 @@ public interface CSP {
 	 * @throws Xdi2ClientException
 	 */
 	public CloudNumber getMemberRegistrar(CloudNumber cloudNumber) throws Xdi2ClientException;
-	
+
+	/**
+	 * deletes cloud in CSP
+	 * @param cloudNumber
+	 * @param secretToken
+	 * @throws Xdi2ClientException
+	 */
+	public void deleteCloudInCSP(CloudNumber cloudNumber, String secretToken) throws Xdi2ClientException;
+
+	/**
+	 * transfers users cloud to a different csp
+	 * @param cloudNumber
+	 * @param cloudNames
+	 * @param secretToken
+	 * @throws Xdi2ClientException
+	 */
+	public void transferCloudInCSP(CloudNumber cloudNumber, CloudName[] cloudNames, String secretToken) throws Xdi2ClientException;
+
     
 }
