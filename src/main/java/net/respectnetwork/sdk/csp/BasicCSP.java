@@ -2331,4 +2331,65 @@ public class BasicCSP implements CSP {
 		this.prepareMessageToCSP(message);
 		this.getXdiClientCSPRegistry().send(messageEnvelope, null);
 	}
+	
+	
+	@Override
+	public void changeMemberRegistrarInRN(CloudNumber cloudNumber) throws Xdi2ClientException {
+		//check if cloudNumber has a registrar assignd already
+		CloudNumber currentMemberRegistrar = getMemberRegistrar(cloudNumber);
+		//delete existing registrar
+		if(currentMemberRegistrar!=null){
+			deleteMemberRegistrar(cloudNumber, currentMemberRegistrar);
+		}
+		currentMemberRegistrar = getMemberRegistrar(cloudNumber);
+		//if delete successfull update with new registrar
+		if(currentMemberRegistrar==null){
+			// prepare message to CSP
+	
+			MessageEnvelope messageEnvelope = new MessageEnvelope();
+			MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
+	
+			Message message = messageCollection.createMessage();
+	
+	
+			XDI3Statement targetAddress = XDI3Statement.fromRelationComponents(cloudNumber.getXri(),XRI_S_REGISTRAR,getCspInformation().getCspCloudNumber().getXri());
+			message.createSetOperation(targetAddress);
+	
+			// send message and read results
+	
+			this.prepareMessageToRN(message);
+			
+			this.getXdiClientRNRegistrationService().send(messageEnvelope, null);
+	
+			log.debug("In RN: updated member registrar for:" + cloudNumber +" with CSP Cloud Number: "+getCspInformation().getCspCloudNumber().getXri());
+		}
+	}
+	
+	/**
+	 * deletes current member registrar for cloud number
+	 * @param cloudNumber
+	 * @param oldMemberRegistrar
+	 * @throws Xdi2ClientException
+	 */
+	private void deleteMemberRegistrar(CloudNumber cloudNumber, CloudNumber currentMemberRegistrar) throws Xdi2ClientException {
+
+		// prepare message to CSP
+		MessageEnvelope messageEnvelope = new MessageEnvelope();
+		MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
+
+		Message message = messageCollection.createMessage();
+
+		List<XDI3Statement> targetStatementsDel = new ArrayList<XDI3Statement> ();
+		XDI3Statement targetAddress = XDI3Statement.fromRelationComponents(cloudNumber.getXri(),XRI_S_REGISTRAR,currentMemberRegistrar.getXri());
+		targetStatementsDel.add(targetAddress);
+		message.createDelOperation(targetStatementsDel.iterator());
+
+		// send message and read results
+		this.prepareMessageToRN(message);
+		this.getXdiClientRNRegistrationService().send(messageEnvelope, null);
+
+
+		log.debug("Deleted current member registrar for:" + cloudNumber);
+	
+	}
 }

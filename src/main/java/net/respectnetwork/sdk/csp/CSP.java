@@ -443,5 +443,11 @@ public interface CSP {
 	 */
 	public void transferCloudInCSP(CloudNumber cloudNumber, CloudName[] cloudNames, String secretToken) throws Xdi2ClientException;
 
+	/**
+	 * change member registrar for a given cloud number, deletes current member registrar
+	 * @param cloudNumber
+	 * @throws Xdi2ClientException
+	 */
+	public void changeMemberRegistrarInRN(CloudNumber cloudNumber) throws Xdi2ClientException;
     
 }
