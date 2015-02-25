@@ -449,5 +449,12 @@ public interface CSP {
 	 * @throws Xdi2ClientException
 	 */
 	public void changeMemberRegistrarInRN(CloudNumber cloudNumber) throws Xdi2ClientException;
-    
+	/**
+     * This method checks if a Cloud Name has been registered in the CSP Cloud.
+     * @return The Cloud Number if the Cloud Name has been registered, false otherwise.
+     * Used in:
+     *   [A] Not used
+     *   [B] Not used
+     */
+    public CloudNumber checkCloudNameInCSP(CloudName cloudName) throws Xdi2ClientException;
 }
