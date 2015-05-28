@@ -399,7 +399,13 @@ public interface CSP {
 	 */
 	public void registerBusinessNameInCloud(CloudName businessCloudName, CloudNumber businessCloudNumber,
 			CloudNumber contactCloudNumber) throws Xdi2ClientException;
-	
+	/**
+     * This method checks that Cloud Name exist in the CSP Cloud.
+     * @param cloudName
+	 * @return
+	 * @throws Xdi2ClientException
+	 */
+	public CloudNumber checkCloudNameInCSP(CloudName cloudName) throws Xdi2ClientException;
 	
     
 }
