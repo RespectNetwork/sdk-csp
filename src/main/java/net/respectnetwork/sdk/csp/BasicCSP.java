@@ -35,8 +35,11 @@ import xdi2.core.constants.XDIAuthenticationConstants;
 import xdi2.core.constants.XDIConstants;
 import xdi2.core.constants.XDIDictionaryConstants;
 import xdi2.core.constants.XDILinkContractConstants;
+import xdi2.core.features.linkcontracts.GenericLinkContract;
 import xdi2.core.features.linkcontracts.PublicLinkContract;
 import xdi2.core.features.linkcontracts.RootLinkContract;
+import xdi2.core.features.linkcontracts.policy.PolicyAnd;
+import xdi2.core.features.linkcontracts.policy.PolicyUtil;
 import xdi2.core.features.nodetypes.XdiAbstractMemberUnordered;
 import xdi2.core.features.nodetypes.XdiInnerRoot;
 import xdi2.core.features.nodetypes.XdiLocalRoot;
@@ -1220,16 +1223,41 @@ public class BasicCSP implements CSP {
 			throw new Xdi2ClientException("Consent required for this operation", new ErrorMessageResult());
 		}
 
-		message2.createSetOperation(targetStatements2.iterator());
+	// Set link contract and policies so that parent/guardian can fetch all
+        // the information from child's cloud.
+        Graph parentChildLinkContractGraph = MemoryGraphFactory.getInstance().openGraph();
+        GenericLinkContract linkContract = GenericLinkContract.findGenericLinkContract(parentChildLinkContractGraph,
+                dependent.getXri(), guardian.getXri(), XDI3Segment.create(""), true);
 
-		// send message
-		String cloudXdiEndpoint2 = this.makeCloudXdiEndpoint(dependent);
-		XDIClient xdiClientCloud2 = new XDIHttpClient(cloudXdiEndpoint2);
-		log.debug("setGuardianshipInCloud :: Message2  " + messageEnvelope2.getGraph().toString());
-		xdiClientCloud2.send(messageEnvelope2, null);
+        PolicyAnd policy = linkContract.getPolicyRoot(true).createAndPolicy(true);
+        PolicyUtil.createSenderIsOperator(policy, guardian.getXri());
+        PolicyUtil.createSignatureValidOperator(policy);
 
-		// done
-		log.debug("In Dependent User Cloud: Creating Guardian Relationship between " + dependent.toString() + " and " + guardian.toString() );
+        linkContract.setPermissionTargetAddress(XDILinkContractConstants.XRI_S_ALL,
+                XDI3Util.concatXris(XDIConstants.XRI_S_ROOT));
+
+        log.info("Sending following XDI data to child cloud: {}",
+                parentChildLinkContractGraph.toString("XDI DISPLAY", null));
+        MessageEnvelope msgEnvelope = new MessageEnvelope();
+        Message parentChildMsg = msgEnvelope.createMessage(dependent.getXri());
+        parentChildMsg.setToPeerRootXri(dependent.getPeerRootXri());
+        parentChildMsg.setLinkContractXri(RootLinkContract.createRootLinkContractXri(dependent.getXri()));
+        parentChildMsg.setSecretToken(dependentToken);
+        parentChildMsg.createSetOperation(parentChildLinkContractGraph);
+
+        message2.createSetOperation(targetStatements2.iterator());
+
+        // send message
+        String cloudXdiEndpoint2 = this.makeCloudXdiEndpoint(dependent);
+        XDIClient xdiClientCloud2 = new XDIHttpClient(cloudXdiEndpoint2);
+        log.debug("setGuardianshipInCloud :: Message2  " + messageEnvelope2.getGraph().toString());
+        xdiClientCloud2.send(messageEnvelope2, null);
+        log.debug("setGuardianshipInCloud :: parent child link contract ");
+        printMessage(msgEnvelope);
+        xdiClientCloud2.send(msgEnvelope, null);
+        // done
+        log.debug("In Dependent User Cloud: Creating Guardian Relationship between " + dependent.toString() + " and "
+                + guardian.toString());
 
 	}
 
@@ -2182,6 +2210,41 @@ public class BasicCSP implements CSP {
 		return targetStatements;
 
 
+	}
+ 	@Override
+	public CloudNumber checkCloudNameInCSP(CloudName cloudName) throws Xdi2ClientException {
+        CloudNumber cloudNumber = null;
+
+        // prepare message to RN
+        MessageEnvelope messageEnvelope = new MessageEnvelope();
+        MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
+
+        Message message = messageCollection.createMessage();
+
+        XDI3Statement targetStatement = XDI3Statement.fromComponents(
+                XDI3Segment.fromComponent(cloudName.getPeerRootXri()), XDIDictionaryConstants.XRI_S_REF,
+                XDIConstants.XRI_S_VARIABLE);
+
+        message.createGetOperation(targetStatement);
+
+        // send message and read result
+	    this.prepareMessageToCSP(message);
+
+	    log.debug("checkCloudNameInCSP :: Message envelope to CSP \n");
+	    printMessage(messageEnvelope);
+
+	    MessageResult messageResult = this.getXdiClientCSPRegistry().send(messageEnvelope, null);
+
+	    Relation relation = messageResult.getGraph().getDeepRelation(
+	             XDI3Segment.fromComponent(cloudName.getPeerRootXri()), XDIDictionaryConstants.XRI_S_REF);
+
+	    if (relation != null) {
+           cloudNumber = CloudNumber.fromPeerRootXri(relation.getTargetContextNodeXri());
+	    }
+
+	   // done
+	   log.debug("In CSP: For Cloud Name " + cloudName + " found Cloud Number " + cloudNumber);
+           return cloudNumber;
 	}
 
 
