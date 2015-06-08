@@ -403,12 +403,13 @@ public class BasicCSP implements CSP {
 		MessageResult messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope, null);
 
 		log.debug("registerCloudNameInRN :: Message Response " + messageResult.getGraph().toString());
-		Relation relation = messageResult.getGraph().getDeepRelation(XDI3Segment.fromComponent(cloudName.getPeerRootXri()), XDIDictionaryConstants.XRI_S_REF);
+		// Not required in the new native XDI registry. So commenting this for now and later on can be removed.
+		/*Relation relation = messageResult.getGraph().getDeepRelation(XDI3Segment.fromComponent(cloudName.getPeerRootXri()), XDIDictionaryConstants.XRI_S_REF);
 		if (relation == null) throw new RuntimeException("Cloud Name not registered.");
 
 		CloudNumber registeredCloudNumber = CloudNumber.fromPeerRootXri(relation.getTargetContextNodeXri());
 		if (! registeredCloudNumber.equals(cloudNumber)) throw new RuntimeException("Registered Cloud Number " + registeredCloudNumber + " does not match requested Cloud Number " + cloudNumber);
-
+        */
 		// done
 
 		log.debug("In RN: Cloud Name " + cloudName + " registered with Cloud Number " + cloudNumber);
@@ -1761,14 +1762,14 @@ public class BasicCSP implements CSP {
 		MessageResult messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope, null);
 
 		log.debug("registerAdditionalCloudNameInRN :: Message Response " + messageResult.getGraph().toString());
-		Relation relation = messageResult.getGraph().getDeepRelation(XDI3Segment.fromComponent(cloudName.getPeerRootXri()), XDIDictionaryConstants.XRI_S_REF);
+		/*Relation relation = messageResult.getGraph().getDeepRelation(XDI3Segment.fromComponent(cloudName.getPeerRootXri()), XDIDictionaryConstants.XRI_S_REF);
 
 		if (relation == null) throw new RuntimeException("Additional Cloud Name not registered.");
 
 		CloudNumber registeredCloudNumber = CloudNumber.fromPeerRootXri(relation.getTargetContextNodeXri());
 		if (! registeredCloudNumber.equals(cloudNumber)) throw new RuntimeException("Registered Cloud Number "
 				+ registeredCloudNumber + " does not match requested Cloud Number " + cloudNumber);
-
+        */
 		// done
 
 		log.debug("In RN: Additional Cloud Name " + cloudName + " registered with Cloud Number " + cloudNumber);
