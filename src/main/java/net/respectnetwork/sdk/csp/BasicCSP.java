@@ -35,6 +35,7 @@ import xdi2.core.constants.XDIAuthenticationConstants;
 import xdi2.core.constants.XDIConstants;
 import xdi2.core.constants.XDIDictionaryConstants;
 import xdi2.core.constants.XDILinkContractConstants;
+import xdi2.core.features.linkcontracts.GenericLinkContract;
 import xdi2.core.features.linkcontracts.PublicLinkContract;
 import xdi2.core.features.linkcontracts.RootLinkContract;
 import xdi2.core.features.linkcontracts.policy.PolicyAnd;
