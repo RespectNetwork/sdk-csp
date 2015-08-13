@@ -2,10 +2,8 @@ package net.respectnetwork.sdk.csp;
 
 import java.io.Serializable;
 import java.net.URI;
-import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.security.PrivateKey;
-
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

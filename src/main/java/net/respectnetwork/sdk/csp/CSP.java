@@ -399,13 +399,62 @@ public interface CSP {
 	 */
 	public void registerBusinessNameInCloud(CloudName businessCloudName, CloudNumber businessCloudNumber,
 			CloudNumber contactCloudNumber) throws Xdi2ClientException;
+
 	/**
-     * This method checks that Cloud Name exist in the CSP Cloud.
-     * @param cloudName
+	 * updates phone number for a given cloud number with new phone number
+	 * @param cloudNumber
+	 * @param verifiedPhone
+	 * @param oldVerifiedPhone
+	 * @throws Xdi2ClientException
+	 */
+	public void updatePhoneInRN(CloudNumber cloudNumber, String verifiedPhone, String oldVerifiedPhone ) throws Xdi2ClientException;	
+
+	/**
+	 * updates email for a given cloud number with new email
+	 * @param cloudNumber
+	 * @param verifiedEmail
+	 * @param oldVerifiedEmail
+	 * @throws Xdi2ClientException
+	 */
+	public void updateEmailInRN(CloudNumber cloudNumber, String verifiedEmail, String oldVerifiedEmail ) throws Xdi2ClientException;	
+	
+	/**
+	 * retrieves csp cloudNumber for a member
+	 * @param cloudNumber
 	 * @return
 	 * @throws Xdi2ClientException
 	 */
-	public CloudNumber checkCloudNameInCSP(CloudName cloudName) throws Xdi2ClientException;
-	
-    
+	public CloudNumber getMemberRegistrar(CloudNumber cloudNumber) throws Xdi2ClientException;
+
+	/**
+	 * deletes cloud in CSP
+	 * @param cloudNumber
+	 * @param secretToken
+	 * @throws Xdi2ClientException
+	 */
+	public void deleteCloudInCSP(CloudNumber cloudNumber, String secretToken) throws Xdi2ClientException;
+
+	/**
+	 * transfers users cloud to a different csp
+	 * @param cloudNumber
+	 * @param cloudNames
+	 * @param secretToken
+	 * @throws Xdi2ClientException
+	 */
+	public void transferCloudInCSP(CloudNumber cloudNumber, CloudName[] cloudNames, String secretToken) throws Xdi2ClientException;
+
+	/**
+	 * change member registrar for a given cloud number, deletes current member registrar
+	 * @param cloudNumber
+	 * @throws Xdi2ClientException
+	 */
+	public void changeMemberRegistrarInRN(CloudNumber cloudNumber) throws Xdi2ClientException;
+	/**
+     * This method checks if a Cloud Name has been registered in the CSP Cloud.
+     * @return The Cloud Number if the Cloud Name has been registered, false otherwise.
+     * Used in:
+     *   [A] Not used
+     *   [B] Not used
+     */
+    public CloudNumber checkCloudNameInCSP(CloudName cloudName) throws Xdi2ClientException;
 }

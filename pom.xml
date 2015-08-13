@@ -5,7 +5,7 @@
 	<groupId>net.respectnetwork</groupId>
 	<artifactId>sdk-csp</artifactId>
 	<packaging>jar</packaging>
-	<version>0.4.3</version>
+	<version>0.5-SNAPSHOT</version>
 	<name>sdk-csp</name>
 	<description>Respect Network SDK for CSPs</description>
 
@@ -31,6 +31,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<github.global.server>github</github.global.server>
 		<org.slf4j-version>1.7.5</org.slf4j-version>
+                <xdi2-version>0.8-SNAPSHOT</xdi2-version>
 	</properties>
 
 	<build>
@@ -136,7 +137,7 @@
 		<dependency>
 			<groupId>xdi2</groupId>
 			<artifactId>xdi2-client</artifactId>
-			<version>0.8-SNAPSHOT</version>
+			<version>${xdi2-version}</version>
 			<scope>compile</scope>
 		</dependency>
         

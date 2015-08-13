@@ -6,20 +6,20 @@ import xdi2.core.syntax.CloudNumber;
 import xdi2.core.syntax.XDIAddress;
 import xdi2.discovery.XDIDiscoveryClient;
 
-public class CSPInformationTestCSPOTE extends BasicCSPInformation {
+public class CSPInformationEmmettStage extends BasicCSPInformation {
 
 	private static final long serialVersionUID = -1186435920408698291L;
 
-	public CSPInformationTestCSPOTE() {
+	public CSPInformationEmmettStage() {
 
 		super(
-				CloudNumber.create("[+]!:uuid:20e3d77c-5a0e-44d5-b949-85153fbb6577"),
-				"https://mycloud-stg.cloudnames.biz/testcsp-registry",
-				"https://mycloud-stg.cloudnames.biz/testcsp-users/",
-				"whitelabel123",
+				CloudNumber.create("[+]!:uuid:690404d0-df12-4a60-a98c-fd975ea79e5b"),
+				"https://mycloud-stg.cloudnames.biz/emmettglobal-registry",
+				"https://mycloud-stg.cloudnames.biz/emmettglobal-users/",
+				"P3hpJ0ErjqIq",
 				null,
 				CloudNumber.create("[+]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa"),
-				"https://registration-ote.respectnetwork.net/registration",
+				"http://registration-stage.respectnetwork.net/registration",
 				XDIAddress.create("([+]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa/#registrar)$do"),
 				null,
 				XDIDiscoveryClient.NEUSTAR_OTE_DISCOVERY_CLIENT
