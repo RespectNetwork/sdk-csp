@@ -8,9 +8,9 @@ import net.respectnetwork.sdk.csp.discount.NeustarRNCampaignCode;
 import net.respectnetwork.sdk.csp.discount.NeustarRNDiscountCode;
 import net.respectnetwork.sdk.csp.discount.RespectNetworkRNDiscountCode;
 import xdi2.client.exceptions.Xdi2ClientException;
-import xdi2.core.xri3.CloudName;
-import xdi2.core.xri3.CloudNumber;
-import xdi2.core.xri3.XDI3Segment;
+import xdi2.core.syntax.CloudName;
+import xdi2.core.syntax.CloudNumber;
+import xdi2.core.syntax.XDIAddress;
 
 /**
  * This interface represents CSP-related functionality of this SDK to communicate with
@@ -215,13 +215,13 @@ public interface CSP {
 	 *   [A] 2.1.1.4
 	 *   [B] 3.1.1.4
 	 */
-	public void setCloudServicesInCloud(CloudNumber cloudNumber, String secretToken, Map<XDI3Segment, String> services) throws Xdi2ClientException;
+	public void setCloudServicesInCloud(CloudNumber cloudNumber, String secretToken, Map<XDIAddress, String> services) throws Xdi2ClientException;
 
 	
 	/**
 	 * Management Utility for setting CSP Service EndPoints in the CSP  Cloud
      */
-	public void setCloudServicesForCSPInCSP(CloudNumber cloudNumber, String secretToken, String cspXdiEndpoint, Map<XDI3Segment, String> services) throws Xdi2ClientException;
+	public void setCloudServicesForCSPInCSP(CloudNumber cloudNumber, String secretToken, String cspXdiEndpoint, Map<XDIAddress, String> services) throws Xdi2ClientException;
 
 	/**
 	 * This method registers or updates a verified phone number and verified e-mail address in the User's Cloud.

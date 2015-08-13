@@ -15,9 +15,9 @@ import net.respectnetwork.sdk.csp.discount.RespectNetworkRNDiscountCode;
 import org.apache.commons.lang.RandomStringUtils;
 
 import xdi2.client.exceptions.Xdi2ClientException;
-import xdi2.core.xri3.CloudName;
-import xdi2.core.xri3.CloudNumber;
-import xdi2.core.xri3.XDI3Segment;
+import xdi2.core.syntax.CloudName;
+import xdi2.core.syntax.CloudNumber;
+import xdi2.core.syntax.XDIAddress;
 
 public class RegisterUser extends AbstractTester {
     
@@ -69,9 +69,9 @@ public class RegisterUser extends AbstractTester {
 
     		// step 2: Set Cloud Services in Cloud
 
-    		Map<XDI3Segment, String> services = new HashMap<XDI3Segment, String> ();
+    		Map<XDIAddress, String> services = new HashMap<XDIAddress, String> ();
 
-    		services.put(XDI3Segment.create("<$https><$connect><$xdi>"), "https://mycloud-ote.neustar.biz/users/" + URLEncoder.encode(cloudNumber.toString(), "UTF-8") + "/connect/request");
+    		services.put(XDIAddress.create("<$https><$connect><$xdi>"), "https://mycloud-ote.neustar.biz/users/" + URLEncoder.encode(cloudNumber.toString(), "UTF-8") + "/connect/request");
 
     		csp.setCloudServicesInCloud(cloudNumber, secretToken, services);
 

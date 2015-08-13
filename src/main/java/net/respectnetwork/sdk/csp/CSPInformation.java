@@ -2,8 +2,8 @@ package net.respectnetwork.sdk.csp;
 
 import java.security.PrivateKey;
 
-import xdi2.core.xri3.CloudNumber;
-import xdi2.core.xri3.XDI3Segment;
+import xdi2.core.syntax.CloudNumber;
+import xdi2.core.syntax.XDIAddress;
 
 /**
  * This interface represents information required for using the SDK.
@@ -26,6 +26,6 @@ public interface CSPInformation {
 
 	public CloudNumber getRnCloudNumber();
 	public String getRnRegistrationServiceXdiEndpoint();
-	public XDI3Segment getRnCspLinkContract();
+	public XDIAddress getRnCspLinkContract();
 	public String getRnCspSecretToken();
 }

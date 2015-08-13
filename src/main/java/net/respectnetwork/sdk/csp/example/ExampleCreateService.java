@@ -8,9 +8,9 @@ import java.util.Map;
 import net.respectnetwork.sdk.csp.BasicCSP;
 import net.respectnetwork.sdk.csp.BasicCSPInformation;
 import net.respectnetwork.sdk.csp.CSP;
-import xdi2.core.xri3.CloudName;
-import xdi2.core.xri3.CloudNumber;
-import xdi2.core.xri3.XDI3Segment;
+import xdi2.core.syntax.CloudName;
+import xdi2.core.syntax.CloudNumber;
+import xdi2.core.syntax.XDIAddress;
 
 public class ExampleCreateService {
 
@@ -70,8 +70,8 @@ public class ExampleCreateService {
         // Get CloudNumber from CloudName
 		CloudNumber cloudNumber = cspInformation.getCspCloudNumber();
 		
-		Map<XDI3Segment, String> services = new HashMap<XDI3Segment, String> ();
-		services.put(XDI3Segment.create(serviceXDI), serviceURI);
+		Map<XDIAddress, String> services = new HashMap<XDIAddress, String> ();
+		services.put(XDIAddress.create(serviceXDI), serviceURI);
 		String cspXDIEndPoint = cspInformation.getCspRegistryXdiEndpoint() + "graph";
 		csp.setCloudServicesForCSPInCSP(cloudNumber, cspInformation.getCspSecretToken(), cspXDIEndPoint, services);
 
