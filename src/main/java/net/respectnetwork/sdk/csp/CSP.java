@@ -399,6 +399,7 @@ public interface CSP {
 	 */
 	public void registerBusinessNameInCloud(CloudName businessCloudName, CloudNumber businessCloudNumber,
 			CloudNumber contactCloudNumber) throws Xdi2ClientException;
+<<<<<<< HEAD
 	
 	/**
 	 * updates phone number for a given cloud number with new phone number
@@ -449,5 +450,14 @@ public interface CSP {
 	 * @throws Xdi2ClientException
 	 */
 	public void changeMemberRegistrarInRN(CloudNumber cloudNumber) throws Xdi2ClientException;
+=======
+	/**
+         * This method checks that Cloud Name exist in the CSP Cloud.
+         * @param cloudName
+	 * @return
+	 * @throws Xdi2ClientException
+	 */
+	public CloudNumber checkCloudNameInCSP(CloudName cloudName) throws Xdi2ClientException;
+>>>>>>> d5b513c598e394897f8af0334b387b87c9567ba9
     
 }

@@ -5,7 +5,11 @@
 	<groupId>net.respectnetwork</groupId>
 	<artifactId>sdk-csp</artifactId>
 	<packaging>jar</packaging>
+<<<<<<< HEAD
 	<version>0.5-SNAPSHOT</version>
+=======
+	<version>0.4.3</version>
+>>>>>>> d5b513c598e394897f8af0334b387b87c9567ba9
 	<name>sdk-csp</name>
 	<description>Respect Network SDK for CSPs</description>
 
@@ -137,7 +141,11 @@
 		<dependency>
 			<groupId>xdi2</groupId>
 			<artifactId>xdi2-client</artifactId>
+<<<<<<< HEAD
 			<version>${xdi2-version}</version>
+=======
+			<version>0.6</version>
+>>>>>>> d5b513c598e394897f8af0334b387b87c9567ba9
 			<scope>compile</scope>
 		</dependency>
         
