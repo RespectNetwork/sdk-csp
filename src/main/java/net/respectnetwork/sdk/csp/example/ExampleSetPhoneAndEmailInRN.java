@@ -12,8 +12,8 @@ import net.respectnetwork.sdk.csp.BasicCSP;
 import net.respectnetwork.sdk.csp.BasicCSPInformation;
 import net.respectnetwork.sdk.csp.CSP;
 import net.respectnetwork.sdk.csp.CSPInformation;
-import xdi2.core.xri3.CloudName;
-import xdi2.core.xri3.CloudNumber;
+import xdi2.core.syntax.CloudName;
+import xdi2.core.syntax.CloudNumber;
 
 public class ExampleSetPhoneAndEmailInRN {
 
@@ -69,7 +69,7 @@ public class ExampleSetPhoneAndEmailInRN {
 			
 			// Step 3: Set phone & email
 			csp.setPhoneAndEmailInRN(cloudNumber, phone, email);
-			System.out.println("Set phone & email for cloudNumber: "+cloudNumber.getXri().toString());
+			System.out.println("Set phone & email for cloudNumber: "+cloudNumber.getXDIAddress().toString());
 			
 			// Step 3: Verify phone & email is set for correct cloudNumber
 			CloudNumber[] existingCloudNumbers = csp.checkPhoneAndEmailAvailableInRN(phone, email);
@@ -79,7 +79,7 @@ public class ExampleSetPhoneAndEmailInRN {
 	
 			System.out.println("Cloud Numbers for verifiedPhone & verifiedEmail  is "+existingCloudNumbersSet.size());
 			if(existingCloudNumbersSet.size()==1 && existingCloudNumbersSet.iterator().next().equals(cloudNumber)){
-				System.out.println("Verified phone & email  for cloudNUmber: "+cloudNumber.getXri().toString());
+				System.out.println("Verified phone & email  for cloudNUmber: "+cloudNumber.getXDIAddress().toString());
 			}
 		}else{
 			System.out.println("Cloud Name : "+cloudName+" does not exist");

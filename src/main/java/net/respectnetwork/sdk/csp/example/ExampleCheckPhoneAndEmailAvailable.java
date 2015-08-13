@@ -5,7 +5,7 @@ import java.util.Arrays;
 import net.respectnetwork.sdk.csp.BasicCSP;
 import net.respectnetwork.sdk.csp.CSP;
 import net.respectnetwork.sdk.csp.CSPInformation;
-import xdi2.core.xri3.CloudNumber;
+import xdi2.core.syntax.CloudNumber;
 
 public class ExampleCheckPhoneAndEmailAvailable {
 

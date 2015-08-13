@@ -2,8 +2,8 @@ package net.respectnetwork.sdk.csp.example;
 
 import net.respectnetwork.sdk.csp.BasicCSPInformation;
 import net.respectnetwork.sdk.csp.ssl.TLSv1Support;
-import xdi2.core.xri3.CloudNumber;
-import xdi2.core.xri3.XDI3Segment;
+import xdi2.core.syntax.CloudNumber;
+import xdi2.core.syntax.XDIAddress;
 import xdi2.discovery.XDIDiscoveryClient;
 
 public class CSPInformationTestCSPStage extends BasicCSPInformation {
@@ -20,7 +20,7 @@ public class CSPInformationTestCSPStage extends BasicCSPInformation {
 				null,
 				CloudNumber.create("[+]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa"),
 				"https://registration-stage.respectnetwork.net/registration",
-				XDI3Segment.create("([+]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa/#registrar)$do"),
+				XDIAddress.create("([+]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa/#registrar)$do"),
 				null,
 				XDIDiscoveryClient.NEUSTAR_OTE_DISCOVERY_CLIENT
 				);

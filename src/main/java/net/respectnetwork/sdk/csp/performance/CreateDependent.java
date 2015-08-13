@@ -11,9 +11,9 @@ import net.respectnetwork.sdk.csp.BasicCSPInformation;
 import net.respectnetwork.sdk.csp.CSP;
 import xdi2.client.exceptions.Xdi2ClientException;
 import xdi2.client.util.XDIClientUtil;
-import xdi2.core.xri3.CloudName;
-import xdi2.core.xri3.CloudNumber;
-import xdi2.core.xri3.XDI3Segment;
+import xdi2.core.syntax.CloudName;
+import xdi2.core.syntax.CloudNumber;
+import xdi2.core.syntax.XDIAddress;
 import xdi2.discovery.XDIDiscoveryClient;
 import xdi2.discovery.XDIDiscoveryResult;
 
@@ -142,21 +142,18 @@ public class CreateDependent extends AbstractTester {
             
             try {
                 XDIDiscoveryResult guardianRegistry = discovery.discoverFromRegistry(
-                        XDI3Segment.create(guardianCloudName.toString()), null);
+                        XDIAddress.create(guardianCloudName.toString()));
                 
                 XDIDiscoveryResult dependentRegistry = discovery.discoverFromRegistry(
-                        XDI3Segment.create(dependentCloudName.toString()), null);
+                        XDIAddress.create(dependentCloudName.toString()));
                 
                 guardianCloudNumber = guardianRegistry.getCloudNumber();
                 dependentCloudNumber = dependentRegistry.getCloudNumber();
                 
-                String guardianXdiEndpoint = guardianRegistry.getXdiEndpointUri();
-                String dependentXdiEndpoint = dependentRegistry.getXdiEndpointUri();
-
-                guardianPrivateKey = XDIClientUtil.retrieveSignaturePrivateKey(guardianCloudNumber, guardianXdiEndpoint, guardianToken);
+                guardianPrivateKey = XDIClientUtil.retrieveSignaturePrivateKey(guardianCloudNumber, guardianRegistry.getXdiEndpointUri(), guardianToken);
                 System.out.println("GuardianPrivateKey Algo: " + guardianPrivateKey.getAlgorithm());
 
-                dependentPrivateKey = XDIClientUtil.retrieveSignaturePrivateKey(dependentCloudNumber, dependentXdiEndpoint, dependentToken);
+                dependentPrivateKey = XDIClientUtil.retrieveSignaturePrivateKey(dependentCloudNumber, dependentRegistry.getXdiEndpointUri(), dependentToken);
                 System.out.println("DependentPrivateKey Algo: " + dependentPrivateKey.getAlgorithm());
                 
 

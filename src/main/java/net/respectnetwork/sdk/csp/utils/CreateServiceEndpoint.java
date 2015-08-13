@@ -11,9 +11,9 @@ import net.respectnetwork.sdk.csp.BasicCSPInformation;
 import net.respectnetwork.sdk.csp.CSP;
 import net.respectnetwork.sdk.csp.ssl.TLSv1Support;
 import xdi2.client.exceptions.Xdi2ClientException;
-import xdi2.core.xri3.CloudName;
-import xdi2.core.xri3.CloudNumber;
-import xdi2.core.xri3.XDI3Segment;
+import xdi2.core.syntax.CloudName;
+import xdi2.core.syntax.CloudNumber;
+import xdi2.core.syntax.XDIAddress;
 import xdi2.discovery.XDIDiscoveryClient;
 import xdi2.discovery.XDIDiscoveryResult;
 
@@ -108,7 +108,7 @@ public class CreateServiceEndpoint
          try
          {
             XDIDiscoveryResult discResult = discoveryClient.discover(
-                  XDI3Segment.create("+" + cspName), null);
+                  XDIAddress.create("+" + cspName));
 
             cspCloudNumber = discResult.getCloudNumber();
             System.out.println("CSP Cloud Number : "
@@ -128,7 +128,7 @@ public class CreateServiceEndpoint
                CloudNumber
                      .create("[+]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa"),
                registrationSvcURL,
-               XDI3Segment
+               XDIAddress
                      .create("([+]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa/#registrar)$do"),
                null, discoveryClient);
 
@@ -156,8 +156,8 @@ public class CreateServiceEndpoint
          // Get CloudNumber from CloudName
          CloudNumber cloudNumber = cspInformation.getCspCloudNumber();
 
-         Map<XDI3Segment, String> services = new HashMap<XDI3Segment, String>();
-         services.put(XDI3Segment.create(serviceXDI), serviceURI);
+         Map<XDIAddress, String> services = new HashMap<XDIAddress, String>();
+         services.put(XDIAddress.create(serviceXDI), serviceURI);
          String cspXDIEndPoint = cspInformation.getCspRegistryXdiEndpoint()
                + "graph";
          csp.setCloudServicesForCSPInCSP(cloudNumber,

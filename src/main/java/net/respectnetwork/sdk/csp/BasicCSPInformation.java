@@ -1,17 +1,17 @@
 package net.respectnetwork.sdk.csp;
 
 import java.io.Serializable;
+import java.net.URI;
 import java.security.GeneralSecurityException;
 import java.security.PrivateKey;
-
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import xdi2.client.exceptions.Xdi2ClientException;
 import xdi2.client.util.XDIClientUtil;
-import xdi2.core.xri3.CloudNumber;
-import xdi2.core.xri3.XDI3Segment;
+import xdi2.core.syntax.CloudNumber;
+import xdi2.core.syntax.XDIAddress;
 import xdi2.discovery.XDIDiscoveryClient;
 import xdi2.discovery.XDIDiscoveryResult;
 
@@ -30,7 +30,7 @@ public class BasicCSPInformation implements CSPInformation, Serializable {
 	private PrivateKey cspSignaturePrivateKey;
 	private CloudNumber rnCloudNumber;
 	private String rnRegistrationServiceXdiEndpoint;
-	private XDI3Segment rnCspLinkContract;
+	private XDIAddress rnCspLinkContract;
 	private String rnCspSecretToken;
 
 	private XDIDiscoveryClient xdiDiscoveryClient;
@@ -45,7 +45,7 @@ public class BasicCSPInformation implements CSPInformation, Serializable {
 
 	}
 
-	public BasicCSPInformation(CloudNumber cspCloudNumber, String cspRegistryXdiEndpoint, String cspCloudBaseXdiEndpoint, String cspSecretToken, PrivateKey cspSignaturePrivateKey, CloudNumber rnCloudNumber, String rnRegistrationServiceXdiEndpoint, XDI3Segment rnCspLinkContract, String rnCspSecretToken, XDIDiscoveryClient xdiDiscoveryClient) {
+	public BasicCSPInformation(CloudNumber cspCloudNumber, String cspRegistryXdiEndpoint, String cspCloudBaseXdiEndpoint, String cspSecretToken, PrivateKey cspSignaturePrivateKey, CloudNumber rnCloudNumber, String rnRegistrationServiceXdiEndpoint, XDIAddress rnCspLinkContract, String rnCspSecretToken, XDIDiscoveryClient xdiDiscoveryClient) {
 
 		this.cspCloudNumber = cspCloudNumber;
 		this.cspRegistryXdiEndpoint = cspRegistryXdiEndpoint;
@@ -64,8 +64,8 @@ public class BasicCSPInformation implements CSPInformation, Serializable {
 	public void retrieveCspSignaturePrivateKey() throws Xdi2ClientException, GeneralSecurityException {
 
 	   logger.debug("retrieveCspSignaturePrivateKey");
-		XDIDiscoveryResult xdiDiscoveryResult = this.getXdiDiscoveryClient().discoverFromRegistry(this.getCspCloudNumber().getXri(), null);
-		String cspXdiEndpoint = xdiDiscoveryResult.getXdiEndpointUri();
+		XDIDiscoveryResult xdiDiscoveryResult = this.getXdiDiscoveryClient().discoverFromRegistry(this.getCspCloudNumber().getXDIAddress());
+		URI cspXdiEndpoint = xdiDiscoveryResult.getXdiEndpointUri();
 
 		PrivateKey cspSignaturePrivateKey = XDIClientUtil.retrieveSignaturePrivateKey(this.getCspCloudNumber(), cspXdiEndpoint, this.getCspSecretToken());
 		this.setCspSignaturePrivateKey(cspSignaturePrivateKey);	
@@ -168,12 +168,12 @@ public class BasicCSPInformation implements CSPInformation, Serializable {
 	}
 
 	@Override
-	public XDI3Segment getRnCspLinkContract() {
+	public XDIAddress getRnCspLinkContract() {
 
 		return this.rnCspLinkContract;
 	}
 
-	public void setRnCspLinkContract(XDI3Segment rnCspLinkContract) {
+	public void setRnCspLinkContract(XDIAddress rnCspLinkContract) {
 
 		this.rnCspLinkContract = rnCspLinkContract;
 	}

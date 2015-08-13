@@ -3,7 +3,7 @@ package net.respectnetwork.sdk.csp.model;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
-import xdi2.core.xri3.CloudNumber;
+import xdi2.core.syntax.CloudNumber;
 
 public class CSPUserCredential {
       
