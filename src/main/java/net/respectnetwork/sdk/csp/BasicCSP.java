@@ -128,7 +128,7 @@ public class BasicCSP implements CSP {
 		String cloudXdiEndpoint = this.makeCloudXdiEndpoint(cloudNumber);
 
 		XDIStatement targetStatementSet = XDIStatement.fromLiteralComponents(
-				XDIAddressUtil.concatXDIAddresses(cloudNumber.getXDIAddress(), XDIAddress.create("<$xdi><$uri>&")), 
+				XDIAddressUtil.concatXDIAddresses(cloudNumber.getXDIAddress(), XDIAddress.create("<$xdi><$uri>")), 
 				cloudXdiEndpoint);
 
 		message.createSetOperation(targetStatementSet);
@@ -204,7 +204,7 @@ public class BasicCSP implements CSP {
 
 		Message message = messageCollection.createMessage();
 
-		XDIStatement targetStatement = XDIStatement.fromComponents(XDIAddress.fromComponent(cloudName.getPeerRootXDIArc()), XDIDictionaryConstants.XDI_ADD_REF, XDIConstants.XS_VARIABLE);
+		XDIStatement targetStatement = XDIStatement.fromComponents(XDIAddress.fromComponent(cloudName.getPeerRootXDIArc()), XDIDictionaryConstants.XDI_ADD_REF, XDIConstants.XDI_ADD_COMMON_VARIABLE);
 
 		message.createGetOperation(targetStatement);
 
@@ -310,7 +310,7 @@ public class BasicCSP implements CSP {
 		String cloudXdiEndpoint = this.makeCloudXdiEndpoint(cloudNumber);
 
 		XDIStatement targetStatementSet2 = XDIStatement.fromLiteralComponents(
-				XDIAddressUtil.concatXDIAddresses(cloudNumber.getXDIAddress(), XDIAddress.create("<$xdi><$uri>&")), 
+				XDIAddressUtil.concatXDIAddresses(cloudNumber.getXDIAddress(), XDIAddress.create("<$xdi><$uri>")), 
 				cloudXdiEndpoint);
 
 		message2.createSetOperation(targetStatementSet2);
@@ -365,7 +365,7 @@ public class BasicCSP implements CSP {
 		List<XDIStatement> targetStatementsSet2 = new ArrayList<XDIStatement> ();
 
 		targetStatementsSet2.add(XDIStatement.fromLiteralComponents(
-				XDIAddressUtil.concatXDIAddresses(cloudNumber.getPeerRootXDIArc(), XDIAddress.create("<$xdi><$uri>&")), 
+				XDIAddressUtil.concatXDIAddresses(cloudNumber.getPeerRootXDIArc(), XDIAddress.create("<$xdi><$uri>")), 
 				cloudXdiEndpoint));
 
 		message2.createSetOperation(targetStatementsSet2.iterator());
@@ -555,7 +555,7 @@ public class BasicCSP implements CSP {
 		Message message = messageCollection.createMessage();
 
 		XDIStatement targetStatementSet = XDIStatement.fromLiteralComponents(
-				XDIAddressUtil.concatXDIAddresses(cloudNumber.getPeerRootXDIArc(), XDIAddress.create("<$xdi><$uri>&")), 
+				XDIAddressUtil.concatXDIAddresses(cloudNumber.getPeerRootXDIArc(), XDIAddress.create("<$xdi><$uri>")), 
 				cloudXdiEndpoint);
 
 		message.createSetOperation(targetStatementSet);
@@ -762,7 +762,7 @@ public class BasicCSP implements CSP {
 		Message message = messageCollection.createMessage();
 
 		XDIStatement targetStatementSet = XDIStatement.fromLiteralComponents(
-				XDIAddressUtil.concatXDIAddresses(cloudNumber.getPeerRootXDIArc(), XDIAddress.create("<$xdi><$uri>&")), 
+				XDIAddressUtil.concatXDIAddresses(cloudNumber.getPeerRootXDIArc(), XDIAddress.create("<$xdi><$uri>")), 
 				cloudXdiEndpoint);
 
 		message.createSetOperation(targetStatementSet);
@@ -1581,7 +1581,7 @@ public class BasicCSP implements CSP {
 
 		String xdiDOBFormat = Timestamps.timestampToString(dependentBirthDate);
 		XDIStatement dobStatement = XDIStatement.fromLiteralComponents(
-				XDIAddressUtil.concatXDIAddresses(dependent.getXDIAddress(), XDIAddress.create("<#birth><$t>&")), 
+				XDIAddressUtil.concatXDIAddresses(dependent.getXDIAddress(), XDIAddress.create("<#birth><$t>")), 
 				xdiDOBFormat);
 
 		g.setStatement(dobStatement);
