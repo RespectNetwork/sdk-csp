@@ -18,9 +18,9 @@ import net.respectnetwork.sdk.csp.discount.RespectNetworkRNDiscountCode;
 import net.respectnetwork.sdk.csp.exception.CSPRegistrationException;
 import net.respectnetwork.sdk.csp.ssl.TLSv1Support;
 import xdi2.client.exceptions.Xdi2ClientException;
-import xdi2.core.xri3.CloudName;
-import xdi2.core.xri3.CloudNumber;
-import xdi2.core.xri3.XDI3Segment;
+import xdi2.core.syntax.CloudName;
+import xdi2.core.syntax.CloudNumber;
+import xdi2.core.syntax.XDIAddress;
 import xdi2.discovery.XDIDiscoveryClient;
 import xdi2.discovery.XDIDiscoveryResult;
 
@@ -81,7 +81,7 @@ public class RegisterCloudName
       try
       {
          XDIDiscoveryResult discResult = discoveryClient.discover(
-               XDI3Segment.create("+" + cspName), null);
+               XDIAddress.create("+" + cspName));
          
          cspCloudNumber = discResult.getCloudNumber();
          System.out.println("CSP Cloud Number : " +cspCloudNumber.toString());
@@ -100,7 +100,7 @@ public class RegisterCloudName
             CloudNumber
                   .create("[+]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa"),
             registrationSvcURL,
-            XDI3Segment
+            XDIAddress
                   .create("([+]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa/#registrar)$do"),
             null, discoveryClient);
 
@@ -153,12 +153,12 @@ public class RegisterCloudName
 
          // step 2: Set Cloud Services in Cloud
 
-         Map<XDI3Segment, String> services = new HashMap<XDI3Segment, String>();
+         Map<XDIAddress, String> services = new HashMap<XDIAddress, String>();
 
          try
          {
             services.put(
-                  XDI3Segment.create("<$https><$connect><$xdi>"),
+                    XDIAddress.create("<$https><$connect><$xdi>"),
                   "https://respectconnect.neustar.biz/"
                         + URLEncoder.encode(cloudNumber.toString(), "UTF-8")
                         + "/connect/request");

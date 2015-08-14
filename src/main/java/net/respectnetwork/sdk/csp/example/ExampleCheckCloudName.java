@@ -7,8 +7,8 @@ import java.io.InputStreamReader;
 import net.respectnetwork.sdk.csp.BasicCSP;
 import net.respectnetwork.sdk.csp.BasicCSPInformation;
 import net.respectnetwork.sdk.csp.CSP;
-import xdi2.core.xri3.CloudName;
-import xdi2.core.xri3.CloudNumber;
+import xdi2.core.syntax.CloudName;
+import xdi2.core.syntax.CloudNumber;
 
 public class ExampleCheckCloudName {
 

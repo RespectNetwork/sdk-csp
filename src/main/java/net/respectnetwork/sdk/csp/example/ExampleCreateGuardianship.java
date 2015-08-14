@@ -3,6 +3,7 @@ package net.respectnetwork.sdk.csp.example;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URI;
 import java.security.PrivateKey;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -13,9 +14,9 @@ import net.respectnetwork.sdk.csp.BasicCSPInformation;
 import net.respectnetwork.sdk.csp.CSP;
 import xdi2.client.exceptions.Xdi2ClientException;
 import xdi2.client.util.XDIClientUtil;
-import xdi2.core.xri3.CloudName;
-import xdi2.core.xri3.CloudNumber;
-import xdi2.core.xri3.XDI3Segment;
+import xdi2.core.syntax.CloudName;
+import xdi2.core.syntax.CloudNumber;
+import xdi2.core.syntax.XDIAddress;
 import xdi2.discovery.XDIDiscoveryClient;
 import xdi2.discovery.XDIDiscoveryResult;
 
@@ -103,16 +104,16 @@ public class ExampleCreateGuardianship {
         
         try {
             XDIDiscoveryResult guardianRegistry = discovery.discoverFromRegistry(
-                    XDI3Segment.create(guardianCloudName.toString()), null);
+                    XDIAddress.create(guardianCloudName.toString()));
             
             XDIDiscoveryResult dependentRegistry = discovery.discoverFromRegistry(
-                    XDI3Segment.create(dependentCloudName.toString()), null);
+                    XDIAddress.create(dependentCloudName.toString()));
             
             guardianCloudNumber = guardianRegistry.getCloudNumber();
             dependentCloudNumber = dependentRegistry.getCloudNumber();
             
-            String guardianXdiEndpoint = guardianRegistry.getXdiEndpointUri();
-            String dependentXdiEndpoint = dependentRegistry.getXdiEndpointUri();
+            URI guardianXdiEndpoint = guardianRegistry.getXdiEndpointUri();
+            URI dependentXdiEndpoint = dependentRegistry.getXdiEndpointUri();
 
             guardianPrivateKey = XDIClientUtil.retrieveSignaturePrivateKey(guardianCloudNumber, guardianXdiEndpoint, guardianToken);
             System.out.println("GuardianPrivateKey Algo: " + guardianPrivateKey.getAlgorithm());

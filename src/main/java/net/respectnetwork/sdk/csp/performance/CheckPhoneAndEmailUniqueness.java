@@ -6,7 +6,7 @@ import net.respectnetwork.sdk.csp.BasicCSP;
 import net.respectnetwork.sdk.csp.BasicCSPInformation;
 import net.respectnetwork.sdk.csp.CSP;
 import xdi2.client.exceptions.Xdi2ClientException;
-import xdi2.core.xri3.CloudNumber;
+import xdi2.core.syntax.CloudNumber;
 
 public class CheckPhoneAndEmailUniqueness extends AbstractTester {
     

@@ -8,8 +8,8 @@ import java.util.Set;
 
 import net.respectnetwork.sdk.csp.ssl.TLSv1Support;
 import xdi2.client.exceptions.Xdi2ClientException;
-import xdi2.core.xri3.CloudName;
-import xdi2.core.xri3.XDI3Segment;
+import xdi2.core.syntax.CloudName;
+import xdi2.core.syntax.XDIAddress;
 import xdi2.discovery.XDIDiscoveryClient;
 import xdi2.discovery.XDIDiscoveryResult;
 
@@ -24,7 +24,7 @@ public class CloudNameDiscovery
    /* CHOOSE THE endpoints */
    private static ArrayList<String>  endpoints  = new ArrayList<String>();
 
-   private static XDI3Segment[]      epSegments = null;
+   private static XDIAddress[]      epSegments = null;
 
    static
    {
@@ -66,10 +66,10 @@ public class CloudNameDiscovery
             endpoints.add(endpointAddress);
          }
 
-         epSegments = new XDI3Segment[endpoints.size()];
+         epSegments = new XDIAddress[endpoints.size()];
          for (int i = 0; i < endpoints.size(); i++)
          {
-            epSegments[i] = XDI3Segment.create(endpoints.get(i));
+            epSegments[i] = XDIAddress.create(endpoints.get(i));
          }
 
       } catch (IOException ex)
@@ -87,13 +87,13 @@ public class CloudNameDiscovery
       try
       {
          XDIDiscoveryResult discResult = discovery.discover(
-               XDI3Segment.create(cloudName.toString()), epSegments);
+                 XDIAddress.create(cloudName.toString()), epSegments);
          System.out.println("CloudNumber : " + discResult.getCloudNumber());
          System.out.println("xdi endpoint : " + discResult.getXdiEndpointUri());
          if (discResult.getEndpointUris() != null)
          {
-            Set<XDI3Segment> keyset = discResult.getEndpointUris().keySet();
-            XDI3Segment[] keys = keyset.toArray(new XDI3Segment[0]);
+            Set<XDIAddress> keyset = discResult.getEndpointUris().keySet();
+            XDIAddress[] keys = keyset.toArray(new XDIAddress[0]);
             for (int i = 0; i < keys.length; i++)
             {
                System.out.println("Endpoint Address :" + keys[i] + ", URI : "

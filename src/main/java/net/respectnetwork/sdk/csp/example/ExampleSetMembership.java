@@ -10,8 +10,8 @@ import net.respectnetwork.sdk.csp.CSP;
 import net.respectnetwork.sdk.csp.CSPInformation;
 import net.respectnetwork.sdk.csp.discount.RespectNetworkRNDiscountCode;
 import xdi2.client.exceptions.Xdi2ClientException;
-import xdi2.core.xri3.CloudName;
-import xdi2.core.xri3.CloudNumber;
+import xdi2.core.syntax.CloudName;
+import xdi2.core.syntax.CloudNumber;
 
 public class ExampleSetMembership {
 

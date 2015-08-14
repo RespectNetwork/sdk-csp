@@ -7,8 +7,8 @@ import java.io.InputStreamReader;
 import net.respectnetwork.sdk.csp.BasicCSP;
 import net.respectnetwork.sdk.csp.CSP;
 import net.respectnetwork.sdk.csp.CSPInformation;
-import xdi2.core.xri3.CloudName;
-import xdi2.core.xri3.CloudNumber;
+import xdi2.core.syntax.CloudName;
+import xdi2.core.syntax.CloudNumber;
 
 public class ExampleCloudTransferInCSP {
 
@@ -48,7 +48,7 @@ public class ExampleCloudTransferInCSP {
 		CSPInformation cspInformation2 = new CSPInformationEmmettStage();
 		CSP csp2 = new BasicCSP(cspInformation2);
 		for(CloudName cloudName:cloudNames){
-			System.out.println(cloudName.getXri().toString());
+			System.out.println(cloudName.getXDIAddress().toString());
 		}
 		csp2.transferCloudInCSP(cloudNumber, cloudNames, secretToken);
 		cloudNames = csp2.checkCloudNamesInCSP(cloudNumber);
