@@ -12,7 +12,7 @@ import net.respectnetwork.sdk.csp.CSP;
 import net.respectnetwork.sdk.csp.discount.NeustarRNDiscountCode;
 import net.respectnetwork.sdk.csp.discount.RespectNetworkRNDiscountCode;
 import xdi2.client.exceptions.Xdi2ClientException;
-import xdi2.client.impl.http.XDIHttpClient;
+import xdi2.client.http.XDIHttpClient;
 import xdi2.core.syntax.CloudName;
 import xdi2.core.syntax.CloudNumber;
 import xdi2.core.syntax.XDIAddress;
@@ -82,7 +82,7 @@ public abstract class RegisterCloud {
         System.out.println("Discovery info:" + discoveryClient.toString());
         try {
             XDIDiscoveryResult discResult = discoveryClient.discover(
-                    XDIAddress.create("+" + cspName));
+                    XDIAddress.create("+" + cspName), null);
 
             cspCloudNumber = discResult.getCloudNumber();
             System.out.println("CSP Cloud Number : "

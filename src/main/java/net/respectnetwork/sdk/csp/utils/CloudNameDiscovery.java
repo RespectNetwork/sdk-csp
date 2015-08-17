@@ -89,7 +89,7 @@ public class CloudNameDiscovery
          XDIDiscoveryResult discResult = discovery.discover(
                  XDIAddress.create(cloudName.toString()), epSegments);
          System.out.println("CloudNumber : " + discResult.getCloudNumber());
-         System.out.println("xdi endpoint : " + discResult.getXdiEndpointUri());
+         System.out.println("xdi endpoint : " + discResult.getXdiEndpointUrl());
          if (discResult.getEndpointUris() != null)
          {
             Set<XDIAddress> keyset = discResult.getEndpointUris().keySet();
