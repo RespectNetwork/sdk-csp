@@ -263,12 +263,12 @@ public class BasicCSP implements CSP {
 	    Relation relation2 = contextNode2 == null ? null : contextNode2.getRelation(XRI_S_IS_EMAIL);
 		if (relation1 != null) {
 
-			cloudNumbers[0] = CloudNumber.fromXDIAddress(relation1.getTargetXDIAddress());
+			cloudNumbers[0] = CloudNumber.fromPeerRootXDIArc(relation1.getTargetXDIAddress());
 		}
 
 		if (relation2 != null) {
 
-			cloudNumbers[1] = CloudNumber.fromXDIAddress(relation2.getTargetXDIAddress());
+			cloudNumbers[1] = CloudNumber.fromPeerRootXDIArc(relation2.getTargetXDIAddress());
 		}
 
 		// done
@@ -1902,7 +1902,7 @@ public class BasicCSP implements CSP {
 		if (relation == null) throw new RuntimeException("Additional Cloud Name not registered.");
 
 
-		CloudNumber registeredCloudNumber = CloudNumber.fromXDIAddress(relation.getTargetXDIAddress());
+		CloudNumber registeredCloudNumber = CloudNumber.fromPeerRootXDIArc(relation.getTargetXDIAddress());
 		if (! registeredCloudNumber.equals(businessCloudNumber)) throw new RuntimeException("Registered Cloud Number "
 				+ registeredCloudNumber + " does not match requested Cloud Number " + businessCloudNumber);
 
@@ -2001,7 +2001,7 @@ public class BasicCSP implements CSP {
         if (relation == null) throw new RuntimeException("Additional Cloud Name not registered in CSP Graph.");
 
 
-		CloudNumber registeredCloudNumber = CloudNumber.fromXDIAddress(relation.getTargetXDIAddress());
+		CloudNumber registeredCloudNumber = CloudNumber.fromPeerRootXDIArc(relation.getTargetXDIAddress());
 		if (! registeredCloudNumber.equals(businessCloudNumber)) throw new RuntimeException("Registered Cloud Number "
 				+ registeredCloudNumber + " does not match requested Cloud Number " + businessCloudNumber);
 
@@ -2101,7 +2101,7 @@ public class BasicCSP implements CSP {
         if (relation == null) throw new RuntimeException("Additional Cloud Name not registered in CSP Graph.");
 
 
-		CloudNumber registeredCloudNumber = CloudNumber.fromXDIAddress(relation.getTargetXDIAddress());
+		CloudNumber registeredCloudNumber = CloudNumber.fromPeerRootXDIArc(relation.getTargetXDIAddress());
 		if (! registeredCloudNumber.equals(businessCloudNumber)) throw new RuntimeException("Registered Cloud Number "
 				+ registeredCloudNumber + " does not match requested Cloud Number " + businessCloudNumber);
 
@@ -2299,7 +2299,7 @@ public class BasicCSP implements CSP {
 
 		CloudNumber cspCloudNumber = null;
 		if (relation != null) {
-			cspCloudNumber = CloudNumber.fromXDIAddress(relation.getTargetXDIAddress());
+			cspCloudNumber = CloudNumber.fromPeerRootXDIArc(relation.getTargetXDIAddress());
 		}
 
 		// done
@@ -2444,7 +2444,7 @@ public class BasicCSP implements CSP {
         Relation relation = cotextNode == null ? null : cotextNode.getRelation(XDIDictionaryConstants.XDI_ADD_REF);
 
 	    if (relation != null) {
-           cloudNumber = CloudNumber.fromXDIAddress(relation.getTargetXDIAddress());
+           cloudNumber = CloudNumber.fromPeerRootXDIArc(relation.getTargetXDIAddress());
 	    }
 
 	   // done
