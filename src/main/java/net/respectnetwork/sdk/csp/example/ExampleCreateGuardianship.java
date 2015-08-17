@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.net.URL;
 import java.security.PrivateKey;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -104,16 +105,16 @@ public class ExampleCreateGuardianship {
         
         try {
             XDIDiscoveryResult guardianRegistry = discovery.discoverFromRegistry(
-                    XDIAddress.create(guardianCloudName.toString()));
+                    XDIAddress.create(guardianCloudName.toString()), null);
             
             XDIDiscoveryResult dependentRegistry = discovery.discoverFromRegistry(
-                    XDIAddress.create(dependentCloudName.toString()));
+                    XDIAddress.create(dependentCloudName.toString()), null);
             
             guardianCloudNumber = guardianRegistry.getCloudNumber();
             dependentCloudNumber = dependentRegistry.getCloudNumber();
             
-            URI guardianXdiEndpoint = guardianRegistry.getXdiEndpointUri();
-            URI dependentXdiEndpoint = dependentRegistry.getXdiEndpointUri();
+            URL guardianXdiEndpoint = guardianRegistry.getXdiEndpointUrl();
+            URL dependentXdiEndpoint = dependentRegistry.getXdiEndpointUrl();
 
             guardianPrivateKey = XDIClientUtil.retrieveSignaturePrivateKey(guardianCloudNumber, guardianXdiEndpoint, guardianToken);
             System.out.println("GuardianPrivateKey Algo: " + guardianPrivateKey.getAlgorithm());

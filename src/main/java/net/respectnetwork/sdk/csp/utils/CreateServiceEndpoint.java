@@ -108,7 +108,7 @@ public class CreateServiceEndpoint
          try
          {
             XDIDiscoveryResult discResult = discoveryClient.discover(
-                  XDIAddress.create("+" + cspName));
+                  XDIAddress.create("+" + cspName), null);
 
             cspCloudNumber = discResult.getCloudNumber();
             System.out.println("CSP Cloud Number : "

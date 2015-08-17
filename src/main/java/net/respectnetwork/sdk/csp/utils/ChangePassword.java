@@ -74,7 +74,7 @@ public class ChangePassword
       try
       {
          XDIDiscoveryResult discResult = discoveryClient.discover(
-               XDIAddress.create("+" + cspName));
+               XDIAddress.create("+" + cspName), null);
 
          cspCloudNumber = discResult.getCloudNumber();
          System.out.println("CSP Cloud Number : " + cspCloudNumber.toString());
@@ -128,7 +128,7 @@ public class ChangePassword
       try
       {
          XDIDiscoveryResult discResult = discoveryClient.discover(
-               XDIAddress.create(cloudNameString));
+               XDIAddress.create(cloudNameString), null);
 
          cloudNumber = discResult.getCloudNumber();
          System.out.println("Cloud Number : " + cloudNumber.toString());

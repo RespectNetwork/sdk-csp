@@ -142,18 +142,18 @@ public class CreateDependent extends AbstractTester {
             
             try {
                 XDIDiscoveryResult guardianRegistry = discovery.discoverFromRegistry(
-                        XDIAddress.create(guardianCloudName.toString()));
+                        XDIAddress.create(guardianCloudName.toString()), null);
                 
                 XDIDiscoveryResult dependentRegistry = discovery.discoverFromRegistry(
-                        XDIAddress.create(dependentCloudName.toString()));
+                        XDIAddress.create(dependentCloudName.toString()), null);
                 
                 guardianCloudNumber = guardianRegistry.getCloudNumber();
                 dependentCloudNumber = dependentRegistry.getCloudNumber();
                 
-                guardianPrivateKey = XDIClientUtil.retrieveSignaturePrivateKey(guardianCloudNumber, guardianRegistry.getXdiEndpointUri(), guardianToken);
+                guardianPrivateKey = XDIClientUtil.retrieveSignaturePrivateKey(guardianCloudNumber, guardianRegistry.getXdiEndpointUrl(), guardianToken);
                 System.out.println("GuardianPrivateKey Algo: " + guardianPrivateKey.getAlgorithm());
 
-                dependentPrivateKey = XDIClientUtil.retrieveSignaturePrivateKey(dependentCloudNumber, dependentRegistry.getXdiEndpointUri(), dependentToken);
+                dependentPrivateKey = XDIClientUtil.retrieveSignaturePrivateKey(dependentCloudNumber, dependentRegistry.getXdiEndpointUrl(), dependentToken);
                 System.out.println("DependentPrivateKey Algo: " + dependentPrivateKey.getAlgorithm());
                 
 
