@@ -1485,7 +1485,7 @@ public class BasicCSP implements CSP {
 
 
 		List<XDIStatement> targetStatements = new ArrayList<XDIStatement> ();
-		String consentUUID = "<!:uuid:" + UUID.randomUUID() + ">";
+		String consentUUID = "<*!:uuid:" + UUID.randomUUID() + ">";
 
 
 		MemoryGraph g = MemoryGraphFactory.getInstance().openGraph();
