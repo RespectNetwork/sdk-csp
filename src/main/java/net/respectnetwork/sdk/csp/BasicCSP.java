@@ -832,17 +832,22 @@ public class BasicCSP implements CSP {
 		MessageResult messageResult = this.getXdiClientCSPRegistry().send(messageEnvelope, null);
 		ContextNode cotextNode = messageResult.getGraph().getDeepContextNode(XDIAddress.fromComponent(cloudNumber.getPeerRootXDIArc()));
 		ReadOnlyIterator<Relation> relations = cotextNode == null ? null : cotextNode.getRelations(XDIDictionaryConstants.XDI_ADD_IS_REF);
+		
+		List<CloudName> cloudNames = new ArrayList<CloudName> ();
 
-		CloudName[] cloudNames = new IteratorArrayMaker<CloudName> (
+		for (Relation relation : relations) {
+		    cloudNames.add(CloudName.fromPeerRootXDIArc(relation.getTargetXDIAddress()));
+		}
+	/*	CloudName[] cloudNames = new IteratorArrayMaker<CloudName> (
 				new NotNullIterator<CloudName> (
 						new MappingCloudNameIterator(
 								new MappingRelationTargetXDIAddressIterator(relations)
-								))).array(CloudName.class);
+								))).array(CloudName.class); */
 
 		// done
 
-		log.debug("In CSP: For Cloud Number " + cloudNumber + " found Cloud Names " + Arrays.asList(cloudNames));
-		return cloudNames;
+		log.debug("In CSP: For Cloud Number " + cloudNumber + " found Cloud Names " + cloudNames.toString());
+		return (CloudName[])cloudNames.toArray();
 	}
 
 	@Override
