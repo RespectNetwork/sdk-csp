@@ -847,7 +847,7 @@ public class BasicCSP implements CSP {
 		// done
 
 		log.debug("In CSP: For Cloud Number " + cloudNumber + " found Cloud Names " + cloudNames.toString());
-		return (CloudName[])cloudNames.toArray();
+		return cloudNames.toArray(new CloudName[cloudNames.size()]);
 	}
 
 	@Override
