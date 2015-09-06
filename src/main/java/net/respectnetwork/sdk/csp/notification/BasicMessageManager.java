@@ -1,30 +1,28 @@
 package net.respectnetwork.sdk.csp.notification;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.HashMap;
+import java.util.Map.Entry;
+import java.util.Properties;
 
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.respectnetwork.sdk.csp.notification.MessageCreationException;
-
 public class BasicMessageManager implements MessageManager {
-    
-    
+
     /** Class Logger */
-    private static final Logger logger = LoggerFactory
-            .getLogger(BasicMessageManager.class);
-    
+    private static final Logger logger = LoggerFactory.getLogger(BasicMessageManager.class);
 
     public BasicMessageManager() {
-        // TODO Auto-generated constructor stub
+
     }
 
     /** Email Template */
     private String emailTemplate;
-    
+
     /** SMS Template */
     private String smsTemplate;
 
@@ -36,7 +34,8 @@ public class BasicMessageManager implements MessageManager {
     }
 
     /**
-     * @param emailTemplate the emailTemplate to set
+     * @param emailTemplate
+     *            the emailTemplate to set
      */
     public void setEmailTemplate(String emailTemplate) {
         this.emailTemplate = emailTemplate;
@@ -50,7 +49,8 @@ public class BasicMessageManager implements MessageManager {
     }
 
     /**
-     * @param smsTemplate the smsTemplate to set
+     * @param smsTemplate
+     *            the smsTemplate to set
      */
     public void setSmsTemplate(String smsTemplate) {
         this.smsTemplate = smsTemplate;
@@ -60,48 +60,64 @@ public class BasicMessageManager implements MessageManager {
      * {@inheritDoc}
      */
     @Override
-    public String createEmailMessage(String validationToken,
-            String validationEndpoint, String cloudNumber) throws MessageCreationException {
-        
+    public String createEmailMessage(String validationToken, String validationEndpoint, String cloudNumber, String cspName)
+            throws MessageCreationException {
+
         try {
-            
+
             HashMap<String, String> valuesMap = new HashMap<String, String>();
             valuesMap.put("validationToken", validationToken);
-            String validationURL = validationEndpoint + "?cloudNumber=" + URLEncoder.encode(cloudNumber, "UTF-8");  
+            String validationURL = validationEndpoint + "?cloudNumber=" + URLEncoder.encode(cloudNumber, "UTF-8");
             valuesMap.put("validationURL", validationURL);
-                  
+
             StrSubstitutor sub = new StrSubstitutor(valuesMap);
             sub.setVariablePrefix("!!");
             sub.setVariableSuffix("!!");
-            String resolvedString = sub.replace(emailTemplate);
-            
+            String resolvedString = sub.replace(getTemplate(cspName +".email.template"));
+
             return resolvedString;
 
-        
         } catch (UnsupportedEncodingException e) {
             String error = "Problem creating Email Message: " + e.getMessage();
             logger.debug(error);
             throw new MessageCreationException(error);
         }
-        
+
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public String createSMSMessage(String validationToken)
-            throws MessageCreationException {
+    public String createSMSMessage(String validationToken, String cspName) throws MessageCreationException {
 
         HashMap<String, String> valuesMap = new HashMap<String, String>();
-        valuesMap.put("validationToken", validationToken);        
-        
+        valuesMap.put("validationToken", validationToken);
+
         StrSubstitutor sub = new StrSubstitutor(valuesMap);
         sub.setVariablePrefix("!!");
         sub.setVariableSuffix("!!");
-        String resolvedString = sub.replace(smsTemplate);
-        
+        String resolvedString = sub.replace(getTemplate(cspName + ".sms.template"));
+
         return resolvedString;
     }
 
+    public String getTemplate(String key) {
+        Properties properties = new Properties();
+        String fileName = "notification.properties";
+        HashMap<String, String> keyValue = new HashMap<String, String>();
+        if (keyValue.isEmpty()) {
+            try {
+                properties.load(BasicMessageManager.class.getClassLoader().getResourceAsStream(fileName));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if (!properties.isEmpty()) {
+                for (final Entry<Object, Object> entry : properties.entrySet()) {
+                    keyValue.put((String) entry.getKey(), (String) entry.getValue());
+                }
+            }
+        }
+        return keyValue.get(key);
+    }
 }

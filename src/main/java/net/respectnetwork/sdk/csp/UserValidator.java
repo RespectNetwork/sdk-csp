@@ -20,7 +20,7 @@ public interface UserValidator {
      * @param mobilePhone 
      * @throws CSPValidationException
      */
-    public void sendValidationMessages(String sessionKey, String email, String mobilePhone)
+    public void sendValidationMessages(String sessionKey, String email, String mobilePhone, String cspName)
             throws CSPValidationException; 
     
     /**

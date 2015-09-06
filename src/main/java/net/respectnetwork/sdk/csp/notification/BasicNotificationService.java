@@ -46,7 +46,7 @@ public class BasicNotificationService implements Notifier {
     private String twillioAuthToken;
     
     /** Max Size of SMS Message */
-    private static final int MAX_SMS_SIZE = 60;
+    private static final int MAX_SMS_SIZE = 100;
     
     /** CSP  Phone Number for sending SMS Messages */
     private  String cspSMSNumber;

@@ -98,7 +98,7 @@ public class BasicUserValidator implements UserValidator {
      * {@inheritDoc}
      */
     @Override
-    public void sendValidationMessages(String sessionKey, String email, String mobilePhone)
+    public void sendValidationMessages(String sessionKey, String email, String mobilePhone, String cspName)
             throws CSPValidationException {
             
         try {
@@ -106,14 +106,13 @@ public class BasicUserValidator implements UserValidator {
                 throw new CSPValidationException("Basic CSP not properly configured,"
                         + " check that all required properties are set.");
             }
-            
-            String emailValidationCode = tokenManager.createToken(new TokenKey(sessionKey, "EMAIL"));
+            if(!"".equals(email) && email != null) {
+                String emailValidationCode = tokenManager.createToken(new TokenKey(sessionKey, "EMAIL"));
+                String emailMessage = messageManager.createEmailMessage(emailValidationCode, validationEndpoint, sessionKey, cspName);
+                theNotifier.sendEmailNotification(email, emailMessage);
+            }
             String smsValidationCode = tokenManager.createToken(new TokenKey(sessionKey, "SMS"));
-                 
-            String emailMessage = messageManager.createEmailMessage(emailValidationCode, validationEndpoint, sessionKey);
-            String smsMessage = messageManager.createSMSMessage(smsValidationCode );
-                   
-            theNotifier.sendEmailNotification(email, emailMessage);
+            String smsMessage = messageManager.createSMSMessage(smsValidationCode, cspName);
             theNotifier.sendSMSNotification(mobilePhone, smsMessage);
 
             // done
@@ -139,8 +138,13 @@ public class BasicUserValidator implements UserValidator {
     public boolean validateCodes(String sessionIdentifier, String emailCode, String smsCode) throws CSPValidationException {
         
         try {
-            boolean result = (tokenManager.validateToken(new TokenKey(sessionIdentifier, "EMAIL"), emailCode) &&
+            boolean result = false;
+              if("".equals(emailCode) && emailCode != null) {     
+                  result = (tokenManager.validateToken(new TokenKey(sessionIdentifier, "EMAIL"), emailCode) &&
                 tokenManager.validateToken(new TokenKey(sessionIdentifier, "SMS"), smsCode));
+              } else {
+                  result = tokenManager.validateToken(new TokenKey(sessionIdentifier, "SMS"), smsCode);
+              }
             
             //If the codes are used for verification once  they should then be invalidated.
             if (result) {
