@@ -25,13 +25,13 @@ import org.slf4j.LoggerFactory;
 import xdi2.client.XDIClient;
 import xdi2.client.constants.XDIClientConstants;
 import xdi2.client.exceptions.Xdi2ClientException;
-import xdi2.client.http.XDIHttpClient;
+import xdi2.client.impl.http.XDIHttpClient;
 import xdi2.core.ContextNode;
 import xdi2.core.Graph;
 import xdi2.core.LiteralNode;
 import xdi2.core.Relation;
 import xdi2.core.Statement;
-import xdi2.core.constants.XDIAuthenticationConstants;
+import xdi2.core.constants.XDISecurityConstants;
 import xdi2.core.constants.XDIConstants;
 import xdi2.core.constants.XDIDictionaryConstants;
 import xdi2.core.constants.XDILinkContractConstants;
@@ -43,16 +43,16 @@ import xdi2.core.features.policy.PolicyUtil;
 import xdi2.core.features.nodetypes.XdiAbstractInstanceUnordered;
 import xdi2.core.features.nodetypes.XdiCommonRoot;
 import xdi2.core.features.nodetypes.XdiInnerRoot;
-import xdi2.core.features.signatures.KeyPairSignature;
+import xdi2.core.features.signatures.RSASignature;
 import xdi2.core.features.signatures.Signatures;
 import xdi2.core.features.timestamps.Timestamps;
 import xdi2.core.impl.memory.MemoryGraph;
 import xdi2.core.impl.memory.MemoryGraphFactory;
 import xdi2.core.io.XDIWriterRegistry;
+import xdi2.core.security.signature.create.RSAStaticPrivateKeySignatureCreator;
 import xdi2.core.util.GraphUtil;
 import xdi2.core.util.XDIAddressUtil;
 import xdi2.core.util.iterators.IteratorArrayMaker;
-import xdi2.core.util.iterators.MappingCloudNameIterator;
 import xdi2.core.util.iterators.MappingCloudNumberIterator;
 import xdi2.core.util.iterators.MappingRelationTargetXDIAddressIterator;
 import xdi2.core.util.iterators.MappingXDIStatementIterator;
@@ -67,8 +67,9 @@ import xdi2.core.syntax.XDIArc;
 import xdi2.messaging.Message;
 import xdi2.messaging.MessageCollection;
 import xdi2.messaging.MessageEnvelope;
-import xdi2.messaging.MessageResult;
-import xdi2.messaging.Operation;
+import xdi2.messaging.response.MessagingResponse;
+import xdi2.messaging.operations.Operation;
+
 
 
 public class BasicCSP implements CSP {
@@ -137,7 +138,7 @@ public class BasicCSP implements CSP {
 		if (secretToken != null) {
 
 			XDIStatement targetStatementDoDigestSecretToken = XDIStatement.fromLiteralComponents(
-					XDIAddressUtil.concatXDIAddresses(XDIAddress.fromComponent(cloudNumber.getPeerRootXDIArc()), XDIAuthenticationConstants.XDI_ADD_DIGEST_SECRET_TOKEN), 
+					XDIAddressUtil.concatXDIAddresses(XDIAddress.fromComponent(cloudNumber.getPeerRootXDIArc()), XDISecurityConstants.XDI_ADD_DIGEST_SECRET_TOKEN), 
 					secretToken);
 
 			message.createOperation(XDIAddress.create("$do<$digest><$secret><$token>"), targetStatementDoDigestSecretToken);
@@ -147,7 +148,7 @@ public class BasicCSP implements CSP {
 
 		this.prepareMessageToCSP(message);
 		log.debug("registerCloudInCSP :: Message to CSP :" + messageEnvelope.getGraph().toString() );
-		this.getXdiClientCSPRegistry().send(messageEnvelope, null);
+		this.getXdiClientCSPRegistry().send(messageEnvelope);
 
 		// done
 
@@ -177,7 +178,7 @@ public class BasicCSP implements CSP {
 		log.debug("checkCloudNameAvailableInRN :: Message envelope to RN \n" );
 		printMessage(messageEnvelope);
 
-		MessageResult messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope, null);
+		MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope);
 
 		LiteralNode literal = messageResult.getGraph().getDeepLiteralNode(XDIAddressUtil.concatXDIAddresses(XDIAddress.fromComponent(cloudName.getPeerRootXDIArc()), XRI_S_AS_AVAILABLE));
 		if (literal == null) throw new Xdi2ClientException("No availability literal found in result.");
@@ -216,7 +217,7 @@ public class BasicCSP implements CSP {
 		log.debug("checkCloudNameAvailableInRN :: Message envelope to RN \n" );
 		printMessage(messageEnvelope);
 
-		MessageResult messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope, null);
+		MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope);
 		ContextNode contextNode = messageResult.getGraph().getDeepContextNode(XDIAddress.fromComponent(cloudName.getPeerRootXDIArc()));
 		if(contextNode == null) {
 		    return cloudNumber;
@@ -224,7 +225,7 @@ public class BasicCSP implements CSP {
 		Relation relation = contextNode.getRelation(XDIDictionaryConstants.XDI_ADD_REF);
 		if (relation != null) {
 
-			cloudNumber = CloudNumber.fromPeerRootXDIArc(relation.getTargetXDIAddress());
+			cloudNumber = CloudNumber.fromXDIAddress(relation.getTargetXDIAddress());
 		}
 
 		// done
@@ -255,7 +256,7 @@ public class BasicCSP implements CSP {
 
 		this.prepareMessageToRN(message);
 		log.debug("checkPhoneAndEmailAvailableInRN :: Message to RN " + messageEnvelope.getGraph().toString());
-		MessageResult messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope, null);
+		MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope);
 	    ContextNode contextNode1 = targetAddress1 == null ? null : messageResult.getGraph().getDeepContextNode(targetAddress1);
 	    Relation relation1 = contextNode1 == null ? null : contextNode1.getRelation(XRI_S_IS_PHONE);
 		
@@ -263,12 +264,12 @@ public class BasicCSP implements CSP {
 	    Relation relation2 = contextNode2 == null ? null : contextNode2.getRelation(XRI_S_IS_EMAIL);
 		if (relation1 != null) {
 
-			cloudNumbers[0] = CloudNumber.fromPeerRootXDIArc(relation1.getTargetXDIAddress());
+			cloudNumbers[0] = CloudNumber.fromXDIAddress(relation1.getTargetXDIAddress());
 		}
 
 		if (relation2 != null) {
 
-			cloudNumbers[1] = CloudNumber.fromPeerRootXDIArc(relation2.getTargetXDIAddress());
+			cloudNumbers[1] = CloudNumber.fromXDIAddress(relation2.getTargetXDIAddress());
 		}
 
 		// done
@@ -297,13 +298,13 @@ public class BasicCSP implements CSP {
 		// send message 1 and read result
 
 		this.prepareMessageToRN(message1);
-		MessageResult messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope1, null);
+		MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope1);
 		ContextNode  contextnode = messageResult.getGraph().getDeepContextNode(XDIAddress.fromComponent(cloudName.getPeerRootXDIArc()));
 		Relation relation = contextnode == null ? null : contextnode.getRelation(XDIDictionaryConstants.XDI_ADD_REF);
 		
 		if (relation == null) throw new RuntimeException("Cloud Number not registered.");
 
-		CloudNumber cloudNumber = CloudNumber.fromPeerRootXDIArc(relation.getTargetXDIAddress());
+		CloudNumber cloudNumber = CloudNumber.fromXDIAddress(relation.getTargetXDIAddress());
 
 		// prepare message 2 to RN
 
@@ -323,7 +324,7 @@ public class BasicCSP implements CSP {
 		// send message 2
 
 		this.prepareMessageToRN(message2);
-		this.getXdiClientRNRegistrationService().send(messageEnvelope2, null);
+		this.getXdiClientRNRegistrationService().send(messageEnvelope2);
 
 		// done
 
@@ -406,7 +407,7 @@ public class BasicCSP implements CSP {
 		this.prepareMessageToRN(message3);
 
 		log.debug("registerCloudNameInRN :: Message " + messageEnvelope.getGraph().toString());
-		MessageResult messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope, null);
+		MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope);
 
 		log.debug("registerCloudNameInRN :: Message Response " + messageResult.getGraph().toString());
 		// Not required in the new native XDI registry. So commenting this for now and later on can be removed.
@@ -449,7 +450,7 @@ public class BasicCSP implements CSP {
 
 		this.prepareMessageToCSP(message);
 		log.debug("registerCloudNameInCSP :: Message  " + messageEnvelope.getGraph().toString());
-		this.getXdiClientCSPRegistry().send(messageEnvelope, null);
+		this.getXdiClientCSPRegistry().send(messageEnvelope);
 
 		// done
 
@@ -503,7 +504,7 @@ public class BasicCSP implements CSP {
 
 		log.debug("registerCloudNameInCloud :: Message  " + messageEnvelope.getGraph().toString());
 
-		xdiClientCloud.send(messageEnvelope, null);
+		xdiClientCloud.send(messageEnvelope);
 
 		// done
 
@@ -538,7 +539,7 @@ public class BasicCSP implements CSP {
 
 		this.prepareMessageToRN(message);
 		log.debug("deleteCloudNameInRN :: Message  " + messageEnvelope.getGraph().toString());
-		this.getXdiClientRNRegistrationService().send(messageEnvelope, null);
+		this.getXdiClientRNRegistrationService().send(messageEnvelope);
 
 		// done
 
@@ -569,7 +570,7 @@ public class BasicCSP implements CSP {
 
 		this.prepareMessageToRN(message);
 		log.debug("setCloudXdiEndpointInRN :: Message  " + messageEnvelope.getGraph().toString());
-		this.getXdiClientRNRegistrationService().send(messageEnvelope, null);
+		this.getXdiClientRNRegistrationService().send(messageEnvelope);
 
 		// done
 
@@ -609,7 +610,7 @@ public class BasicCSP implements CSP {
 
 		// send message
 
-		this.getXdiClientRNRegistrationService().send(messageEnvelope, null);
+		this.getXdiClientRNRegistrationService().send(messageEnvelope);
 
 		// done
 
@@ -654,7 +655,7 @@ public class BasicCSP implements CSP {
 
 		this.prepareMessageToRN(message);
 		log.debug("setRespectNetworkMembershipInRN :: Message  " + messageEnvelope.getGraph().toString());
-		this.getXdiClientRNRegistrationService().send(messageEnvelope, null);
+		this.getXdiClientRNRegistrationService().send(messageEnvelope);
 
 		// done
 
@@ -681,7 +682,7 @@ public class BasicCSP implements CSP {
 		// Send message and read result
 
 		this.prepareMessageToRN(message);
-		MessageResult messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope, null);
+		MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope);
 
 		boolean member = messageResult.getGraph().containsStatement(targetStatement);
 
@@ -714,7 +715,7 @@ public class BasicCSP implements CSP {
 		// send message
 
 		this.prepareMessageToRN(message);
-		this.getXdiClientRNRegistrationService().send(messageEnvelope, null);
+		this.getXdiClientRNRegistrationService().send(messageEnvelope);
 
 		// done
 
@@ -741,7 +742,7 @@ public class BasicCSP implements CSP {
 		// send message and read result
 
 		this.prepareMessageToRN(message);
-		MessageResult messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope, null);
+		MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope);
 
 		boolean member = messageResult.getGraph().containsStatement(targetStatement);
 
@@ -776,7 +777,7 @@ public class BasicCSP implements CSP {
 
 		this.prepareMessageToCSP(message);
 		log.debug("setCloudXdiEndpointInCSP :: Message  " + messageEnvelope.getGraph().toString());
-		this.getXdiClientCSPRegistry().send(messageEnvelope, null);
+		this.getXdiClientCSPRegistry().send(messageEnvelope);
 
 		// done
 
@@ -794,7 +795,7 @@ public class BasicCSP implements CSP {
 		Message message = messageCollection.createMessage();
 
 		XDIStatement targetStatementsDoDigestSecretToken = XDIStatement.fromLiteralComponents(
-				XDIAddressUtil.concatXDIAddresses(XDIAddress.fromComponent(cloudNumber.getPeerRootXDIArc()), XDIAuthenticationConstants.XDI_ADD_DIGEST_SECRET_TOKEN), 
+				XDIAddressUtil.concatXDIAddresses(XDIAddress.fromComponent(cloudNumber.getPeerRootXDIArc()), XDISecurityConstants.XDI_ADD_DIGEST_SECRET_TOKEN), 
 				secretToken);
 
 		message.createOperation(XDIAddress.create("$do<$digest><$secret><$token>"), targetStatementsDoDigestSecretToken);
@@ -802,7 +803,7 @@ public class BasicCSP implements CSP {
 		// send message
 
 		this.prepareMessageToCSP(message);
-		this.getXdiClientCSPRegistry().send(messageEnvelope, null);
+		this.getXdiClientCSPRegistry().send(messageEnvelope);
 
 		// done
 
@@ -829,14 +830,14 @@ public class BasicCSP implements CSP {
 		// send message and read results
 
 		this.prepareMessageToCSP(message);
-		MessageResult messageResult = this.getXdiClientCSPRegistry().send(messageEnvelope, null);
+		MessagingResponse messageResult = this.getXdiClientCSPRegistry().send(messageEnvelope);
 		ContextNode cotextNode = messageResult.getGraph().getDeepContextNode(XDIAddress.fromComponent(cloudNumber.getPeerRootXDIArc()));
 		ReadOnlyIterator<Relation> relations = cotextNode == null ? null : cotextNode.getRelations(XDIDictionaryConstants.XDI_ADD_IS_REF);
 		
 		List<CloudName> cloudNames = new ArrayList<CloudName> ();
 
 		for (Relation relation : relations) {
-		    cloudNames.add(CloudName.fromPeerRootXDIArc(relation.getTargetXDIAddress()));
+		    cloudNames.add(CloudName.fromXDIAddress(relation.getTargetXDIAddress()));
 		}
 	/*	CloudName[] cloudNames = new IteratorArrayMaker<CloudName> (
 				new NotNullIterator<CloudName> (
@@ -874,7 +875,7 @@ public class BasicCSP implements CSP {
 
 		this.prepareMessageToCloud(message, cloudNumber, secretToken);
 		log.debug("authenticateInCloud :: Message  :" + messageEnvelope.getGraph().toString() );
-		xdiClientCloud.send(messageEnvelope, null);
+		xdiClientCloud.send(messageEnvelope);
 
 		// done
 
@@ -914,7 +915,7 @@ public class BasicCSP implements CSP {
 
 		XDIClient xdiClientCloud = new XDIHttpClient(cloudXdiEndpoint);
 
-		xdiClientCloud.send(messageEnvelope, null);
+		xdiClientCloud.send(messageEnvelope);
 
 		// done
 
@@ -956,7 +957,7 @@ public class BasicCSP implements CSP {
 
 		XDIClient xdiCSPCloud = new XDIHttpClient(cspXdiEndpoint);
 
-		xdiCSPCloud.send(messageEnvelope, null);
+		xdiCSPCloud.send(messageEnvelope);
 
 		// done
 
@@ -998,7 +999,7 @@ public class BasicCSP implements CSP {
 
 		XDIClient xdiClientCloud = new XDIHttpClient(cloudXdiEndpoint);
 
-		xdiClientCloud.send(messageEnvelope, null);
+		xdiClientCloud.send(messageEnvelope);
 
 		// done
 
@@ -1033,7 +1034,7 @@ public class BasicCSP implements CSP {
 
 		this.prepareMessageToRN(message);
 
-		MessageResult messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope, null);
+		MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope);
         ContextNode cotextNode = messageResult.getGraph().getDeepContextNode(this.getCspInformation().getRnCloudNumber().getXDIAddress());
         ReadOnlyIterator<Relation> relations = cotextNode == null ? null : cotextNode.getRelations(XRI_S_MEMBER);
         if(relations != null) {
@@ -1109,11 +1110,10 @@ public class BasicCSP implements CSP {
 		if (this.getCspInformation().getCspSignaturePrivateKey() != null) {
 			log.debug("CSP Private Key is not null. Signing Messages with it.");
 
-			KeyPairSignature signature = (KeyPairSignature) message.createSignature(KeyPairSignature.DIGEST_ALGORITHM_SHA, 256, KeyPairSignature.KEY_ALGORITHM_RSA, 2048, true);
+			RSASignature signature = (RSASignature)message.createSignature(RSASignature.DIGEST_ALGORITHM_SHA, 256, RSASignature.KEY_ALGORITHM_RSA, 2048, true);
 
 			try {
-
-				signature.sign(this.getCspInformation().getCspSignaturePrivateKey());
+				new RSAStaticPrivateKeySignatureCreator(this.getCspInformation().getCspSignaturePrivateKey()).createSignature(signature);
 			} catch (GeneralSecurityException ex) {
 
 				throw new RuntimeException(ex.getMessage(), ex);
@@ -1137,11 +1137,11 @@ public class BasicCSP implements CSP {
 
 		if (this.getCspInformation().getCspSignaturePrivateKey() != null) {
 
-			KeyPairSignature signature = (KeyPairSignature) message.createSignature(KeyPairSignature.DIGEST_ALGORITHM_SHA, 256, KeyPairSignature.KEY_ALGORITHM_RSA, 2048, true);
+			RSASignature signature = (RSASignature)message.createSignature(RSASignature.DIGEST_ALGORITHM_SHA, 256, RSASignature.KEY_ALGORITHM_RSA, 2048, true);
 
 			try {
 
-				signature.sign(this.getCspInformation().getCspSignaturePrivateKey());
+				new RSAStaticPrivateKeySignatureCreator(this.getCspInformation().getCspSignaturePrivateKey()).createSignature(signature);
 			} catch (GeneralSecurityException ex) {
 
 				throw new RuntimeException(ex.getMessage(), ex);
@@ -1198,7 +1198,7 @@ public class BasicCSP implements CSP {
 		String cloudXdiEndpoint = this.makeCloudXdiEndpoint(guardian);
 		XDIClient xdiClientCloud = new XDIHttpClient(cloudXdiEndpoint);
 		log.debug("setGuardianshipInCloud :: Message1  " + messageEnvelope.getGraph().toString());
-		xdiClientCloud.send(messageEnvelope, null);
+		xdiClientCloud.send(messageEnvelope);
 
 		// done
 		log.debug("In Guardian User Cloud: Creating is Guardian Relationship between " + guardian.toString() + " and " + dependent.toString() );
@@ -1235,7 +1235,7 @@ public class BasicCSP implements CSP {
         // the information from child's cloud.
         Graph parentChildLinkContractGraph = MemoryGraphFactory.getInstance().openGraph();
         GenericLinkContract linkContract = GenericLinkContract.findGenericLinkContract(parentChildLinkContractGraph,
-                dependent.getXDIAddress(), guardian.getXDIAddress(), XDIAddress.create(""), true);
+                dependent.getXDIAddress(), guardian.getXDIAddress(), XDIAddress.create(""), XDIArc.create(""),true);
 
         PolicyAnd policy = linkContract.getPolicyRoot(true).createAndPolicy(true);
         PolicyUtil.createSenderIsOperator(policy, guardian.getXDIAddress());
@@ -1259,10 +1259,10 @@ public class BasicCSP implements CSP {
         String cloudXdiEndpoint2 = this.makeCloudXdiEndpoint(dependent);
         XDIClient xdiClientCloud2 = new XDIHttpClient(cloudXdiEndpoint2);
         log.debug("setGuardianshipInCloud :: Message2  " + messageEnvelope2.getGraph().toString());
-        xdiClientCloud2.send(messageEnvelope2, null);
+        xdiClientCloud2.send(messageEnvelope2);
         log.debug("setGuardianshipInCloud :: parent child link contract ");
         printMessage(msgEnvelope);
-        xdiClientCloud2.send(msgEnvelope, null);
+        xdiClientCloud2.send(msgEnvelope);
         // done
         log.debug("In Dependent User Cloud: Creating Guardian Relationship between " + dependent.toString() + " and "
                 + guardian.toString());
@@ -1313,7 +1313,7 @@ public class BasicCSP implements CSP {
 
 		this.prepareMessageToCSP(message);
 		log.debug("setGuardianshipInCSP :: Message  " + messageEnvelope.getGraph().toString());
-		this.getXdiClientCSPRegistry().send(messageEnvelope, null);
+		this.getXdiClientCSPRegistry().send(messageEnvelope);
 
 		// done
 
@@ -1363,7 +1363,7 @@ public class BasicCSP implements CSP {
 		// send message
 
 		this.prepareMessageToRN(message);
-		this.getXdiClientRNRegistrationService().send(messageEnvelope, null);
+		this.getXdiClientRNRegistrationService().send(messageEnvelope);
 
 		// done
 		log.debug("In RN: Creating is Guardian Relationship between " + guardian.toString() + " and " + dependent.toString() );
@@ -1394,7 +1394,7 @@ public class BasicCSP implements CSP {
 
 		this.prepareMessageToCSP(message);
 
-		MessageResult messageResult = this.getXdiClientCSPRegistry().send(messageEnvelope, null);
+		MessagingResponse messageResult = this.getXdiClientCSPRegistry().send(messageEnvelope);
         ContextNode cotextNode = messageResult.getGraph().getDeepContextNode(guardian.getXDIAddress());
         ReadOnlyIterator<Relation> relations = cotextNode == null ? null : cotextNode.getRelations(XRI_S_IS_GUARDIAN);
         CloudNumber[] theDependencies = null;
@@ -1440,7 +1440,7 @@ public class BasicCSP implements CSP {
 
 		this.prepareMessageToCSP(message);
 
-		MessageResult messageResult = this.getXdiClientCSPRegistry().send(messageEnvelope, null);
+		MessagingResponse messageResult = this.getXdiClientCSPRegistry().send(messageEnvelope);
         ContextNode cotextNode = messageResult.getGraph().getDeepContextNode(dependent.getXDIAddress());
         Iterator<Relation> relations = cotextNode == null ? null : cotextNode.getRelations(XRI_S_GUARDIAN);
         CloudNumber[] theGuardians = null;
@@ -1518,10 +1518,10 @@ public class BasicCSP implements CSP {
 		ContextNode signingNode = g.getRootContextNode().getDeepContextNode(consentSubjectTo);
 
 		// now create the signature and add it to the graph
-		KeyPairSignature s = (KeyPairSignature) Signatures.createSignature(signingNode, "sha", 256, "rsa", 2048, true);
+		RSASignature s = (RSASignature)Signatures.createSignature(signingNode, "sha", 256, "rsa", 2048, true);
 
 		try {
-			s.sign(signingKey);
+			new RSAStaticPrivateKeySignatureCreator(this.getCspInformation().getCspSignaturePrivateKey()).createSignature(s);
 		} catch (GeneralSecurityException e) {
 			throw new RuntimeException("Problem Signing Dependent Graph");           
 		}
@@ -1600,11 +1600,11 @@ public class BasicCSP implements CSP {
 		ContextNode signingNode = g.getRootContextNode().getContextNode(innerGraph);
 
 		// now create the signature and add it to the graph
-		KeyPairSignature s = (KeyPairSignature) Signatures.createSignature(signingNode, "sha", 256, "rsa", 2048, false);
+		RSASignature s = (RSASignature)Signatures.createSignature(signingNode, "sha", 256, "rsa", 2048, false);
 
 
 		try {
-			s.sign(signingKey);
+			new RSAStaticPrivateKeySignatureCreator(this.getCspInformation().getCspSignaturePrivateKey()).createSignature(s);
 		} catch (GeneralSecurityException e) {
 			throw new RuntimeException("Problem Signing Dependent Graph");           
 		}
@@ -1622,7 +1622,7 @@ public class BasicCSP implements CSP {
 		.setDeepContextNode(pk)
 		.setRelation(
 				XDIDictionaryConstants.XDI_ADD_REF,
-				XDIAddressUtil.concatXDIAddresses(guardian.getXDIAddress(), XDIAuthenticationConstants.XDI_ADD_MSG_SIG_KEYPAIR_PRIVATE_KEY));
+				XDIAddressUtil.concatXDIAddresses(guardian.getXDIAddress(), XDISecurityConstants.XDI_ADD_MSG_SIG_KEYPAIR_PRIVATE_KEY));
 
 
 		ContextNode c = g.getRootContextNode();
@@ -1764,7 +1764,7 @@ public class BasicCSP implements CSP {
 
 
 		log.debug("registerAdditionalCloudNameInRN :: Message " + messageEnvelope.getGraph().toString());
-		MessageResult messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope, null);
+		MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope);
 
 		log.debug("registerAdditionalCloudNameInRN :: Message Response " + messageResult.getGraph().toString());
 		/*Relation relation = messageResult.getGraph().getDeepRelation(XDIAddress.fromComponent(cloudName.getPeerRootXDIArc()), XDIDictionaryConstants.XDI_ADD_REF);
@@ -1899,7 +1899,7 @@ public class BasicCSP implements CSP {
 
 
 		log.debug("registerBusinessCloudNameInRN :: Message " + messageEnvelope.getGraph().toString());
-		MessageResult messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope, null);
+		MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope);
 
 		log.debug("registerBusinessCloudNameInRN :: Message Response " + messageResult.getGraph().toString());
         ContextNode cotextNode = messageResult.getGraph().getDeepContextNode(XDIAddress.fromComponent(businessCloudName.getPeerRootXDIArc()));
@@ -1907,7 +1907,7 @@ public class BasicCSP implements CSP {
 		if (relation == null) throw new RuntimeException("Additional Cloud Name not registered.");
 
 
-		CloudNumber registeredCloudNumber = CloudNumber.fromPeerRootXDIArc(relation.getTargetXDIAddress());
+		CloudNumber registeredCloudNumber = CloudNumber.fromXDIAddress(relation.getTargetXDIAddress());
 		if (! registeredCloudNumber.equals(businessCloudNumber)) throw new RuntimeException("Registered Cloud Number "
 				+ registeredCloudNumber + " does not match requested Cloud Number " + businessCloudNumber);
 
@@ -1997,7 +1997,7 @@ public class BasicCSP implements CSP {
 
 
 		log.debug("registerBusinessCloudNameInRN :: Message " + messageEnvelope.getGraph().toString());
-		MessageResult messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope, null);
+		MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope);
 
 		log.debug("registerBusinessCloudNameInRN :: Message Response " + messageResult.getGraph().toString());
         ContextNode cotextNode = messageResult.getGraph().getDeepContextNode(XDIAddress.fromComponent(businessCloudName.getPeerRootXDIArc()));
@@ -2006,7 +2006,7 @@ public class BasicCSP implements CSP {
         if (relation == null) throw new RuntimeException("Additional Cloud Name not registered in CSP Graph.");
 
 
-		CloudNumber registeredCloudNumber = CloudNumber.fromPeerRootXDIArc(relation.getTargetXDIAddress());
+		CloudNumber registeredCloudNumber = CloudNumber.fromXDIAddress(relation.getTargetXDIAddress());
 		if (! registeredCloudNumber.equals(businessCloudNumber)) throw new RuntimeException("Registered Cloud Number "
 				+ registeredCloudNumber + " does not match requested Cloud Number " + businessCloudNumber);
 
@@ -2096,7 +2096,7 @@ public class BasicCSP implements CSP {
 
 
 		log.debug("registerBusinessCloudNameInRN :: Message " + messageEnvelope.getGraph().toString());
-		MessageResult messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope, null);
+		MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope);
 
 		log.debug("registerBusinessCloudNameInRN :: Message Response " + messageResult.getGraph().toString());
         
@@ -2106,7 +2106,7 @@ public class BasicCSP implements CSP {
         if (relation == null) throw new RuntimeException("Additional Cloud Name not registered in CSP Graph.");
 
 
-		CloudNumber registeredCloudNumber = CloudNumber.fromPeerRootXDIArc(relation.getTargetXDIAddress());
+		CloudNumber registeredCloudNumber = CloudNumber.fromXDIAddress(relation.getTargetXDIAddress());
 		if (! registeredCloudNumber.equals(businessCloudNumber)) throw new RuntimeException("Registered Cloud Number "
 				+ registeredCloudNumber + " does not match requested Cloud Number " + businessCloudNumber);
 
@@ -2191,10 +2191,10 @@ public class BasicCSP implements CSP {
 		ContextNode signingNode = g.getRootContextNode().getDeepContextNode(contactIsBC);
 
 		// now create the signature and add it to the graph
-		KeyPairSignature s = (KeyPairSignature) Signatures.createSignature(signingNode, "sha", 256, "rsa", 2048, true);
+		RSASignature s = (RSASignature)Signatures.createSignature(signingNode, "sha", 256, "rsa", 2048, true);
 
 		try {
-			s.sign(signingKey);
+			new RSAStaticPrivateKeySignatureCreator(this.getCspInformation().getCspSignaturePrivateKey()).createSignature(s);
 		} catch (GeneralSecurityException e) {
 			throw new RuntimeException("Problem Signing Billing Contact  Graph");           
 		}
@@ -2238,7 +2238,7 @@ public class BasicCSP implements CSP {
 		message.createDelOperation(targetStatementsSet.iterator());
 
 		// send message
-		this.getXdiClientRNRegistrationService().send(messageEnvelope, null);
+		this.getXdiClientRNRegistrationService().send(messageEnvelope);
 
 		//update(set) new phone number
 		setPhoneAndEmailInRN(cloudNumber, verifiedPhone, null);
@@ -2270,7 +2270,7 @@ public class BasicCSP implements CSP {
 		message.createDelOperation(targetStatementsSet.iterator());
 
 		// send message
-		this.getXdiClientRNRegistrationService().send(messageEnvelope, null);
+		this.getXdiClientRNRegistrationService().send(messageEnvelope);
 
 		//update(set) new email
 		setPhoneAndEmailInRN(cloudNumber, null, verifiedEmail);
@@ -2298,13 +2298,13 @@ public class BasicCSP implements CSP {
 
 		this.prepareMessageToRN(message);
 		
-		MessageResult messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope, null);
+		MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope);
         ContextNode cotextNode = messageResult.getGraph().getDeepContextNode(cloudNumber.getXDIAddress());
         Relation relation = cotextNode == null ? null : cotextNode.getRelation(XRI_S_REGISTRAR);
 
 		CloudNumber cspCloudNumber = null;
 		if (relation != null) {
-			cspCloudNumber = CloudNumber.fromPeerRootXDIArc(relation.getTargetXDIAddress());
+			cspCloudNumber = CloudNumber.fromXDIAddress(relation.getTargetXDIAddress());
 		}
 
 		// done
@@ -2341,7 +2341,7 @@ public class BasicCSP implements CSP {
 
 		this.prepareMessageToCSP(message);
 		log.debug("registerCloudNamesInCSP :: Message  "+ messageEnvelope.getGraph().toString());
-		this.getXdiClientCSPRegistry().send(messageEnvelope, null);
+		this.getXdiClientCSPRegistry().send(messageEnvelope);
 
 		//set registrar
 		setCloudXdiEndpointInCSP(cloudNumber, null);
@@ -2359,7 +2359,7 @@ public class BasicCSP implements CSP {
 
 		// send message
 		this.prepareMessageToCSP(message);
-		this.getXdiClientCSPRegistry().send(messageEnvelope, null);
+		this.getXdiClientCSPRegistry().send(messageEnvelope);
 	}
 	
 	
@@ -2389,7 +2389,7 @@ public class BasicCSP implements CSP {
 	
 			this.prepareMessageToRN(message);
 			
-			this.getXdiClientRNRegistrationService().send(messageEnvelope, null);
+			this.getXdiClientRNRegistrationService().send(messageEnvelope);
 	
 			log.debug("In RN: updated member registrar for:" + cloudNumber +" with CSP Cloud Number: "+getCspInformation().getCspCloudNumber().getXDIAddress());
 		}
@@ -2416,7 +2416,7 @@ public class BasicCSP implements CSP {
 
 		// send message and read results
 		this.prepareMessageToRN(message);
-		this.getXdiClientRNRegistrationService().send(messageEnvelope, null);
+		this.getXdiClientRNRegistrationService().send(messageEnvelope);
 
 
 		log.debug("Deleted current member registrar for:" + cloudNumber);
@@ -2444,12 +2444,12 @@ public class BasicCSP implements CSP {
 	    log.debug("checkCloudNameInCSP :: Message envelope to CSP \n");
 	    printMessage(messageEnvelope);
 
-	    MessageResult messageResult = this.getXdiClientCSPRegistry().send(messageEnvelope, null);
+	    MessagingResponse messageResult = this.getXdiClientCSPRegistry().send(messageEnvelope);
         ContextNode cotextNode = messageResult.getGraph().getDeepContextNode(XDIAddress.fromComponent(cloudName.getPeerRootXDIArc()));
         Relation relation = cotextNode == null ? null : cotextNode.getRelation(XDIDictionaryConstants.XDI_ADD_REF);
 
 	    if (relation != null) {
-           cloudNumber = CloudNumber.fromPeerRootXDIArc(relation.getTargetXDIAddress());
+           cloudNumber = CloudNumber.fromXDIAddress(relation.getTargetXDIAddress());
 	    }
 
 	   // done

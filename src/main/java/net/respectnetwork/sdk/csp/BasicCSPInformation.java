@@ -2,7 +2,6 @@ package net.respectnetwork.sdk.csp;
 
 import java.io.Serializable;
 import java.net.URI;
-import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.security.PrivateKey;
 
@@ -65,8 +64,8 @@ public class BasicCSPInformation implements CSPInformation, Serializable {
 	public void retrieveCspSignaturePrivateKey() throws Xdi2ClientException, GeneralSecurityException {
 
 	   logger.debug("retrieveCspSignaturePrivateKey");
-		XDIDiscoveryResult xdiDiscoveryResult = this.getXdiDiscoveryClient().discoverFromRegistry(this.getCspCloudNumber().getXDIAddress(), null);
-		URL cspXdiEndpoint = xdiDiscoveryResult.getXdiEndpointUrl();
+		XDIDiscoveryResult xdiDiscoveryResult = this.getXdiDiscoveryClient().discoverFromRegistry(this.getCspCloudNumber().getXDIAddress());
+		URI cspXdiEndpoint = xdiDiscoveryResult.getXdiEndpointUri();
 
 		PrivateKey cspSignaturePrivateKey = XDIClientUtil.retrieveSignaturePrivateKey(this.getCspCloudNumber(), cspXdiEndpoint, this.getCspSecretToken());
 		this.setCspSignaturePrivateKey(cspSignaturePrivateKey);	
