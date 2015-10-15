@@ -118,9 +118,7 @@ public class CreateDependent extends AbstractTester {
     }
 
 
-    public void execute() throws TestException {
-        
-        CloudNumber cloudNumber;
+    public void execute() throws TestException {               
 
         // Step 0: Set up CSP
         
@@ -142,18 +140,18 @@ public class CreateDependent extends AbstractTester {
             
             try {
                 XDIDiscoveryResult guardianRegistry = discovery.discoverFromRegistry(
-                        XDIAddress.create(guardianCloudName.toString()), null);
+                        XDIAddress.create(guardianCloudName.toString()));
                 
                 XDIDiscoveryResult dependentRegistry = discovery.discoverFromRegistry(
-                        XDIAddress.create(dependentCloudName.toString()), null);
+                        XDIAddress.create(dependentCloudName.toString()));
                 
                 guardianCloudNumber = guardianRegistry.getCloudNumber();
                 dependentCloudNumber = dependentRegistry.getCloudNumber();
                 
-                guardianPrivateKey = XDIClientUtil.retrieveSignaturePrivateKey(guardianCloudNumber, guardianRegistry.getXdiEndpointUrl(), guardianToken);
+                guardianPrivateKey = XDIClientUtil.retrieveSignaturePrivateKey(guardianCloudNumber, guardianRegistry.getXdiEndpointUri(), guardianToken);
                 System.out.println("GuardianPrivateKey Algo: " + guardianPrivateKey.getAlgorithm());
 
-                dependentPrivateKey = XDIClientUtil.retrieveSignaturePrivateKey(dependentCloudNumber, dependentRegistry.getXdiEndpointUrl(), dependentToken);
+                dependentPrivateKey = XDIClientUtil.retrieveSignaturePrivateKey(dependentCloudNumber, dependentRegistry.getXdiEndpointUri(), dependentToken);
                 System.out.println("DependentPrivateKey Algo: " + dependentPrivateKey.getAlgorithm());
                 
 

@@ -55,7 +55,7 @@ public class RegisterDependentCloud extends RegisterCloud {
             System.out.println("Invalid Dependent BirthDate.");
         }
 
-        discovery.setAuthorityCache(null);
+//        discovery.setAuthorityCache(null);
    //     discovery.setRegistryCache(null);
 
         for (int tries = 0; tries < 10; tries++) {
@@ -72,11 +72,11 @@ public class RegisterDependentCloud extends RegisterCloud {
 
                 XDIDiscoveryResult guardianRegistry = discovery
                         .discoverFromRegistry(XDIAddress
-                                .create(guardianCloudName.toString()), null);
+                                .create(guardianCloudName.toString()));
 
                 XDIDiscoveryResult dependentRegistry = discovery
                         .discoverFromRegistry(
-                                XDIAddress.create(cloudNameString), null);
+                                XDIAddress.create(cloudNameString));
                 if (dependentRegistry == null
                         || dependentRegistry.getCloudNumber() == null) {
                     System.out
@@ -87,10 +87,10 @@ public class RegisterDependentCloud extends RegisterCloud {
                 guardianCloudNumber = guardianRegistry.getCloudNumber();
                 dependentCloudNumber = dependentRegistry.getCloudNumber();
 
-                URL guardianXdiEndpoint = guardianRegistry
-                        .getXdiEndpointUrl();
-                URL dependentXdiEndpoint = dependentRegistry
-                        .getXdiEndpointUrl();
+                URI guardianXdiEndpoint = guardianRegistry
+                        .getXdiEndpointUri();
+                URI dependentXdiEndpoint = dependentRegistry
+                        .getXdiEndpointUri();
 
                 guardianPrivateKey = XDIClientUtil
                         .retrieveSignaturePrivateKey(guardianCloudNumber,

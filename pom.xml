@@ -31,7 +31,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<github.global.server>github</github.global.server>
 		<org.slf4j-version>1.7.5</org.slf4j-version>
-                <xdi2-version>0.7.4</xdi2-version>
+                <xdi2-version>0.8-M1</xdi2-version>
 	</properties>
 
 	<build>
