@@ -2449,7 +2449,7 @@ public class BasicCSP implements CSP {
         Relation relation = cotextNode == null ? null : cotextNode.getRelation(XDIDictionaryConstants.XDI_ADD_REF);
 
 	    if (relation != null) {
-           cloudNumber = CloudNumber.fromXDIAddress(relation.getTargetXDIAddress());
+           cloudNumber = CloudNumber.fromPeerRootXDIArc(relation.getTargetXDIAddress().getFirstXDIArc());
 	    }
 
 	   // done
