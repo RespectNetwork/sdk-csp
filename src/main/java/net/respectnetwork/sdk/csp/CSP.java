@@ -457,4 +457,7 @@ public interface CSP {
      *   [B] Not used
      */
     public CloudNumber checkCloudNameInCSP(CloudName cloudName) throws Xdi2ClientException;
+
+    void createDefaultProfile(CloudName cloudName, CloudNumber cloudNumber, String secretToken, String phone,
+            String email) throws Xdi2ClientException;
 }
