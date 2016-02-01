@@ -1,10 +1,9 @@
 package net.respectnetwork.sdk.csp;
 
+
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
-import net.respectnetwork.sdk.csp.notification.AnotherBasicTokenManager;
 import net.respectnetwork.sdk.csp.notification.MessageCreationException;
 import net.respectnetwork.sdk.csp.notification.MessageManager;
 import net.respectnetwork.sdk.csp.notification.NotificationException;
@@ -155,10 +154,8 @@ public class BasicUserValidator implements UserValidator {
             
             TokenKey emailTokenKey = new TokenKey(sessionIdentifier, "EMAIL");
             TokenKey smsTokenKey = new TokenKey(sessionIdentifier, "SMS");
-            
-            ConcurrentHashMap<String,String> tokenCache = AnotherBasicTokenManager.getTokenCache();
-            String sentEmailCode = tokenCache.get(emailTokenKey.toString());
-            if(sentEmailCode != null && !sentEmailCode.equals("")){     
+
+            if(emailCode != null && !emailCode.equals("")){
                   result = (tokenManager.validateToken(emailTokenKey, emailCode) &&
                 tokenManager.validateToken(smsTokenKey, smsCode));
               } else {
