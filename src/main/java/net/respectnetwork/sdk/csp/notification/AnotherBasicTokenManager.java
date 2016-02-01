@@ -86,8 +86,10 @@ public class AnotherBasicTokenManager implements TokenManager {
     @Override
     public void inValidateToken(TokenKey tokenKey)
         throws TokenException {
-        
-        tokenCache.remove(tokenKey);        
+
+        if(tokenKey!=null) {
+        tokenCache.remove(tokenKey.toString());
+        }
         
     }
 

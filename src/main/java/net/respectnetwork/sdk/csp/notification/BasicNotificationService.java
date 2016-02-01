@@ -2,7 +2,9 @@ package net.respectnetwork.sdk.csp.notification;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.mail.AuthenticationFailedException;
@@ -18,6 +20,8 @@ import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import biz.neustar.sdk.csp.util.FreemarkerUtil;
 
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
@@ -346,6 +350,7 @@ public class BasicNotificationService implements Notifier {
             LOG.warn("Problem Sending eMail to {} : Issue: {}", emailTo, e.getMessage());
             throw new NotificationException(e.getMessage());
         }
+
     }
         
         
@@ -444,4 +449,17 @@ public class BasicNotificationService implements Notifier {
             throw new NotificationException(e.getMessage());
         }
     }
+
+    /* (non-Javadoc)
+     * @see net.respectnetwork.sdk.csp.notification.Notifier#sendEmailNotification(java.lang.String, java.lang.String, java.lang.String, java.util.Map)
+     */
+    @Override
+    public void sendEmailNotification(String event, String emailAddress,
+   		String cspCloudName, Map<String, Object> placeHolders) throws NotificationException{   		    	    	
+    	
+       	FreemarkerUtil freemarkerUtil = FreemarkerUtil.getInstance();
+       	String content = freemarkerUtil.getTemplateContent(event, cspCloudName, placeHolders);       	
+		sendEmailNotification(emailAddress, content);
+   }
+
 }

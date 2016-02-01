@@ -5,13 +5,16 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.security.GeneralSecurityException;
 import java.security.PrivateKey;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TimeZone;
 import java.util.UUID;
 
 import net.respectnetwork.sdk.csp.discount.NeustarRNCampaignCode;
@@ -35,6 +38,7 @@ import xdi2.core.constants.XDISecurityConstants;
 import xdi2.core.constants.XDIConstants;
 import xdi2.core.constants.XDIDictionaryConstants;
 import xdi2.core.constants.XDILinkContractConstants;
+import xdi2.core.constants.XDITimestampsConstants;
 import xdi2.core.features.linkcontracts.instance.GenericLinkContract;
 import xdi2.core.features.linkcontracts.instance.PublicLinkContract;
 import xdi2.core.features.linkcontracts.instance.RootLinkContract;
@@ -97,6 +101,12 @@ public class BasicCSP implements CSP {
 	public static final XDIAddress XRI_S_AS_AVAILABLE = XDIAddress.create("<#available>");
 	
 	public static final XDIAddress XRI_S_REGISTRAR = XDIAddress.create("#registrar");
+    public static final XDIAddress XRI_S_AS_PHONE = XDIAddress.create("<#phone>");
+    public static final XDIAddress XRI_S_AS_EMAIL = XDIAddress.create("<#email>");
+    public static final XDIAddress XRI_S_AS_PROFILE_CARD_NAME = XDIAddress.create("<#card><#name>");
+    public static final XDIAddress XRI_S_AS_PROFILE = XDIAddress.create("#profile$card");
+    public static final XDIAddress XRI_S_AS_REGISTER_DATE = XDIAddress.create("<#registration><#date><$t>");
+
 
 	private CSPInformation cspInformation;
 
@@ -1006,7 +1016,70 @@ public class BasicCSP implements CSP {
 		log.debug("In Cloud: Verified phone " + verifiedPhone + " and verified e-mail " + verifiedEmail + " set for Cloud Number " + cloudNumber);
 	}
 
+	@Override
+    public void createDefaultProfile(CloudName cloudName, CloudNumber cloudNumber, String secretToken) throws Xdi2ClientException {
+        // prepare message to Cloud
 
+        MessageEnvelope messageEnvelope = new MessageEnvelope();
+        MessageCollection messageCollection = this.createMessageCollectionToCloud(messageEnvelope, cloudNumber);
+
+        Message message = messageCollection.createMessage(-1);
+
+        List<XDIStatement> targetStatementsSet = new ArrayList<XDIStatement>();
+        List<XDIStatement> xdiStatements = new ArrayList<XDIStatement>();
+
+        XDIAddress profileAddress = XDIAddressUtil.concatXDIAddresses(cloudNumber.getXDIAddress(), XRI_S_AS_PROFILE);
+        targetStatementsSet.add(XDIStatement.fromRelationComponents(
+                XDIAddressUtil.concatXDIAddresses(profileAddress, XRI_S_AS_PROFILE_CARD_NAME),
+                XDIDictionaryConstants.XDI_ADD_REF,
+                XDIAddressUtil.concatXDIAddresses(cloudNumber.getXDIAddress(), XRI_S_AS_PROFILE_CARD_NAME)));
+        xdiStatements.add(XDIStatement.fromLiteralComponents(
+                XDIAddressUtil.concatXDIAddresses(profileAddress, XRI_S_AS_PROFILE_CARD_NAME), "Main"));
+        targetStatementsSet.add(XDIStatement.fromRelationComponents(
+                    XDIAddressUtil.concatXDIAddresses(profileAddress, XRI_S_AS_PHONE),
+                    XDIDictionaryConstants.XDI_ADD_REF,
+                    XDIAddressUtil.concatXDIAddresses(cloudNumber.getXDIAddress(), XRI_S_AS_VERIFIED_PHONE)));
+            
+        targetStatementsSet.add(XDIStatement.fromRelationComponents(
+                    XDIAddressUtil.concatXDIAddresses(profileAddress, XRI_S_AS_EMAIL),
+                    XDIDictionaryConstants.XDI_ADD_REF,
+                    XDIAddressUtil.concatXDIAddresses(cloudNumber.getXDIAddress(), XRI_S_AS_VERIFIED_EMAIL)));
+         
+        DateFormat dateFormat = XDITimestampsConstants.FORMATS_TIMESTAMP[0];
+        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        String registrationDate = dateFormat.format(Calendar.getInstance().getTime());
+        targetStatementsSet.add(XDIStatement.fromRelationComponents(
+                XDIAddressUtil.concatXDIAddresses(profileAddress, XRI_S_AS_REGISTER_DATE),
+                XDIDictionaryConstants.XDI_ADD_REF,
+                XDIAddressUtil.concatXDIAddresses(cloudNumber.getXDIAddress(), XRI_S_AS_REGISTER_DATE)));
+        xdiStatements.add(XDIStatement.fromLiteralComponents(
+                XDIAddressUtil.concatXDIAddresses(profileAddress, XRI_S_AS_REGISTER_DATE), registrationDate));
+
+        this.prepareMessageToCloud(message, cloudNumber, secretToken);
+        message.createSetOperation(targetStatementsSet.iterator());
+        // send message
+
+        String cloudXdiEndpoint = this.makeCloudXdiEndpoint(cloudNumber);
+        XDIClient xdiClientCloud = new XDIHttpClient(cloudXdiEndpoint);
+        if (log.isDebugEnabled()) {
+            log.debug("createDefaultProfile :: Message envelope to Cloud \n");
+            printMessage(messageEnvelope);
+        }
+        xdiClientCloud.send(messageEnvelope, null);
+
+        MessageEnvelope messageEnvelope1 = new MessageEnvelope();
+        MessageCollection messageCollection1 = this.createMessageCollectionToCloud(messageEnvelope1, cloudNumber);
+        
+        Message message1 = messageCollection1.createMessage(-1);
+        this.prepareMessageToCloud(message1, cloudNumber, secretToken);
+        message1.createSetOperation(xdiStatements.iterator());
+        if (log.isDebugEnabled()) {
+            log.debug("createDefaultProfile :: Message1 envelope to Cloud \n");
+            printMessage(messageEnvelope1);
+        }
+        // send message
+        xdiClientCloud.send(messageEnvelope1, null);
+    }
 
 	/**
 	 * {@inheritDoc}

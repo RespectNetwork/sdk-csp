@@ -1,5 +1,7 @@
 package net.respectnetwork.sdk.csp.notification;
 
+import java.util.Map;
+
 public interface Notifier {
     
     /**
@@ -26,5 +28,15 @@ public interface Notifier {
      * @throws NotificationException
      */
     public void sendEmailNotification(String toEmail, String bccEmail, String message) throws NotificationException;
+
+    /**
+     * @param event
+     * @param emailAddress
+     * @param cspCloudName
+     * @param placeHolders
+     * @throws NotificationException
+     */
+    public void sendEmailNotification(String event, String emailAddress,
+	String cspCloudName, Map<String, Object> placeHolders) throws NotificationException;
 
 }
