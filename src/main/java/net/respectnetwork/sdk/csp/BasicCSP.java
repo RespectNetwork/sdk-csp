@@ -1065,7 +1065,7 @@ public class BasicCSP implements CSP {
             log.debug("createDefaultProfile :: Message envelope to Cloud \n");
             printMessage(messageEnvelope);
         }
-        xdiClientCloud.send(messageEnvelope, null);
+        xdiClientCloud.send(messageEnvelope);
 
         MessageEnvelope messageEnvelope1 = new MessageEnvelope();
         MessageCollection messageCollection1 = this.createMessageCollectionToCloud(messageEnvelope1, cloudNumber);
@@ -1078,7 +1078,7 @@ public class BasicCSP implements CSP {
             printMessage(messageEnvelope1);
         }
         // send message
-        xdiClientCloud.send(messageEnvelope1, null);
+        xdiClientCloud.send(messageEnvelope1);
     }
 
 	/**
