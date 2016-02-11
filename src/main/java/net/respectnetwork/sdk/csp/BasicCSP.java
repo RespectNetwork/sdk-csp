@@ -1308,7 +1308,7 @@ public class BasicCSP implements CSP {
         // the information from child's cloud.
         Graph parentChildLinkContractGraph = MemoryGraphFactory.getInstance().openGraph();
         GenericLinkContract linkContract = GenericLinkContract.findGenericLinkContract(parentChildLinkContractGraph,
-                dependent.getXDIAddress(), guardian.getXDIAddress(), XDIAddress.create(""), XDIArc.create(""),true);
+                dependent.getXDIAddress(), guardian.getXDIAddress(), null, null,true);
 
         PolicyAnd policy = linkContract.getPolicyRoot(true).createAndPolicy(true);
         PolicyUtil.createSenderIsOperator(policy, guardian.getXDIAddress());
