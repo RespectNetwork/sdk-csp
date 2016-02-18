@@ -40,6 +40,8 @@ public class RegisterDependentCloud extends RegisterCloud {
         boolean withConsent = true;
 
         Date dependentBirthDate = null;
+        Date bornBeforeDate = null;
+        Date bornAfterDate = null;
 
         BasicCSPInformation cspInformation = (BasicCSPInformation) csp
                 .getCspInformation();
@@ -128,12 +130,12 @@ public class RegisterDependentCloud extends RegisterCloud {
                 // Set User Cloud Data
                 csp.setGuardianshipInCloud(cspInformation, guardianCloudNumber,
                         dependentCloudNumber, dependentBirthDate, withConsent,
-                        guardianToken, guardianPrivateKey, dependentToken);
+                        bornBeforeDate, bornAfterDate, guardianToken, guardianPrivateKey, dependentToken);
 
                 // Set CSP Cloud Data
                 csp.setGuardianshipInCSP(cspInformation, guardianCloudNumber,
                         dependentCloudNumber, dependentBirthDate, withConsent,
-                        guardianPrivateKey);
+                        bornBeforeDate, bornAfterDate, guardianPrivateKey);
 
                 // Set MemberGraph Data
                 csp.setGuardianshipInRN(cspInformation, guardianCloudNumber,

@@ -267,8 +267,8 @@ public interface CSP {
      *   [C] Dependency Flow.  
      */
     public void setGuardianshipInCloud(CSPInformation cspInformation, CloudNumber guardian,
-        CloudNumber dependent, Date dependentBirthDate, boolean withConsent, String secretToken,
-        PrivateKey guardianPrivateSigningKey , String dependentToken)
+        CloudNumber dependent, Date dependentBirthDate, boolean withConsent, Date bornBeforeDate,
+        Date bornAfterDate, String secretToken, PrivateKey guardianPrivateSigningKey , String dependentToken)
             throws Xdi2ClientException;   
       
       
@@ -279,8 +279,8 @@ public interface CSP {
      *   [C] Dependency Flow.  
      */
     public void setGuardianshipInCSP(CSPInformation cspInformation, CloudNumber guardian,
-        CloudNumber dependent, Date dependentBirthDate, boolean withConsent,
-        PrivateKey guardianPrivateSigningKey)
+        CloudNumber dependent, Date dependentBirthDate, boolean withConsent, Date bornBeforeDate,
+        Date bornAfterDate, PrivateKey guardianPrivateSigningKey)
             throws Xdi2ClientException; 
        
     

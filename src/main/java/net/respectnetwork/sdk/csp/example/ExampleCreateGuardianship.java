@@ -33,6 +33,12 @@ public class ExampleCreateGuardianship {
     /* CHOOSE THE DEPENDENT'S DOB */
     private static Date dependentBirthDate;
     
+    /* DEPENDENT Born before date */
+    private static Date bornBeforeDate;
+    
+    /* DEPENDENT Born after date */
+    private static Date bornAfterDate;
+    
     /* CHOOSE THE INDIVIDUAL's SECRET TOKEN HERE */
     private static String guardianToken = "mysecret";
     
@@ -135,10 +141,10 @@ public class ExampleCreateGuardianship {
              
         try {
             // Set User Cloud Data
-    	    csp.setGuardianshipInCloud(cspInformation, guardianCloudNumber, dependentCloudNumber, dependentBirthDate, withConsent, guardianToken, guardianPrivateKey,dependentToken);
+    	    csp.setGuardianshipInCloud(cspInformation, guardianCloudNumber, dependentCloudNumber, dependentBirthDate, withConsent, bornBeforeDate, bornAfterDate, guardianToken, guardianPrivateKey,dependentToken);
     		
     		// Set CSP Cloud Data
-    	    csp.setGuardianshipInCSP(cspInformation, guardianCloudNumber, dependentCloudNumber, dependentBirthDate, withConsent, guardianPrivateKey);
+    	    csp.setGuardianshipInCSP(cspInformation, guardianCloudNumber, dependentCloudNumber, dependentBirthDate, withConsent, bornBeforeDate, bornAfterDate, guardianPrivateKey);
     	    
     	    // Set MemberGraph Data
     	    csp.setGuardianshipInRN(cspInformation, guardianCloudNumber, dependentCloudNumber, dependentBirthDate, withConsent, guardianPrivateKey);
