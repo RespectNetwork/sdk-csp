@@ -1243,7 +1243,8 @@ public class BasicCSP implements CSP {
 	 * {@inheritDoc}
 	 */
 	public void setGuardianshipInCloud(CSPInformation cspInformation, CloudNumber guardian,
-			CloudNumber dependent, Date dependentBirthDate, boolean withConsent, String secretToken, PrivateKey guardianPrivateSigningKey, String dependentToken)
+			CloudNumber dependent, Date dependentBirthDate, boolean withConsent, Date bornBeforeDate,
+	        Date bornAfterDate, String secretToken, PrivateKey guardianPrivateSigningKey, String dependentToken)
 					throws Xdi2ClientException {
 
 		// Prepare message to guardian Cloud
@@ -1291,7 +1292,8 @@ public class BasicCSP implements CSP {
 
 
 		//Generating and Adding Dependent Statements
-		List<XDIStatement> dependentStatements =  createDependentXDIStatements( guardian,  dependent, dependentBirthDate, guardianPrivateSigningKey);
+		List<XDIStatement> dependentStatements =  createDependentXDIStatements( guardian,  dependent, dependentBirthDate, bornBeforeDate,
+				bornAfterDate, guardianPrivateSigningKey);
 		targetStatements2.addAll(dependentStatements);
 
 
@@ -1346,7 +1348,8 @@ public class BasicCSP implements CSP {
 	 * {@inheritDoc}
 	 */
 	public void setGuardianshipInCSP(CSPInformation cspInformation, CloudNumber guardian,
-			CloudNumber dependent, Date dependentBirthDate, boolean withConsent, PrivateKey guardianPrivateSigningKey)
+			CloudNumber dependent, Date dependentBirthDate, boolean withConsent, Date bornBeforeDate,
+	        Date bornAfterDate, PrivateKey guardianPrivateSigningKey)
 					throws Xdi2ClientException {
 
 		// Prepare message to Guardian Sub Graph in CSP Graph
@@ -1367,7 +1370,8 @@ public class BasicCSP implements CSP {
 
 
 		//Generating and Adding Dependent Statements
-		List<XDIStatement> dependentStatements =  createDependentXDIStatements(guardian, dependent, dependentBirthDate, guardianPrivateSigningKey);
+		List<XDIStatement> dependentStatements =  createDependentXDIStatements(guardian, dependent, dependentBirthDate, bornBeforeDate,
+				bornAfterDate, guardianPrivateSigningKey);
 		targetStatements.addAll(dependentStatements);
 
 
@@ -1420,7 +1424,7 @@ public class BasicCSP implements CSP {
 
 
 		//Generating and Adding Dependent Statements
-		List<XDIStatement> dependentStatements =  createDependentXDIStatements( guardian,  dependent, dependentBirthDate, guardianPrivateSigningKey);
+		List<XDIStatement> dependentStatements =  createDependentXDIStatements( guardian,  dependent, dependentBirthDate, null, null, guardianPrivateSigningKey);
 		targetStatements.addAll(dependentStatements);
 
 		if (withConsent) {     
@@ -1629,7 +1633,7 @@ public class BasicCSP implements CSP {
 	 * @param signingKey
 	 * @return XDIStatements
 	 */
-	private List<XDIStatement> createDependentXDIStatements(CloudNumber guardian, CloudNumber dependent, Date dependentBirthDate, PrivateKey signingKey) {
+	private List<XDIStatement> createDependentXDIStatements(CloudNumber guardian, CloudNumber dependent, Date dependentBirthDate, Date bornBeforeDate, Date bornAfterDate, PrivateKey signingKey) {
 
 
 		XDIArc innerGraph = XDIArc.create("(" + dependent.getXDIAddress() +"/#guardian" + ")");
@@ -1660,15 +1664,33 @@ public class BasicCSP implements CSP {
 
 		//Adding Date to Dependent's SubGraph
 		//[=]!:uuid:3333<#birth><$t>&/&/"2000-04-10T22:22:22Z")
-
-		String xdiDOBFormat = Timestamps.timestampToString(dependentBirthDate);
-		XDIStatement dobStatement = XDIStatement.fromLiteralComponents(
-				XDIAddressUtil.concatXDIAddresses(dependent.getXDIAddress(), XDIAddress.create("<#birth><$t>")), 
-				xdiDOBFormat);
-
-		g.setStatement(dobStatement);
-
-
+		if(dependentBirthDate != null) {
+			String xdiDOBFormat = Timestamps.timestampToString(dependentBirthDate);
+			XDIStatement dobStatement = XDIStatement.fromLiteralComponents(
+					XDIAddressUtil.concatXDIAddresses(dependent.getXDIAddress(), XDIAddress.create("<#birth><$t>")), 
+					xdiDOBFormat);
+	
+			g.setStatement(dobStatement);
+		}
+		// Born before date
+		if(bornBeforeDate != null) {
+			String xdiBBAFormat = Timestamps.timestampToString(bornBeforeDate);
+			XDIStatement bbaStatement = XDIStatement.fromLiteralComponents(
+					XDIAddressUtil.concatXDIAddresses(dependent.getXDIAddress(), XDIAddress.create("<#born><#before><$t>")), 
+					xdiBBAFormat);
+	
+			g.setStatement(bbaStatement);
+		}
+		
+		// Born after date
+		if(bornAfterDate != null) {
+			String xdiBADFormat = Timestamps.timestampToString(bornAfterDate);
+			XDIStatement badStatement = XDIStatement.fromLiteralComponents(
+					XDIAddressUtil.concatXDIAddresses(dependent.getXDIAddress(), XDIAddress.create("<#born><#after><$t>")), 
+					xdiBADFormat);
+	
+			g.setStatement(badStatement);
+		}
 		//Sign the Context: ([=]!:uuid:3333/#guardian)[<$sig>]<[=]!:uuid:6666>&/&/”...”        
 		ContextNode signingNode = g.getRootContextNode().getContextNode(innerGraph);
 
