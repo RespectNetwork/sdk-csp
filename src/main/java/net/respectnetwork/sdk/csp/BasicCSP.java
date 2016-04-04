@@ -1701,6 +1701,7 @@ public class BasicCSP implements CSP {
 		try {
 			new RSAStaticPrivateKeySignatureCreator(this.getCspInformation().getCspSignaturePrivateKey()).createSignature(s);
 		} catch (GeneralSecurityException e) {
+		    log.error("Error while sining the graph is : {}", e.getMessage(), e);
 			throw new RuntimeException("Problem Signing Dependent Graph");           
 		}
 

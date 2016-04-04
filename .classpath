@@ -1,31 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" output="target/classes" path="src/main/java">
-		<attributes>
-			<attribute name="optional" value="true"/>
-			<attribute name="maven.pomderived" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="src" output="target/test-classes" path="src/test/java">
-		<attributes>
-			<attribute name="optional" value="true"/>
-			<attribute name="maven.pomderived" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry excluding="**" kind="src" output="target/classes" path="src/main/resources">
-		<attributes>
-			<attribute name="maven.pomderived" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6">
-		<attributes>
-			<attribute name="maven.pomderived" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
-		<attributes>
-			<attribute name="maven.pomderived" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="output" path="target/classes"/>
+  <classpathentry kind="src" path="src/main/java" including="**/*.java"/>
+  <classpathentry kind="src" path="src/main/resources" excluding="**/*.java"/>
+  <classpathentry kind="output" path="target/classes"/>
+  <classpathentry kind="var" path="M2_REPO/javax/mail/mail/1.4/mail-1.4.jar"/>
+  <classpathentry kind="var" path="M2_REPO/javax/activation/activation/1.1-rev-1/activation-1.1-rev-1.jar"/>
+  <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+  <classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-api/1.7.5/slf4j-api-1.7.5.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/slf4j/jcl-over-slf4j/1.7.5/jcl-over-slf4j-1.7.5.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-log4j12/1.7.5/slf4j-log4j12-1.7.5.jar"/>
+  <classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.17/log4j-1.2.17.jar"/>
+  <classpathentry kind="var" path="M2_REPO/junit/junit/4.10/junit-4.10.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/hamcrest/hamcrest-core/1.1/hamcrest-core-1.1.jar"/>
+  <classpathentry kind="var" path="M2_REPO/xdi2/xdi2-client/0.8-M3/xdi2-client-0.8-M3.jar" sourcepath="M2_REPO/xdi2/xdi2-client/0.8-M3/xdi2-client-0.8-M3-sources.jar">
+    <attributes>
+      <attribute value="jar:file:/C:/Users/kvats/.m2/repository/xdi2/xdi2-client/0.8-M3/xdi2-client-0.8-M3-javadoc.jar!/" name="javadoc_location"/>
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="var" path="M2_REPO/xdi2/xdi2-messaging/0.8-M3/xdi2-messaging-0.8-M3.jar" sourcepath="M2_REPO/xdi2/xdi2-messaging/0.8-M3/xdi2-messaging-0.8-M3-sources.jar">
+    <attributes>
+      <attribute value="jar:file:/C:/Users/kvats/.m2/repository/xdi2/xdi2-messaging/0.8-M3/xdi2-messaging-0.8-M3-javadoc.jar!/" name="javadoc_location"/>
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="var" path="M2_REPO/xdi2/xdi2-core/0.8-M3/xdi2-core-0.8-M3.jar" sourcepath="M2_REPO/xdi2/xdi2-core/0.8-M3/xdi2-core-0.8-M3-sources.jar">
+    <attributes>
+      <attribute value="jar:file:/C:/Users/kvats/.m2/repository/xdi2/xdi2-core/0.8-M3/xdi2-core-0.8-M3-javadoc.jar!/" name="javadoc_location"/>
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="var" path="M2_REPO/commons-lang/commons-lang/2.6/commons-lang-2.6.jar"/>
+  <classpathentry kind="var" path="M2_REPO/commons-codec/commons-codec/1.6/commons-codec-1.6.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/google/code/gson/gson/2.2.4/gson-2.2.4.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/sleepycat/je/4.0.92/je-4.0.92.jar"/>
+  <classpathentry kind="var" path="M2_REPO/net/sf/ehcache/ehcache/2.8.1/ehcache-2.8.1.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/twilio/sdk/twilio-java-sdk/3.4.1/twilio-java-sdk-3.4.1.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/httpcomponents/httpclient/4.3.3/httpclient-4.3.3.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/httpcomponents/httpcore/4.3.2/httpcore-4.3.2.jar"/>
+  <classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging/1.1.3/commons-logging-1.1.3.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/googlecode/json-simple/json-simple/1.1/json-simple-1.1.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/codehaus/jackson/jackson-mapper-asl/1.9.3/jackson-mapper-asl-1.9.3.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/codehaus/jackson/jackson-core-asl/1.9.3/jackson-core-asl-1.9.3.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/googlecode/libphonenumber/libphonenumber/4.3/libphonenumber-4.3.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/freemarker/freemarker/2.3.23/freemarker-2.3.23.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/google/guava/guava/12.0/guava-12.0.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/google/code/findbugs/jsr305/1.3.9/jsr305-1.3.9.jar"/>
 </classpath>
