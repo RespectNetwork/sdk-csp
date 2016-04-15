@@ -118,13 +118,7 @@ public class BasicCSP implements CSP {
 	}
 
 	public BasicCSP(CSPInformation cspInformation) {
-
 		this.cspInformation = cspInformation;
-
-		this.xdiClientCSPRegistry = new XDIHttpClient(cspInformation.getCspRegistryXdiEndpoint());
-		((XDIHttpClient) this.xdiClientCSPRegistry).setFollowRedirects(true);
-		this.xdiClientRNRegistrationService = new XDIHttpClient(cspInformation.getRnRegistrationServiceXdiEndpoint());
-		((XDIHttpClient) this.xdiClientRNRegistrationService).setFollowRedirects(true);
 	}
 
 	@Override
@@ -1755,7 +1749,8 @@ public class BasicCSP implements CSP {
 	}
 
 	public XDIClient getXdiClientCSPRegistry() {
-
+	    this.xdiClientCSPRegistry = new XDIHttpClient(cspInformation.getCspRegistryXdiEndpoint());
+        ((XDIHttpClient) this.xdiClientCSPRegistry).setFollowRedirects(true);
 		return this.xdiClientCSPRegistry;
 	}
 
@@ -1765,7 +1760,8 @@ public class BasicCSP implements CSP {
 	}
 
 	public XDIClient getXdiClientRNRegistrationService() {
-
+	    this.xdiClientRNRegistrationService = new XDIHttpClient(cspInformation.getRnRegistrationServiceXdiEndpoint());
+        ((XDIHttpClient) this.xdiClientRNRegistrationService).setFollowRedirects(true);
 		return this.xdiClientRNRegistrationService;
 	}
 
