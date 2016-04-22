@@ -18,7 +18,7 @@ public interface Notifier {
      * @param Message
      * @throws NotificationException
      */
-    public void sendEmailNotification(String email, String Message) throws NotificationException;
+    public void sendEmailNotification(String email, String Message, String subject) throws NotificationException;
     
     /**
      * Method to send email notification.
@@ -27,7 +27,7 @@ public interface Notifier {
      * @param Message Email content.
      * @throws NotificationException
      */
-    public void sendEmailNotification(String toEmail, String bccEmail, String message) throws NotificationException;
+    public void sendEmailNotification(String toEmail, String bccEmail, String message, String subject) throws NotificationException;
 
     /**
      * @param event
@@ -37,6 +37,6 @@ public interface Notifier {
      * @throws NotificationException
      */
     public void sendEmailNotification(String event, String emailAddress,
-	String cspCloudName, Map<String, Object> placeHolders) throws NotificationException;
+	String cspCloudName, Map<String, Object> placeHolders, String subject) throws NotificationException;
 
 }

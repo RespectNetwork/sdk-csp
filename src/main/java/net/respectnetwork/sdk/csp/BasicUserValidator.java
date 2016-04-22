@@ -1,8 +1,11 @@
 package net.respectnetwork.sdk.csp;
 
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import net.respectnetwork.sdk.csp.notification.MessageCreationException;
 import net.respectnetwork.sdk.csp.notification.MessageManager;
@@ -15,6 +18,8 @@ import net.respectnetwork.sdk.csp.validation.CSPValidationException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import biz.neustar.sdk.csp.util.FreemarkerUtil;
 
 public class BasicUserValidator implements UserValidator {
     
@@ -121,7 +126,8 @@ public class BasicUserValidator implements UserValidator {
                 String emailValidationCode = tokenManager.createToken(emailTokenKey);
                 Map<String, Object> placeHolders = new HashMap<String, Object>();
                 placeHolders.put("emailValidationCode", emailValidationCode);
-                theNotifier.sendEmailNotification("ValidationCode", email, cspName, placeHolders);
+                String subject = getSubject();
+                theNotifier.sendEmailNotification("ValidationCode", email, cspName, placeHolders, subject);
             }
             String smsValidationCode = tokenManager.createToken(smsTokenKey);
             String smsMessage = messageManager.createSMSMessage(smsValidationCode, cspName);
@@ -142,6 +148,26 @@ public class BasicUserValidator implements UserValidator {
         }
     }
      
+    private String getSubject() throws CSPValidationException{
+    	
+    	String subject = "";
+    	try{
+			
+			Properties props = new Properties();
+			String propFileName = "locale\\messages_en_US.properties";			
+			
+			InputStream inputStream = FreemarkerUtil.class.getClassLoader().getResourceAsStream(propFileName);
+			props.load(inputStream);						
+			
+			subject = props.getProperty("verify.email.subject");
+						
+		}catch(IOException io){
+			String error = "Error while getting verification email subject ";
+			log.debug(error);
+            throw new CSPValidationException(error);
+		}
+    	return subject;
+    }
 
     /**
      * {@inheritDoc}

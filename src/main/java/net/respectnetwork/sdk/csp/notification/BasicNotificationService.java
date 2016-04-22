@@ -55,9 +55,6 @@ public class BasicNotificationService implements Notifier {
     /** CSP  Phone Number for sending SMS Messages */
     private  String cspSMSNumber;
     
-    /** Verification Email Subject */
-    private String emailSubject;
-    
     /** Who the Verification email is from */
     private String emailFrom;
     
@@ -84,8 +81,6 @@ public class BasicNotificationService implements Notifier {
  
     /** Mail Transport */
     private String mailTransport;
-    
-    
      
     /**
      * @return the accountSID
@@ -141,20 +136,6 @@ public class BasicNotificationService implements Notifier {
      */
     public void setCspSMSNumber(String cspSMSNumber) {
         this.cspSMSNumber = cspSMSNumber;
-    }
-
-    /**
-     * @return the emailSubject
-     */
-    public String getEmailSubject() {
-        return emailSubject;
-    }
-
-    /**
-     * @param emailSubject the emailSubject to set
-     */
-    public void setEmailSubject(String emailSubject) {
-        this.emailSubject = emailSubject;
     }
 
     /**
@@ -312,7 +293,7 @@ public class BasicNotificationService implements Notifier {
     }
 
     @Override
-    public void sendEmailNotification(String emailTo, String messageOut)
+    public void sendEmailNotification(String emailTo, String messageOut, String subject)
             throws NotificationException {
 
         Properties props = new Properties();
@@ -324,7 +305,7 @@ public class BasicNotificationService implements Notifier {
         props.put("mail.debug", mailDebug);
         props.put("mail.transport.protocol", mailTransport);
         
- 
+        LOG.debug("Thread Name: {}, Subject: {}, emailId: {}", Thread.currentThread().getName(), subject, emailTo);
         Session session = Session.getInstance(props,
           new javax.mail.Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
@@ -338,7 +319,7 @@ public class BasicNotificationService implements Notifier {
             message.setFrom(new InternetAddress(emailFrom));
             message.setRecipients(Message.RecipientType.TO,
             InternetAddress.parse(emailTo));
-            message.setSubject(emailSubject);
+            message.setSubject(subject);
             message.setContent(messageOut, "text/html");
             Transport.send(message);
  
@@ -404,7 +385,7 @@ public class BasicNotificationService implements Notifier {
      */
     @Override
     public void sendEmailNotification(String toEmail,
-            String bccEmail, String messageOut) throws NotificationException {
+            String bccEmail, String messageOut, String subject) throws NotificationException {
         Properties props = new Properties();
 
         props.put("mail.smtp.auth", mailSMTPAuth);
@@ -436,7 +417,7 @@ public class BasicNotificationService implements Notifier {
                 message.setRecipients(Message.RecipientType.BCC,
                 InternetAddress.parse(bccEmail));
             }
-            message.setSubject(emailSubject);
+            message.setSubject(subject);
             message.setContent(messageOut, "text/html");
             Transport.send(message);
 
@@ -455,11 +436,11 @@ public class BasicNotificationService implements Notifier {
      */
     @Override
     public void sendEmailNotification(String event, String emailAddress,
-   		String cspCloudName, Map<String, Object> placeHolders) throws NotificationException{   		    	    	
+   		String cspCloudName, Map<String, Object> placeHolders, String subject) throws NotificationException{   		    	    	
     	
        	FreemarkerUtil freemarkerUtil = FreemarkerUtil.getInstance();
        	String content = freemarkerUtil.getTemplateContent(event, cspCloudName, placeHolders);       	
-		sendEmailNotification(emailAddress, content);
+		sendEmailNotification(emailAddress, content, subject);
    }
 
 }

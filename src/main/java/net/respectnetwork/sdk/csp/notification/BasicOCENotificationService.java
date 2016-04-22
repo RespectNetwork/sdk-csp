@@ -119,12 +119,12 @@ public class BasicOCENotificationService extends BasicNotificationService {
     private PojoOCE _pojo;
  
     @Override
-    public void sendEmailNotification(String emailTo, String messageOut)
+    public void sendEmailNotification(String emailTo, String messageOut, String subject)
             throws NotificationException {
         // NOT mt-safe
         _pojo = new PojoOCE();
 
-    	LOG.debug("sendOCEMail[" + OCEendpoint + "] with subject:" + getEmailSubject()  + " emailFrom:" + getEmailFrom() + " and sendTo:" + emailTo);
+    	LOG.debug("sendOCEMail[" + OCEendpoint + "] with subject:" + subject  + " emailFrom:" + getEmailFrom() + " and sendTo:" + emailTo);
             // locally we need an HTTP/POST/JSON/ACCEPT/AUTHORIZATION instances.
     		// which if any of these are thread-safe for reuse?
         try {
@@ -134,7 +134,7 @@ public class BasicOCENotificationService extends BasicNotificationService {
         	HttpPost   post = new HttpPost(endpoint);
 
         	//messageOut = updateHtmlMarkup(messageOut);
-        	String jsonPost = generatePostJson(emailTo, messageOut);
+        	String jsonPost = generatePostJson(emailTo, messageOut, subject);
         	LOG.debug("OCE JSON string to send as request:" + jsonPost);
           	StringEntity jsonPostEntity = new StringEntity(jsonPost);
         	post.setHeader(HTTP.CONTENT_TYPE, "application/json");
@@ -164,7 +164,7 @@ public class BasicOCENotificationService extends BasicNotificationService {
     	return newMsg;
     }
     
-	private String generatePostJson(String emailTo, String messageOut) throws JsonMappingException, IOException {
+	private String generatePostJson(String emailTo, String messageOut,String subject) throws JsonMappingException, IOException {
 		String pic = "<img width=\"275\" height=\"96\" src=\"data:image/png;base64,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\" />";
 		KVPair p = new KVPair();
 		p.emailAddress = emailTo;
@@ -176,7 +176,7 @@ public class BasicOCENotificationService extends BasicNotificationService {
 
 		_pojo.setFrom(z);
 		_pojo.setMimeType("HTML");
-		_pojo.setSubject(getEmailSubject());
+		_pojo.setSubject(subject);
 		_pojo.setContent("<html>" + messageOut + /*pic +*/ "</html>");
 		ObjectMapper om = new ObjectMapper();	
 		//Gson gson = new Gson();
@@ -238,7 +238,7 @@ public class BasicOCENotificationService extends BasicNotificationService {
 		BasicOCENotificationService bon = new BasicOCENotificationService();
 		
 		bon.setEmailFrom("will.martin@neustar.biz");
-		bon.setEmailSubject("Test OCE send within csp-sdk codebase");
+		String subject = "Test OCE send within csp-sdk codebase";
 		
 		//bon.setOCEApiKey("p9Es6G3w_ib5bC9BRDdmyd5lxkIa");
 		//bon.setOCESecret("pyIpbBQ08GGtzP61GMrEE_4D900a");
@@ -246,7 +246,7 @@ public class BasicOCENotificationService extends BasicNotificationService {
 		bon.setOCESecret("7OmxVvWTlC2z_l0FzwIIkY7WX90a"/*"pyIpbBQ08GGtzP61GMrEE_4D900a"*/);
 		
 		try {
-			bon.sendEmailNotification("will.martin@neustar.biz","A bunch of gobbledy gook");
+			bon.sendEmailNotification("will.martin@neustar.biz","A bunch of gobbledy gook", subject);
 		} catch (NotificationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
