@@ -124,12 +124,13 @@ public class BasicUserValidator implements UserValidator {
             
             if(!"".equals(email) && email != null) {
                 String emailValidationCode = tokenManager.createToken(emailTokenKey);
+                log.debug("Email Verification Code: {} for emailId: {}", emailValidationCode, email);
                 Map<String, Object> placeHolders = new HashMap<String, Object>();
                 placeHolders.put("emailValidationCode", emailValidationCode);
-                String subject = getSubject();
-                theNotifier.sendEmailNotification("ValidationCode", email, cspName, placeHolders, subject);
+                theNotifier.sendEmailNotification("ValidationCode", email, cspName, placeHolders);
             }
             String smsValidationCode = tokenManager.createToken(smsTokenKey);
+            log.debug("SMS Verification Code: {} for phoneNumber: {}", smsValidationCode, mobilePhone);
             String smsMessage = messageManager.createSMSMessage(smsValidationCode, cspName);
             theNotifier.sendSMSNotification(mobilePhone, smsMessage);
 
@@ -146,27 +147,6 @@ public class BasicUserValidator implements UserValidator {
             log.warn("Problem Creating Notification Message: {}", e.getMessage());
             throw new CSPValidationException(e.getMessage());
         }
-    }
-     
-    private String getSubject() throws CSPValidationException{
-    	
-    	String subject = "";
-    	try{
-			
-			Properties props = new Properties();
-			String propFileName = "locale\\messages_en_US.properties";			
-			
-			InputStream inputStream = FreemarkerUtil.class.getClassLoader().getResourceAsStream(propFileName);
-			props.load(inputStream);						
-			
-			subject = props.getProperty("verify.email.subject");
-						
-		}catch(IOException io){
-			String error = "Error while getting verification email subject ";
-			log.debug(error);
-            throw new CSPValidationException(error);
-		}
-    	return subject;
     }
 
     /**

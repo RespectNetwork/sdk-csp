@@ -37,6 +37,6 @@ public interface Notifier {
      * @throws NotificationException
      */
     public void sendEmailNotification(String event, String emailAddress,
-	String cspCloudName, Map<String, Object> placeHolders, String subject) throws NotificationException;
+	String cspCloudName, Map<String, Object> placeHolders) throws NotificationException;
 
 }

@@ -436,10 +436,11 @@ public class BasicNotificationService implements Notifier {
      */
     @Override
     public void sendEmailNotification(String event, String emailAddress,
-   		String cspCloudName, Map<String, Object> placeHolders, String subject) throws NotificationException{   		    	    	
+   		String cspCloudName, Map<String, Object> placeHolders) throws NotificationException{   		    	    	
     	
        	FreemarkerUtil freemarkerUtil = FreemarkerUtil.getInstance();
-       	String content = freemarkerUtil.getTemplateContent(event, cspCloudName, placeHolders);       	
+       	String content = freemarkerUtil.getTemplateContent(event, cspCloudName, placeHolders);  
+       	String subject = freemarkerUtil.getSubject();       	
 		sendEmailNotification(emailAddress, content, subject);
    }
 
