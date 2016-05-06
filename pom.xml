@@ -145,7 +145,7 @@
         <dependency>
             <groupId>com.twilio.sdk</groupId>
             <artifactId>twilio-java-sdk</artifactId>
-            <version>3.4.1</version>
+            <version>5.10.0</version>
         </dependency>
 
         <!-- Java Mail -->

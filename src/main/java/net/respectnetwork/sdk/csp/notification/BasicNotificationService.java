@@ -2,7 +2,6 @@ package net.respectnetwork.sdk.csp.notification;
 
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -28,8 +27,6 @@ import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
 import com.twilio.sdk.TwilioRestClient;
 import com.twilio.sdk.TwilioRestException;
 import com.twilio.sdk.resource.factory.MessageFactory;
-import com.twilio.sdk.resource.factory.SmsFactory;
-import com.twilio.sdk.resource.instance.Sms;
 
 /**
  * Basic Notification Service uses
@@ -280,7 +277,6 @@ public class BasicNotificationService implements Notifier {
             params.add(new BasicNameValuePair("Body", checkSMSMessage(smsMessage)));
             params.add(new BasicNameValuePair("To", validatePhoneNumber(phoneNumber)));
             params.add(new BasicNameValuePair("From", cspSMSNumber));
-
             MessageFactory messageFactory = client.getAccount().getMessageFactory();
             try {
                com.twilio.sdk.resource.instance.Message message = messageFactory.create(params);
