@@ -27,6 +27,7 @@ import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
 import com.twilio.sdk.TwilioRestClient;
 import com.twilio.sdk.TwilioRestException;
+import com.twilio.sdk.resource.factory.MessageFactory;
 import com.twilio.sdk.resource.factory.SmsFactory;
 import com.twilio.sdk.resource.instance.Sms;
 
@@ -300,10 +301,10 @@ public class BasicNotificationService implements Notifier {
             params.add(new BasicNameValuePair("From", cspSMSNumber));
              
              
-            SmsFactory smsFactory = client.getAccount().getSmsFactory();
+            MessageFactory messageFactory = client.getAccount().getMessageFactory();
             try {
-               Sms sms = smsFactory.create(params);
-               LOG.debug("Created SMS message SID: {}",sms.getSid());
+               com.twilio.sdk.resource.instance.Message message = messageFactory.create(params);
+               LOG.debug("Created SMS message SID: {}", message.getSid());
             } catch (TwilioRestException e) {
                 String smsError = "Problem sending SMS Message: Exception: " +  e.getMessage();
                 LOG.warn(smsError);
