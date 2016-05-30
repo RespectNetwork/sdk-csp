@@ -317,7 +317,16 @@ public class BasicNotificationService implements Notifier {
             InternetAddress.parse(emailTo));
             message.setSubject(subject);
             message.setContent(messageOut, "text/html");
-            Transport.send(message);
+            synchronized (message) {
+                Transport.send(message);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    LOG.warn("Email sending thread interrupted for email id:{}, subject:{}" , emailTo, subject);
+                    e.printStackTrace();
+                }
+            }
+            
  
         } catch ( AuthenticationFailedException e) { 
             String errorMsg = "Problem Sending eMail to {} : Issue:Authentication Failed at  mail Service";
@@ -415,7 +424,15 @@ public class BasicNotificationService implements Notifier {
             }
             message.setSubject(subject);
             message.setContent(messageOut, "text/html");
-            Transport.send(message);
+            synchronized (message) {
+                Transport.send(message);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    LOG.warn("Email sending thread interrupted for email id:{}, subject:{}" , toEmail, subject);
+                    e.printStackTrace();
+                }
+            }
 
         } catch ( AuthenticationFailedException e) {
             String errorMsg = "Problem Sending eMail to {} : Issue:Authentication Failed at  mail Service";
