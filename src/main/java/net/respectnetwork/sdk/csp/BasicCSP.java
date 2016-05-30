@@ -152,7 +152,11 @@ public class BasicCSP implements CSP {
 
 		this.prepareMessageToCSP(message);
 		log.debug("registerCloudInCSP :: Message to CSP :" + messageEnvelope.getGraph().toString() );
+		long startTime = System.currentTimeMillis();
 		this.getXdiClientCSPRegistry().send(messageEnvelope);
+		long endTime = System.currentTimeMillis();
+		log.info("registerCloudInCSP Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
+	                - startTime);
 
 		// done
 
@@ -182,7 +186,11 @@ public class BasicCSP implements CSP {
 		log.debug("checkCloudNameAvailableInRN :: Message envelope to RN \n" );
 		printMessage(messageEnvelope);
 
+		long startTime = System.currentTimeMillis();
 		MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope);
+		long endTime = System.currentTimeMillis();
+		log.info("checkCloudNameAvailableInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
+	                - startTime);
 
 		LiteralNode literal = messageResult.getGraph().getDeepLiteralNode(XDIAddressUtil.concatXDIAddresses(XDIAddress.fromComponent(cloudName.getPeerRootXDIArc()), XRI_S_AS_AVAILABLE));
 		if (literal == null) throw new Xdi2ClientException("No availability literal found in result.");
@@ -221,7 +229,11 @@ public class BasicCSP implements CSP {
 		log.debug("checkCloudNameAvailableInRN :: Message envelope to RN \n" );
 		printMessage(messageEnvelope);
 
+		long startTime = System.currentTimeMillis();
 		MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope);
+		long endTime = System.currentTimeMillis();
+		log.info("checkCloudNameInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
+	                - startTime);
 		ContextNode contextNode = messageResult.getGraph().getDeepContextNode(XDIAddress.fromComponent(cloudName.getPeerRootXDIArc()));
 		if(contextNode == null) {
 		    return cloudNumber;
@@ -260,7 +272,11 @@ public class BasicCSP implements CSP {
 
 		this.prepareMessageToRN(message);
 		log.debug("checkPhoneAndEmailAvailableInRN :: Message to RN " + messageEnvelope.getGraph().toString());
+		long startTime = System.currentTimeMillis();
 		MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope);
+		long endTime = System.currentTimeMillis();
+		log.info("checkPhoneAndEmailAvailableInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
+	                - startTime);
 	    ContextNode contextNode1 = targetAddress1 == null ? null : messageResult.getGraph().getDeepContextNode(targetAddress1);
 	    Relation relation1 = contextNode1 == null ? null : contextNode1.getRelation(XRI_S_IS_PHONE);
 		
@@ -289,7 +305,6 @@ public class BasicCSP implements CSP {
 
 		MessageEnvelope messageEnvelope1 = new MessageEnvelope();
 		MessageCollection messageCollection1 = this.createMessageCollectionToRN(messageEnvelope1);
-
 		Message message1 = messageCollection1.createMessage();
 
 		XDIStatement targetStatementSet1 = XDIStatement.fromRelationComponents(
@@ -302,7 +317,11 @@ public class BasicCSP implements CSP {
 		// send message 1 and read result
 
 		this.prepareMessageToRN(message1);
+		long startTime = System.currentTimeMillis();
 		MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope1);
+		long endTime = System.currentTimeMillis();
+		log.info("registerCloudNameInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
+	                - startTime);
 		ContextNode  contextnode = messageResult.getGraph().getDeepContextNode(XDIAddress.fromComponent(cloudName.getPeerRootXDIArc()));
 		Relation relation = contextnode == null ? null : contextnode.getRelation(XDIDictionaryConstants.XDI_ADD_REF);
 		
@@ -411,7 +430,11 @@ public class BasicCSP implements CSP {
 		this.prepareMessageToRN(message3);
 
 		log.debug("registerCloudNameInRN :: Message " + messageEnvelope.getGraph().toString());
+		long startTime = System.currentTimeMillis();
 		MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope);
+		long endTime = System.currentTimeMillis();
+		log.info("registerCloudNameInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
+	                - startTime);
 
 		log.debug("registerCloudNameInRN :: Message Response " + messageResult.getGraph().toString());
 		// Not required in the new native XDI registry. So commenting this for now and later on can be removed.
@@ -454,7 +477,11 @@ public class BasicCSP implements CSP {
 
 		this.prepareMessageToCSP(message);
 		log.debug("registerCloudNameInCSP :: Message  " + messageEnvelope.getGraph().toString());
+		long startTime = System.currentTimeMillis();
 		this.getXdiClientCSPRegistry().send(messageEnvelope);
+		long endTime = System.currentTimeMillis();
+		log.info("registerCloudNameInCSP Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
+	                - startTime);
 
 		// done
 
@@ -508,7 +535,11 @@ public class BasicCSP implements CSP {
 
 		log.debug("registerCloudNameInCloud :: Message  " + messageEnvelope.getGraph().toString());
 
+		long startTime = System.currentTimeMillis();
 		xdiClientCloud.send(messageEnvelope);
+		long endTime = System.currentTimeMillis();
+		log.info("registerCloudNameInCloud Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
+	                - startTime);
 
 		// done
 
@@ -543,7 +574,11 @@ public class BasicCSP implements CSP {
 
 		this.prepareMessageToRN(message);
 		log.debug("deleteCloudNameInRN :: Message  " + messageEnvelope.getGraph().toString());
+		long startTime = System.currentTimeMillis();
 		this.getXdiClientRNRegistrationService().send(messageEnvelope);
+		long endTime = System.currentTimeMillis();
+		log.info("deleteCloudNameInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
+	                - startTime);
 
 		// done
 
@@ -574,7 +609,11 @@ public class BasicCSP implements CSP {
 
 		this.prepareMessageToRN(message);
 		log.debug("setCloudXdiEndpointInRN :: Message  " + messageEnvelope.getGraph().toString());
+		long startTime = System.currentTimeMillis();
 		this.getXdiClientRNRegistrationService().send(messageEnvelope);
+		long endTime = System.currentTimeMillis();
+		log.info("setCloudXdiEndpointInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
+	                - startTime);
 
 		// done
 
@@ -614,7 +653,11 @@ public class BasicCSP implements CSP {
 
 		// send message
 
+		long startTime = System.currentTimeMillis();
 		this.getXdiClientRNRegistrationService().send(messageEnvelope);
+		long endTime = System.currentTimeMillis();
+		log.info("setPhoneAndEmailInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
+	                - startTime);
 
 		// done
 
@@ -659,7 +702,11 @@ public class BasicCSP implements CSP {
 
 		this.prepareMessageToRN(message);
 		log.debug("setRespectNetworkMembershipInRN :: Message  " + messageEnvelope.getGraph().toString());
+		long startTime = System.currentTimeMillis();
 		this.getXdiClientRNRegistrationService().send(messageEnvelope);
+		long endTime = System.currentTimeMillis();
+		log.info("setRespectNetworkMembershipInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
+	                - startTime);
 
 		// done
 
@@ -686,7 +733,11 @@ public class BasicCSP implements CSP {
 		// Send message and read result
 
 		this.prepareMessageToRN(message);
+		long startTime = System.currentTimeMillis();
 		MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope);
+		long endTime = System.currentTimeMillis();
+		log.info("checkRespectNetworkMembershipInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
+	                - startTime);
 
 		boolean member = messageResult.getGraph().containsStatement(targetStatement);
 
@@ -719,7 +770,11 @@ public class BasicCSP implements CSP {
 		// send message
 
 		this.prepareMessageToRN(message);
+		long startTime = System.currentTimeMillis();
 		this.getXdiClientRNRegistrationService().send(messageEnvelope);
+		long endTime = System.currentTimeMillis();
+		log.info("setRespectFirstMembershipInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
+	                - startTime);
 
 		// done
 
@@ -746,7 +801,11 @@ public class BasicCSP implements CSP {
 		// send message and read result
 
 		this.prepareMessageToRN(message);
+		long startTime = System.currentTimeMillis();
 		MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope);
+		long endTime = System.currentTimeMillis();
+		log.info("checkRespectFirstMembershipInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
+	                - startTime);
 
 		boolean member = messageResult.getGraph().containsStatement(targetStatement);
 
@@ -781,7 +840,11 @@ public class BasicCSP implements CSP {
 
 		this.prepareMessageToCSP(message);
 		log.debug("setCloudXdiEndpointInCSP :: Message  " + messageEnvelope.getGraph().toString());
+		long startTime = System.currentTimeMillis();
 		this.getXdiClientCSPRegistry().send(messageEnvelope);
+		long endTime = System.currentTimeMillis();
+		log.info("setCloudXdiEndpointInCSP Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
+	                - startTime);
 
 		// done
 
@@ -807,7 +870,11 @@ public class BasicCSP implements CSP {
 		// send message
 
 		this.prepareMessageToCSP(message);
+		long startTime = System.currentTimeMillis();
 		this.getXdiClientCSPRegistry().send(messageEnvelope);
+		long endTime = System.currentTimeMillis();
+		log.info("setCloudSecretTokenInCSP Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
+	                - startTime);
 
 		// done
 
@@ -834,7 +901,11 @@ public class BasicCSP implements CSP {
 		// send message and read results
 
 		this.prepareMessageToCSP(message);
+		long startTime = System.currentTimeMillis();
 		MessagingResponse messageResult = this.getXdiClientCSPRegistry().send(messageEnvelope);
+		long endTime = System.currentTimeMillis();
+		log.info("checkCloudNamesInCSP Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
+	                - startTime);
 		ContextNode cotextNode = messageResult.getGraph().getDeepContextNode(XDIAddress.fromComponent(cloudNumber.getPeerRootXDIArc()));
 		ReadOnlyIterator<Relation> relations = cotextNode == null ? null : cotextNode.getRelations(XDIDictionaryConstants.XDI_ADD_IS_REF);
 		
@@ -879,8 +950,12 @@ public class BasicCSP implements CSP {
 
 		this.prepareMessageToCloud(message, cloudNumber, secretToken);
 		log.debug("authenticateInCloud :: Message  :" + messageEnvelope.getGraph().toString() );
+		long startTime = System.currentTimeMillis();
 		xdiClientCloud.send(messageEnvelope);
 
+		long endTime = System.currentTimeMillis();
+		log.info("authenticateInCloud Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
+	                - startTime);
 		// done
 
 		log.debug("In Cloud: Authenticated Cloud Number");
@@ -919,7 +994,11 @@ public class BasicCSP implements CSP {
 
 		XDIClient xdiClientCloud = new XDIHttpClient(cloudXdiEndpoint);
 
+		long startTime = System.currentTimeMillis();
 		xdiClientCloud.send(messageEnvelope);
+		long endTime = System.currentTimeMillis();
+		log.info("setCloudServicesInCloud Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
+	                - startTime);
 
 		// done
 
@@ -961,7 +1040,11 @@ public class BasicCSP implements CSP {
 
 		XDIClient xdiCSPCloud = new XDIHttpClient(cspXdiEndpoint);
 
+		long startTime = System.currentTimeMillis();
 		xdiCSPCloud.send(messageEnvelope);
+		long endTime = System.currentTimeMillis();
+		log.info("setCloudServicesForCSPInCSP Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
+	                - startTime);
 
 		// done
 
@@ -1003,7 +1086,11 @@ public class BasicCSP implements CSP {
 
 		XDIClient xdiClientCloud = new XDIHttpClient(cloudXdiEndpoint);
 
+		long startTime = System.currentTimeMillis();
 		xdiClientCloud.send(messageEnvelope);
+		long endTime = System.currentTimeMillis();
+		log.info("setPhoneAndEmailInCloud Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
+	                - startTime);
 
 		// done
 
@@ -1059,7 +1146,11 @@ public class BasicCSP implements CSP {
             log.debug("createDefaultProfile :: Message envelope to Cloud \n");
             printMessage(messageEnvelope);
         }
+        long startTime = System.currentTimeMillis();
         xdiClientCloud.send(messageEnvelope);
+        long endTime = System.currentTimeMillis();
+		log.info("createDefaultProfile Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
+	                - startTime);
 
         MessageEnvelope messageEnvelope1 = new MessageEnvelope();
         MessageCollection messageCollection1 = this.createMessageCollectionToCloud(messageEnvelope1, cloudNumber);
@@ -1101,7 +1192,11 @@ public class BasicCSP implements CSP {
 
 		this.prepareMessageToRN(message);
 
+		long startTime = System.currentTimeMillis();
 		MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope);
+		long endTime = System.currentTimeMillis();
+		log.info("getRespectFirstMemberCount Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
+	                - startTime);
         ContextNode cotextNode = messageResult.getGraph().getDeepContextNode(this.getCspInformation().getRnCloudNumber().getXDIAddress());
         ReadOnlyIterator<Relation> relations = cotextNode == null ? null : cotextNode.getRelations(XRI_S_MEMBER);
         if(relations != null) {
@@ -1266,7 +1361,11 @@ public class BasicCSP implements CSP {
 		String cloudXdiEndpoint = this.makeCloudXdiEndpoint(guardian);
 		XDIClient xdiClientCloud = new XDIHttpClient(cloudXdiEndpoint);
 		log.debug("setGuardianshipInCloud :: Message1  " + messageEnvelope.getGraph().toString());
+		long startTime = System.currentTimeMillis();
 		xdiClientCloud.send(messageEnvelope);
+		long endTime = System.currentTimeMillis();
+		log.info("setGuardianshipInCloud Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
+	                - startTime);
 
 		// done
 		log.debug("In Guardian User Cloud: Creating is Guardian Relationship between " + guardian.toString() + " and " + dependent.toString() );
@@ -1384,7 +1483,11 @@ public class BasicCSP implements CSP {
 
 		this.prepareMessageToCSP(message);
 		log.debug("setGuardianshipInCSP :: Message  " + messageEnvelope.getGraph().toString());
+		long startTime = System.currentTimeMillis();
 		this.getXdiClientCSPRegistry().send(messageEnvelope);
+		long endTime = System.currentTimeMillis();
+		log.info("setGuardianshipInCSP Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
+	                - startTime);
 
 		// done
 
@@ -1434,7 +1537,11 @@ public class BasicCSP implements CSP {
 		// send message
 
 		this.prepareMessageToRN(message);
+		long startTime = System.currentTimeMillis();
 		this.getXdiClientRNRegistrationService().send(messageEnvelope);
+		long endTime = System.currentTimeMillis();
+		log.info("setGuardianshipInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
+	                - startTime);
 
 		// done
 		log.debug("In RN: Creating is Guardian Relationship between " + guardian.toString() + " and " + dependent.toString() );
@@ -1465,7 +1572,11 @@ public class BasicCSP implements CSP {
 
 		this.prepareMessageToCSP(message);
 
+		long startTime = System.currentTimeMillis();
 		MessagingResponse messageResult = this.getXdiClientCSPRegistry().send(messageEnvelope);
+		long endTime = System.currentTimeMillis();
+		log.info("getMyDependentsInCSP Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
+	                - startTime);
         ContextNode cotextNode = messageResult.getGraph().getDeepContextNode(guardian.getXDIAddress());
         ReadOnlyIterator<Relation> relations = cotextNode == null ? null : cotextNode.getRelations(XRI_S_IS_GUARDIAN);
         CloudNumber[] theDependencies = null;
@@ -1511,7 +1622,11 @@ public class BasicCSP implements CSP {
 
 		this.prepareMessageToCSP(message);
 
+		long startTime = System.currentTimeMillis();
 		MessagingResponse messageResult = this.getXdiClientCSPRegistry().send(messageEnvelope);
+		long endTime = System.currentTimeMillis();
+		log.info("getMyGuardiansInCSP Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
+	                - startTime);
         ContextNode cotextNode = messageResult.getGraph().getDeepContextNode(dependent.getXDIAddress());
         Iterator<Relation> relations = cotextNode == null ? null : cotextNode.getRelations(XRI_S_GUARDIAN);
         CloudNumber[] theGuardians = null;
@@ -1856,7 +1971,11 @@ public class BasicCSP implements CSP {
 
 
 		log.debug("registerAdditionalCloudNameInRN :: Message " + messageEnvelope.getGraph().toString());
+		long startTime = System.currentTimeMillis();
 		MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope);
+		long endTime = System.currentTimeMillis();
+		log.info("registerAdditionalCloudNameInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
+	                - startTime);
 
 		log.debug("registerAdditionalCloudNameInRN :: Message Response " + messageResult.getGraph().toString());
 		/*Relation relation = messageResult.getGraph().getDeepRelation(XDIAddress.fromComponent(cloudName.getPeerRootXDIArc()), XDIDictionaryConstants.XDI_ADD_REF);
@@ -1991,7 +2110,11 @@ public class BasicCSP implements CSP {
 
 
 		log.debug("registerBusinessCloudNameInRN :: Message " + messageEnvelope.getGraph().toString());
+		long startTime = System.currentTimeMillis();
 		MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope);
+		long endTime = System.currentTimeMillis();
+		log.info("registerBusinessNameInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
+	                - startTime);
 
 		log.debug("registerBusinessCloudNameInRN :: Message Response " + messageResult.getGraph().toString());
         ContextNode cotextNode = messageResult.getGraph().getDeepContextNode(XDIAddress.fromComponent(businessCloudName.getPeerRootXDIArc()));
@@ -2089,7 +2212,11 @@ public class BasicCSP implements CSP {
 
 
 		log.debug("registerBusinessCloudNameInRN :: Message " + messageEnvelope.getGraph().toString());
+		long startTime = System.currentTimeMillis();
 		MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope);
+		long endTime = System.currentTimeMillis();
+		log.info("registerBusinessNameInCSP Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
+	                - startTime);
 
 		log.debug("registerBusinessCloudNameInRN :: Message Response " + messageResult.getGraph().toString());
         ContextNode cotextNode = messageResult.getGraph().getDeepContextNode(XDIAddress.fromComponent(businessCloudName.getPeerRootXDIArc()));
@@ -2188,7 +2315,11 @@ public class BasicCSP implements CSP {
 
 
 		log.debug("registerBusinessCloudNameInRN :: Message " + messageEnvelope.getGraph().toString());
+		long startTime = System.currentTimeMillis();
 		MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope);
+		long endTime = System.currentTimeMillis();
+		log.info("registerBusinessNameInCloud Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
+	                - startTime);
 
 		log.debug("registerBusinessCloudNameInRN :: Message Response " + messageResult.getGraph().toString());
         
@@ -2330,7 +2461,11 @@ public class BasicCSP implements CSP {
 		message.createDelOperation(targetStatementsSet.iterator());
 
 		// send message
+		long startTime = System.currentTimeMillis();
 		this.getXdiClientRNRegistrationService().send(messageEnvelope);
+		long endTime = System.currentTimeMillis();
+		log.info("updatePhoneInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
+	                - startTime);
 
 		//update(set) new phone number
 		setPhoneAndEmailInRN(cloudNumber, verifiedPhone, null);
@@ -2362,7 +2497,11 @@ public class BasicCSP implements CSP {
 		message.createDelOperation(targetStatementsSet.iterator());
 
 		// send message
+		long startTime = System.currentTimeMillis();
 		this.getXdiClientRNRegistrationService().send(messageEnvelope);
+		long endTime = System.currentTimeMillis();
+		log.info("updateEmailInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
+	                - startTime);
 
 		//update(set) new email
 		setPhoneAndEmailInRN(cloudNumber, null, verifiedEmail);
@@ -2390,7 +2529,11 @@ public class BasicCSP implements CSP {
 
 		this.prepareMessageToRN(message);
 		
+		long startTime = System.currentTimeMillis();
 		MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope);
+		long endTime = System.currentTimeMillis();
+		log.info("getMemberRegistrar Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
+	                - startTime);
         ContextNode cotextNode = messageResult.getGraph().getDeepContextNode(cloudNumber.getXDIAddress());
         Relation relation = cotextNode == null ? null : cotextNode.getRelation(XRI_S_REGISTRAR);
 
@@ -2433,7 +2576,11 @@ public class BasicCSP implements CSP {
 
 		this.prepareMessageToCSP(message);
 		log.debug("registerCloudNamesInCSP :: Message  "+ messageEnvelope.getGraph().toString());
+		long startTime = System.currentTimeMillis();
 		this.getXdiClientCSPRegistry().send(messageEnvelope);
+		long endTime = System.currentTimeMillis();
+		log.info("transferCloudInCSP Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
+	                - startTime);
 
 		//set registrar
 		setCloudXdiEndpointInCSP(cloudNumber, null);
@@ -2451,7 +2598,11 @@ public class BasicCSP implements CSP {
 
 		// send message
 		this.prepareMessageToCSP(message);
+		long startTime = System.currentTimeMillis();
 		this.getXdiClientCSPRegistry().send(messageEnvelope);
+		long endTime = System.currentTimeMillis();
+		log.info("deleteCloudInCSP Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
+	                - startTime);
 	}
 	
 	
@@ -2481,8 +2632,12 @@ public class BasicCSP implements CSP {
 	
 			this.prepareMessageToRN(message);
 			
+			long startTime = System.currentTimeMillis();
 			this.getXdiClientRNRegistrationService().send(messageEnvelope);
-	
+			long endTime = System.currentTimeMillis();
+			log.info("changeMemberRegistrarInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
+		                - startTime);
+
 			log.debug("In RN: updated member registrar for:" + cloudNumber +" with CSP Cloud Number: "+getCspInformation().getCspCloudNumber().getXDIAddress());
 		}
 	}
@@ -2508,8 +2663,11 @@ public class BasicCSP implements CSP {
 
 		// send message and read results
 		this.prepareMessageToRN(message);
+		long startTime = System.currentTimeMillis();
 		this.getXdiClientRNRegistrationService().send(messageEnvelope);
-
+		long endTime = System.currentTimeMillis();
+		log.info("deleteMemberRegistrar Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
+	                - startTime);
 
 		log.debug("Deleted current member registrar for:" + cloudNumber);
 	
@@ -2536,8 +2694,12 @@ public class BasicCSP implements CSP {
 	    log.debug("checkCloudNameInCSP :: Message envelope to CSP \n");
 	    printMessage(messageEnvelope);
 
+	    long startTime = System.currentTimeMillis();
 	    MessagingResponse messageResult = this.getXdiClientCSPRegistry().send(messageEnvelope);
-        ContextNode cotextNode = messageResult.getGraph().getDeepContextNode(XDIAddress.fromComponent(cloudName.getPeerRootXDIArc()));
+	    long endTime = System.currentTimeMillis();
+		log.info("checkCloudNameInCSP Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
+	                - startTime);
+		ContextNode cotextNode = messageResult.getGraph().getDeepContextNode(XDIAddress.fromComponent(cloudName.getPeerRootXDIArc()));
         Relation relation = cotextNode == null ? null : cotextNode.getRelation(XDIDictionaryConstants.XDI_ADD_REF);
 
 	    if (relation != null) {

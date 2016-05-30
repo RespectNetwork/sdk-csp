@@ -79,7 +79,11 @@ public class BasicNotificationService implements Notifier {
  
     /** Mail Transport */
     private String mailTransport;
-     
+   
+    /** Email Failure Retry **/
+    private final long SLEEP_TIME = 10000;
+    private final int RETRY_LIMIT = 5;
+    
     /**
      * @return the accountSID
      */
@@ -309,15 +313,16 @@ public class BasicNotificationService implements Notifier {
             }
           });
  
+        Message message = null;
         try {
  
-            Message message = new MimeMessage(session);
+            message = new MimeMessage(session);
             message.setFrom(new InternetAddress(emailFrom));
             message.setRecipients(Message.RecipientType.TO,
             InternetAddress.parse(emailTo));
             message.setSubject(subject);
             message.setContent(messageOut, "text/html");
-            synchronized (message) {
+            synchronized (this) {
                 Transport.send(message);
                 try {
                     Thread.sleep(1000);
@@ -326,15 +331,35 @@ public class BasicNotificationService implements Notifier {
                     e.printStackTrace();
                 }
             }
-            
- 
         } catch ( AuthenticationFailedException e) { 
             String errorMsg = "Problem Sending eMail to {} : Issue:Authentication Failed at  mail Service";
             LOG.warn(errorMsg);
             throw new NotificationException(errorMsg);
         } catch (MessagingException e) {
             LOG.warn("Problem Sending eMail to {} : Issue: {}", emailTo, e.getMessage());
-            throw new NotificationException(e.getMessage());
+            for(int retryCount = 1; retryCount <= RETRY_LIMIT; retryCount++){
+            	
+            	try{
+            		Transport.send(message);
+            		break;
+            
+            	}catch(MessagingException ex){
+            		
+            		LOG.warn("Problem Sending eMail to {} : Issue: {}", emailTo, e.getMessage());
+            		
+            		if(retryCount == RETRY_LIMIT){
+            			LOG.debug("Retry completed. Giving up.");
+            			throw new NotificationException(e.getMessage());            			           		
+            		}
+            		try {
+            			LOG.debug("Retrying for {} time", retryCount);
+						Thread.sleep(SLEEP_TIME);
+						
+					} catch (InterruptedException e1) {
+						LOG.debug("This thread is waiting before retrying");
+					}
+            	}
+            }
         }
 
     }
@@ -408,9 +433,10 @@ public class BasicNotificationService implements Notifier {
           });
 
         String errorInEmail = null;
+        Message message = null;
         try {
 
-            Message message = new MimeMessage(session);
+            message = new MimeMessage(session);
             message.setFrom(new InternetAddress(emailFrom));
             if(toEmail != null) {
                 errorInEmail = toEmail;
@@ -424,7 +450,7 @@ public class BasicNotificationService implements Notifier {
             }
             message.setSubject(subject);
             message.setContent(messageOut, "text/html");
-            synchronized (message) {
+            synchronized (this) {
                 Transport.send(message);
                 try {
                     Thread.sleep(1000);
@@ -440,7 +466,30 @@ public class BasicNotificationService implements Notifier {
             throw new NotificationException(errorMsg);
         } catch (MessagingException e) {
             LOG.warn("Problem Sending eMail to {} : Issue: {}", errorInEmail, e.getMessage());
-            throw new NotificationException(e.getMessage());
+            
+            for(int retryCount = 1; retryCount <= RETRY_LIMIT; retryCount++){
+            	
+            	try{
+            		Transport.send(message);
+            		break;
+            
+            	}catch(MessagingException ex){
+            		
+            		LOG.warn("Problem Sending eMail to {} : Issue: {}", errorInEmail, e.getMessage());
+            		
+            		if(retryCount == RETRY_LIMIT){
+            			LOG.debug("Retry completed. Giving up.");
+            			throw new NotificationException(e.getMessage());            			           		
+            		}
+            		try {
+            			LOG.debug("Retrying for {} time", retryCount);
+						Thread.sleep(SLEEP_TIME);
+						
+					} catch (InterruptedException e1) {
+						LOG.debug("This thread is waiting before retrying");
+					}
+            	}
+            }
         }
     }
 
