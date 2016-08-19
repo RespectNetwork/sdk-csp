@@ -37,7 +37,7 @@ public interface UserValidator {
      * @return whether or not Validation succeeded
      * 
      */
-    public boolean validateCodes(String sessionIdentifier, String emailCode, String smsCode)
+    public boolean validateCodes(String sessionIdentifier, String emailCode, String smsCode, String email, String phone)
             throws CSPValidationException;
     
    

@@ -2,8 +2,6 @@ package net.respectnetwork.sdk.csp.notification;
 
 import java.io.Serializable;
 
-import net.respectnetwork.sdk.csp.model.UserProfile;
-
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
@@ -18,16 +16,20 @@ public class TokenKey implements Serializable {
     /** Qualifier Key e.g. Phone/Email */
     private String tokenQualifier;
 
+    /** email address or phone number */
+    private String value;
+
     /**
      * Constructor using all fields.
      * 
      * @param cloudNumber
      * @param tokenQualifier
      */
-    public TokenKey(String cloudNumber, String tokenQualifier) {
+    public TokenKey(String cloudNumber, String tokenQualifier, String value) {
         super();
         this.cloudNumber = cloudNumber;
         this.tokenQualifier = tokenQualifier;
+        this.value = value;
     }
 
     /**
@@ -59,13 +61,27 @@ public class TokenKey implements Serializable {
     }
     
     /**
+     * @return value
+     */
+    public String getValue() {
+		return value;
+	}
+
+	/**
+	 * @param value the email address or phone number
+	 */
+	public void setValue(String value) {
+		this.value = value;
+	}
+
+	/**
      * toString Impl.
      */
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append("MessageForm [cloudNumber=").append(cloudNumber).append(", tokenQualifier=").append(tokenQualifier)
-                .append("]");
+                .append(", value=").append(value).append("]");
         return builder.toString();
     }
     
@@ -77,6 +93,7 @@ public class TokenKey implements Serializable {
         return new HashCodeBuilder()
         .append(cloudNumber)
         .append(tokenQualifier)
+        .append(value)
         .toHashCode();
     }
     
@@ -90,6 +107,7 @@ public class TokenKey implements Serializable {
             return new EqualsBuilder()
                 .append(cloudNumber, other.cloudNumber)
                 .append(tokenQualifier, other.tokenQualifier)
+                .append(value, other.value)
                 .isEquals();
         } else{
             return false;
