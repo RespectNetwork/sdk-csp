@@ -2,7 +2,6 @@ package net.respectnetwork.sdk.csp.notification;
 
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -28,8 +27,6 @@ import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
 import com.twilio.sdk.TwilioRestClient;
 import com.twilio.sdk.TwilioRestException;
 import com.twilio.sdk.resource.factory.MessageFactory;
-import com.twilio.sdk.resource.factory.SmsFactory;
-import com.twilio.sdk.resource.instance.Sms;
 
 /**
  * Basic Notification Service uses
@@ -85,9 +82,7 @@ public class BasicNotificationService implements Notifier {
  
     /** Mail Transport */
     private String mailTransport;
-    
-    
-     
+
     /**
      * @return the accountSID
      */
@@ -313,7 +308,7 @@ public class BasicNotificationService implements Notifier {
     }
 
     @Override
-    public void sendEmailNotification(String emailTo, String messageOut)
+    public void sendEmailNotification(String emailTo, String messageOut, String subject)
             throws NotificationException {
 
         Properties props = new Properties();
@@ -324,8 +319,8 @@ public class BasicNotificationService implements Notifier {
         props.put("mail.smtp.port", mailSMTPPort);
         props.put("mail.debug", mailDebug);
         props.put("mail.transport.protocol", mailTransport);
-        
- 
+
+        LOG.debug("Thread Name: {}, Subject: {}, emailId: {}", Thread.currentThread().getName(), subject, emailTo);
         Session session = Session.getInstance(props,
           new javax.mail.Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
@@ -333,13 +328,14 @@ public class BasicNotificationService implements Notifier {
             }
           });
  
+        Message message = null;
         try {
  
-            Message message = new MimeMessage(session);
+            message = new MimeMessage(session);
             message.setFrom(new InternetAddress(emailFrom));
             message.setRecipients(Message.RecipientType.TO,
             InternetAddress.parse(emailTo));
-            message.setSubject(emailSubject);
+            message.setSubject(subject);
             message.setContent(messageOut, "text/html");
             Transport.send(message);
  
@@ -365,7 +361,7 @@ public class BasicNotificationService implements Notifier {
         throws NotificationException{
         
         //First Check length
-        if( message.length() >  MAX_SMS_SIZE ) {
+        if(message != null && message.length() >  MAX_SMS_SIZE ) {
             throw new NotificationException ("SMS Message too large");
         } else {
             return message;
@@ -405,7 +401,7 @@ public class BasicNotificationService implements Notifier {
      */
     @Override
     public void sendEmailNotification(String toEmail,
-            String bccEmail, String messageOut) throws NotificationException {
+            String bccEmail, String messageOut, String subject) throws NotificationException {
         Properties props = new Properties();
 
         props.put("mail.smtp.auth", mailSMTPAuth);
@@ -423,9 +419,10 @@ public class BasicNotificationService implements Notifier {
           });
 
         String errorInEmail = null;
+        Message message = null;
         try {
 
-            Message message = new MimeMessage(session);
+            message = new MimeMessage(session);
             message.setFrom(new InternetAddress(emailFrom));
             if(toEmail != null) {
                 errorInEmail = toEmail;
@@ -437,7 +434,7 @@ public class BasicNotificationService implements Notifier {
                 message.setRecipients(Message.RecipientType.BCC,
                 InternetAddress.parse(bccEmail));
             }
-            message.setSubject(emailSubject);
+            message.setSubject(subject);
             message.setContent(messageOut, "text/html");
             Transport.send(message);
 
@@ -459,8 +456,8 @@ public class BasicNotificationService implements Notifier {
    		String cspCloudName, Map<String, Object> placeHolders) throws NotificationException{   		    	    	
     	
        	FreemarkerUtil freemarkerUtil = FreemarkerUtil.getInstance();
-       	String content = freemarkerUtil.getTemplateContent(event, cspCloudName, placeHolders);       	
-		sendEmailNotification(emailAddress, content);
+       	String content = freemarkerUtil.getTemplateContent(event, cspCloudName, placeHolders);
+		sendEmailNotification(emailAddress, content, freemarkerUtil.getSubject());
    }
 
 }
