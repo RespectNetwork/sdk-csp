@@ -34,19 +34,19 @@ import xdi2.core.Graph;
 import xdi2.core.LiteralNode;
 import xdi2.core.Relation;
 import xdi2.core.Statement;
-import xdi2.core.constants.XDISecurityConstants;
 import xdi2.core.constants.XDIConstants;
 import xdi2.core.constants.XDIDictionaryConstants;
 import xdi2.core.constants.XDILinkContractConstants;
+import xdi2.core.constants.XDISecurityConstants;
 import xdi2.core.constants.XDITimestampsConstants;
 import xdi2.core.features.linkcontracts.instance.GenericLinkContract;
 import xdi2.core.features.linkcontracts.instance.PublicLinkContract;
 import xdi2.core.features.linkcontracts.instance.RootLinkContract;
-import xdi2.core.features.policy.PolicyAnd;
-import xdi2.core.features.policy.PolicyUtil;
 import xdi2.core.features.nodetypes.XdiAbstractInstanceUnordered;
 import xdi2.core.features.nodetypes.XdiCommonRoot;
 import xdi2.core.features.nodetypes.XdiInnerRoot;
+import xdi2.core.features.policy.PolicyAnd;
+import xdi2.core.features.policy.PolicyUtil;
 import xdi2.core.features.signatures.RSASignature;
 import xdi2.core.features.signatures.Signatures;
 import xdi2.core.features.timestamps.Timestamps;
@@ -54,6 +54,11 @@ import xdi2.core.impl.memory.MemoryGraph;
 import xdi2.core.impl.memory.MemoryGraphFactory;
 import xdi2.core.io.XDIWriterRegistry;
 import xdi2.core.security.signature.create.RSAStaticPrivateKeySignatureCreator;
+import xdi2.core.syntax.CloudName;
+import xdi2.core.syntax.CloudNumber;
+import xdi2.core.syntax.XDIAddress;
+import xdi2.core.syntax.XDIArc;
+import xdi2.core.syntax.XDIStatement;
 import xdi2.core.util.GraphUtil;
 import xdi2.core.util.XDIAddressUtil;
 import xdi2.core.util.iterators.IteratorArrayMaker;
@@ -63,1042 +68,1074 @@ import xdi2.core.util.iterators.MappingXDIStatementIterator;
 import xdi2.core.util.iterators.NotNullIterator;
 import xdi2.core.util.iterators.ReadOnlyIterator;
 import xdi2.core.util.iterators.SelectingNotImpliedStatementIterator;
-import xdi2.core.syntax.CloudName;
-import xdi2.core.syntax.CloudNumber;
-import xdi2.core.syntax.XDIAddress;
-import xdi2.core.syntax.XDIStatement;
-import xdi2.core.syntax.XDIArc;
 import xdi2.messaging.Message;
 import xdi2.messaging.MessageCollection;
 import xdi2.messaging.MessageEnvelope;
-import xdi2.messaging.response.MessagingResponse;
 import xdi2.messaging.operations.Operation;
-
-
+import xdi2.messaging.response.MessagingResponse;
 
 public class BasicCSP implements CSP {
 
-	private static final Logger log = LoggerFactory.getLogger(BasicCSP.class);
+    private static final Logger log = LoggerFactory.getLogger(BasicCSP.class);
 
-	public static final XDIAddress XRI_S_AC_VERIFIED_DIGEST_PHONE = XDIAddress.create("<#verified><$digest>[<#phone>]");
-	public static final XDIAddress XRI_S_AC_VERIFIED_DIGEST_EMAIL = XDIAddress.create("<#verified><$digest>[<#email>]");
-	public static final XDIAddress XRI_S_AS_VERIFIED_PHONE = XDIAddress.create("<#verified><#phone>");
-	public static final XDIAddress XRI_S_AS_VERIFIED_EMAIL = XDIAddress.create("<#verified><#email>");
-	public static final XDIAddress XRI_S_IS_PHONE = XDIAddress.create("$is#phone");
-	public static final XDIAddress XRI_S_IS_EMAIL = XDIAddress.create("$is#email");
+    public static final XDIAddress XRI_S_AC_VERIFIED_DIGEST_PHONE = XDIAddress.create("<#verified><$digest>[<#phone>]");
+    public static final XDIAddress XRI_S_AC_VERIFIED_DIGEST_EMAIL = XDIAddress.create("<#verified><$digest>[<#email>]");
+    public static final XDIAddress XRI_S_AS_VERIFIED_PHONE = XDIAddress.create("<#verified><#phone>");
+    public static final XDIAddress XRI_S_AS_VERIFIED_EMAIL = XDIAddress.create("<#verified><#email>");
+    public static final XDIAddress XRI_S_IS_PHONE = XDIAddress.create("$is#phone");
+    public static final XDIAddress XRI_S_IS_EMAIL = XDIAddress.create("$is#email");
 
-	public static final XDIAddress XRI_S_IS_GUARDIAN = XDIAddress.create("$is#guardian");
-	public static final XDIAddress XRI_S_GUARDIAN = XDIAddress.create("#guardian");
+    public static final XDIAddress XRI_S_IS_GUARDIAN = XDIAddress.create("$is#guardian");
+    public static final XDIAddress XRI_S_GUARDIAN = XDIAddress.create("#guardian");
 
-	public static final XDIAddress XRI_S_IS_BILLING_CONTACT = XDIAddress.create("$is#billing#contact");
-	public static final XDIAddress XRI_S_BILLING_CONTACT = XDIAddress.create("#billing#contact");
+    public static final XDIAddress XRI_S_IS_BILLING_CONTACT = XDIAddress.create("$is#billing#contact");
+    public static final XDIAddress XRI_S_BILLING_CONTACT = XDIAddress.create("#billing#contact");
 
-	public static final XDIAddress XRI_S_MEMBER = XDIAddress.create("#member");
-	public static final XDIAddress XRI_S_AS_MEMBER_EXPIRATION_TIME = XDIAddress.create("<#member><#expiration><$t>");
+    public static final XDIAddress XRI_S_MEMBER = XDIAddress.create("#member");
+    public static final XDIAddress XRI_S_AS_MEMBER_EXPIRATION_TIME = XDIAddress.create("<#member><#expiration><$t>");
 
-	public static final XDIAddress XRI_S_FIRST_MEMBER = XDIAddress.create("#first#member");
+    public static final XDIAddress XRI_S_FIRST_MEMBER = XDIAddress.create("#first#member");
 
-	public static final XDIAddress XRI_S_AS_AVAILABLE = XDIAddress.create("<#available>");
-	
-	public static final XDIAddress XRI_S_REGISTRAR = XDIAddress.create("#registrar");
+    public static final XDIAddress XRI_S_AS_AVAILABLE = XDIAddress.create("<#available>");
+
+    public static final XDIAddress XRI_S_REGISTRAR = XDIAddress.create("#registrar");
     public static final XDIAddress XRI_S_AS_PHONE = XDIAddress.create("<#phone>");
     public static final XDIAddress XRI_S_AS_EMAIL = XDIAddress.create("<#email>");
     public static final XDIAddress XRI_S_AS_PROFILE_CARD_NAME = XDIAddress.create("<#card><#name>");
     public static final XDIAddress XRI_S_AS_PROFILE = XDIAddress.create("#profile$card");
     public static final XDIAddress XRI_S_AS_REGISTER_DATE = XDIAddress.create("<#registration><#date><$t>");
+    public static final XDIAddress XRI_S_IS_DEVELOPER = XDIAddress.create("$is#developer");
+    public static final XDIAddress XRI_S_DEVELOPER = XDIAddress.create("#developer");
 
+    private CSPInformation cspInformation;
 
-	private CSPInformation cspInformation;
+    private XDIClient xdiClientCSPRegistry;
+    private XDIClient xdiClientRNRegistrationService;
 
-	private XDIClient xdiClientCSPRegistry;
-	private XDIClient xdiClientRNRegistrationService;
+    public BasicCSP() {
 
-	public BasicCSP() {
+    }
 
-	}
+    public BasicCSP(CSPInformation cspInformation) {
+        this.cspInformation = cspInformation;
+    }
 
-	public BasicCSP(CSPInformation cspInformation) {
-		this.cspInformation = cspInformation;
-	}
+    @Override
+    public void registerCloudInCSP(CloudNumber cloudNumber, String secretToken) throws Xdi2ClientException {
 
-	@Override
-	public void registerCloudInCSP(CloudNumber cloudNumber, String secretToken) throws Xdi2ClientException {
+        // prepare message to CSP
 
-		// prepare message to CSP
+        MessageEnvelope messageEnvelope = new MessageEnvelope();
+        MessageCollection messageCollection = this.createMessageCollectionToCSP(messageEnvelope);
 
-		MessageEnvelope messageEnvelope = new MessageEnvelope();
-		MessageCollection messageCollection = this.createMessageCollectionToCSP(messageEnvelope);
+        Message message = messageCollection.createMessage();
 
-		Message message = messageCollection.createMessage();
+        String cloudXdiEndpoint = this.makeCloudXdiEndpoint(cloudNumber);
 
-		String cloudXdiEndpoint = this.makeCloudXdiEndpoint(cloudNumber);
+        XDIStatement targetStatementSet = XDIStatement.fromLiteralComponents(
+                XDIAddressUtil.concatXDIAddresses(cloudNumber.getXDIAddress(), XDIAddress.create("<$xdi><$uri>")),
+                cloudXdiEndpoint);
 
-		XDIStatement targetStatementSet = XDIStatement.fromLiteralComponents(
-				XDIAddressUtil.concatXDIAddresses(cloudNumber.getXDIAddress(), XDIAddress.create("<$xdi><$uri>")), 
-				cloudXdiEndpoint);
+        message.createSetOperation(targetStatementSet);
 
-		message.createSetOperation(targetStatementSet);
+        if (secretToken != null) {
 
-		if (secretToken != null) {
+            XDIStatement targetStatementDoDigestSecretToken = XDIStatement.fromLiteralComponents(XDIAddressUtil
+                    .concatXDIAddresses(XDIAddress.fromComponent(cloudNumber.getPeerRootXDIArc()),
+                            XDISecurityConstants.XDI_ADD_DIGEST_SECRET_TOKEN), secretToken);
 
-			XDIStatement targetStatementDoDigestSecretToken = XDIStatement.fromLiteralComponents(
-					XDIAddressUtil.concatXDIAddresses(XDIAddress.fromComponent(cloudNumber.getPeerRootXDIArc()), XDISecurityConstants.XDI_ADD_DIGEST_SECRET_TOKEN), 
-					secretToken);
+            message.createOperation(XDIAddress.create("$do<$digest><$secret><$token>"),
+                    targetStatementDoDigestSecretToken);
+        }
 
-			message.createOperation(XDIAddress.create("$do<$digest><$secret><$token>"), targetStatementDoDigestSecretToken);
-		}
+        // send message
 
-		// send message
+        this.prepareMessageToCSP(message);
+        log.debug("registerCloudInCSP :: Message to CSP :" + messageEnvelope.getGraph().toString());
+        long startTime = System.currentTimeMillis();
+        this.getXdiClientCSPRegistry().send(messageEnvelope);
+        long endTime = System.currentTimeMillis();
+        log.info("registerCloudInCSP Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
+                - startTime);
 
-		this.prepareMessageToCSP(message);
-		log.debug("registerCloudInCSP :: Message to CSP :" + messageEnvelope.getGraph().toString() );
-		long startTime = System.currentTimeMillis();
-		this.getXdiClientCSPRegistry().send(messageEnvelope);
-		long endTime = System.currentTimeMillis();
-		log.info("registerCloudInCSP Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
-	                - startTime);
+        // done
 
-		// done
+        log.debug("In CSP: Cloud registered with Cloud Number " + cloudNumber
+                + " and Secret Token and Cloud XDI endpoint " + cloudXdiEndpoint);
+    }
 
-		log.debug("In CSP: Cloud registered with Cloud Number " + cloudNumber + " and Secret Token and Cloud XDI endpoint " + cloudXdiEndpoint);
-	}
+    @Override
+    public boolean checkCloudNameAvailableInRN(CloudName cloudName) throws Xdi2ClientException {
 
-	@Override
-	public boolean checkCloudNameAvailableInRN(CloudName cloudName) throws Xdi2ClientException {
+        boolean available;
 
-		boolean available;
+        // prepare message to RN
 
-		// prepare message to RN
+        MessageEnvelope messageEnvelope = new MessageEnvelope();
+        MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
 
-		MessageEnvelope messageEnvelope = new MessageEnvelope();
-		MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
+        Message message = messageCollection.createMessage();
 
-		Message message = messageCollection.createMessage();
+        XDIAddress targetAddress = XDIAddress.fromComponent(cloudName.getPeerRootXDIArc());
 
-		XDIAddress targetAddress = XDIAddress.fromComponent(cloudName.getPeerRootXDIArc());
+        message.createGetOperation(targetAddress);
 
-		message.createGetOperation(targetAddress);
+        // send message and read result
 
-		// send message and read result
+        this.prepareMessageToRN(message);
 
-		this.prepareMessageToRN(message);
+        log.debug("checkCloudNameAvailableInRN :: Message envelope to RN \n");
+        printMessage(messageEnvelope);
 
-		log.debug("checkCloudNameAvailableInRN :: Message envelope to RN \n" );
-		printMessage(messageEnvelope);
+        long startTime = System.currentTimeMillis();
+        MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope);
+        long endTime = System.currentTimeMillis();
+        log.info("checkCloudNameAvailableInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime,
+                startTime, endTime - startTime);
 
-		long startTime = System.currentTimeMillis();
-		MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope);
-		long endTime = System.currentTimeMillis();
-		log.info("checkCloudNameAvailableInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
-	                - startTime);
+        LiteralNode literal = messageResult.getGraph().getDeepLiteralNode(
+                XDIAddressUtil.concatXDIAddresses(XDIAddress.fromComponent(cloudName.getPeerRootXDIArc()),
+                        XRI_S_AS_AVAILABLE));
+        if (literal == null)
+            throw new Xdi2ClientException("No availability literal found in result.");
 
-		LiteralNode literal = messageResult.getGraph().getDeepLiteralNode(XDIAddressUtil.concatXDIAddresses(XDIAddress.fromComponent(cloudName.getPeerRootXDIArc()), XRI_S_AS_AVAILABLE));
-		if (literal == null) throw new Xdi2ClientException("No availability literal found in result.");
+        Boolean literalDataBoolean = literal.getLiteralDataBoolean();
+        if (literalDataBoolean == null)
+            throw new Xdi2ClientException("No availability boolean value found in result.");
 
-		Boolean literalDataBoolean = literal.getLiteralDataBoolean();
-		if (literalDataBoolean == null) throw new Xdi2ClientException("No availability boolean value found in result.");
+        available = literalDataBoolean.booleanValue();
 
-		available = literalDataBoolean.booleanValue();
+        // done
 
-		// done
+        log.debug("In RN: For Cloud Name " + cloudName + " found availability " + available);
+        return available;
+    }
 
-		log.debug("In RN: For Cloud Name " + cloudName + " found availability " + available);
-		return available;
-	}
+    @Override
+    public CloudNumber checkCloudNameInRN(CloudName cloudName) throws Xdi2ClientException {
 
-	@Override
-	public CloudNumber checkCloudNameInRN(CloudName cloudName) throws Xdi2ClientException {
+        CloudNumber cloudNumber = null;
 
-		CloudNumber cloudNumber = null;
+        // prepare message to RN
 
-		// prepare message to RN
+        MessageEnvelope messageEnvelope = new MessageEnvelope();
+        MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
 
-		MessageEnvelope messageEnvelope = new MessageEnvelope();
-		MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
+        Message message = messageCollection.createMessage();
 
-		Message message = messageCollection.createMessage();
+        XDIStatement targetStatement = XDIStatement.fromComponents(
+                XDIAddress.fromComponent(cloudName.getPeerRootXDIArc()), XDIDictionaryConstants.XDI_ADD_REF,
+                XDIConstants.XDI_ADD_COMMON_VARIABLE);
 
-		XDIStatement targetStatement = XDIStatement.fromComponents(XDIAddress.fromComponent(cloudName.getPeerRootXDIArc()), XDIDictionaryConstants.XDI_ADD_REF, XDIConstants.XDI_ADD_COMMON_VARIABLE);
+        message.createGetOperation(targetStatement);
 
-		message.createGetOperation(targetStatement);
+        // send message and read result
 
-		// send message and read result
+        this.prepareMessageToRN(message);
 
-		this.prepareMessageToRN(message);
+        log.debug("checkCloudNameAvailableInRN :: Message envelope to RN \n");
+        printMessage(messageEnvelope);
 
-		log.debug("checkCloudNameAvailableInRN :: Message envelope to RN \n" );
-		printMessage(messageEnvelope);
+        long startTime = System.currentTimeMillis();
+        MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope);
+        long endTime = System.currentTimeMillis();
+        log.info("checkCloudNameInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
+                - startTime);
+        ContextNode contextNode = messageResult.getGraph().getDeepContextNode(
+                XDIAddress.fromComponent(cloudName.getPeerRootXDIArc()));
+        if (contextNode == null) {
+            return cloudNumber;
+        }
+        Relation relation = contextNode.getRelation(XDIDictionaryConstants.XDI_ADD_REF);
+        if (relation != null) {
 
-		long startTime = System.currentTimeMillis();
-		MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope);
-		long endTime = System.currentTimeMillis();
-		log.info("checkCloudNameInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
-	                - startTime);
-		ContextNode contextNode = messageResult.getGraph().getDeepContextNode(XDIAddress.fromComponent(cloudName.getPeerRootXDIArc()));
-		if(contextNode == null) {
-		    return cloudNumber;
-		}
-		Relation relation = contextNode.getRelation(XDIDictionaryConstants.XDI_ADD_REF);
-		if (relation != null) {
+            cloudNumber = CloudNumber.fromPeerRootXDIArc(relation.getTargetXDIAddress().getFirstXDIArc());
+        }
 
-			cloudNumber = CloudNumber.fromPeerRootXDIArc(relation.getTargetXDIAddress().getFirstXDIArc());
-		}
+        // done
 
-		// done
+        log.debug("In RN: For Cloud Name " + cloudName + " found Cloud Number " + cloudNumber);
+        return cloudNumber;
+    }
 
-		log.debug("In RN: For Cloud Name " + cloudName + " found Cloud Number " + cloudNumber);
-		return cloudNumber;
-	}
+    @Override
+    public CloudNumber[] checkPhoneAndEmailAvailableInRN(String verifiedPhone, String verifiedEmail)
+            throws Xdi2ClientException {
 
-	@Override
-	public CloudNumber[] checkPhoneAndEmailAvailableInRN(String verifiedPhone, String verifiedEmail) throws Xdi2ClientException {
+        CloudNumber[] cloudNumbers = new CloudNumber[2];
 
-		CloudNumber[] cloudNumbers = new CloudNumber[2];
+        // prepare message to RN
 
-		// prepare message to RN
+        MessageEnvelope messageEnvelope = new MessageEnvelope();
+        MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
 
-		MessageEnvelope messageEnvelope = new MessageEnvelope();
-		MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
+        Message message = messageCollection.createMessage();
 
-		Message message = messageCollection.createMessage();
+        XDIAddress targetAddress1 = verifiedPhone == null ? null : XDIAddressUtil.concatXDIAddresses(
+                this.getCspInformation().getRnCloudNumber().getXDIAddress(),
+                XRI_S_AC_VERIFIED_DIGEST_PHONE,
+                XDIAddress.fromComponent(XdiAbstractInstanceUnordered.createXDIArc(true, true, false,
+                        XDIArc.literalFromDigest(verifiedPhone))));
+        XDIAddress targetAddress2 = verifiedEmail == null ? null : XDIAddressUtil.concatXDIAddresses(
+                this.getCspInformation().getRnCloudNumber().getXDIAddress(),
+                XRI_S_AC_VERIFIED_DIGEST_EMAIL,
+                XDIAddress.fromComponent(XdiAbstractInstanceUnordered.createXDIArc(true, true, false,
+                        XDIArc.literalFromDigest(verifiedEmail))));
 
-		XDIAddress targetAddress1 = verifiedPhone == null ? null : XDIAddressUtil.concatXDIAddresses(this.getCspInformation().getRnCloudNumber().getXDIAddress(), XRI_S_AC_VERIFIED_DIGEST_PHONE, XDIAddress.fromComponent(XdiAbstractInstanceUnordered.createXDIArc(true, true, false, XDIArc.literalFromDigest(verifiedPhone))));
-		XDIAddress targetAddress2 = verifiedEmail == null ? null : XDIAddressUtil.concatXDIAddresses(this.getCspInformation().getRnCloudNumber().getXDIAddress(), XRI_S_AC_VERIFIED_DIGEST_EMAIL, XDIAddress.fromComponent(XdiAbstractInstanceUnordered.createXDIArc(true, true, false, XDIArc.literalFromDigest(verifiedEmail))));
+        if (targetAddress1 != null)
+            message.createGetOperation(targetAddress1);
+        if (targetAddress2 != null)
+            message.createGetOperation(targetAddress2);
 
-		if (targetAddress1 != null) message.createGetOperation(targetAddress1);
-		if (targetAddress2 != null) message.createGetOperation(targetAddress2);
+        // send message
 
-		// send message
+        this.prepareMessageToRN(message);
+        log.debug("checkPhoneAndEmailAvailableInRN :: Message to RN " + messageEnvelope.getGraph().toString());
+        long startTime = System.currentTimeMillis();
+        MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope);
+        long endTime = System.currentTimeMillis();
+        log.info("checkPhoneAndEmailAvailableInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime,
+                startTime, endTime - startTime);
+        ContextNode contextNode1 = targetAddress1 == null ? null : messageResult.getGraph().getDeepContextNode(
+                targetAddress1);
+        Relation relation1 = contextNode1 == null ? null : contextNode1.getRelation(XRI_S_IS_PHONE);
 
-		this.prepareMessageToRN(message);
-		log.debug("checkPhoneAndEmailAvailableInRN :: Message to RN " + messageEnvelope.getGraph().toString());
-		long startTime = System.currentTimeMillis();
-		MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope);
-		long endTime = System.currentTimeMillis();
-		log.info("checkPhoneAndEmailAvailableInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
-	                - startTime);
-	    ContextNode contextNode1 = targetAddress1 == null ? null : messageResult.getGraph().getDeepContextNode(targetAddress1);
-	    Relation relation1 = contextNode1 == null ? null : contextNode1.getRelation(XRI_S_IS_PHONE);
-		
-	    ContextNode contextNode2 = targetAddress2 == null ? null : messageResult.getGraph().getDeepContextNode(targetAddress2);
-	    Relation relation2 = contextNode2 == null ? null : contextNode2.getRelation(XRI_S_IS_EMAIL);
-		if (relation1 != null) {
+        ContextNode contextNode2 = targetAddress2 == null ? null : messageResult.getGraph().getDeepContextNode(
+                targetAddress2);
+        Relation relation2 = contextNode2 == null ? null : contextNode2.getRelation(XRI_S_IS_EMAIL);
+        if (relation1 != null) {
 
-			cloudNumbers[0] = CloudNumber.fromXDIAddress(relation1.getTargetXDIAddress());
-		}
+            cloudNumbers[0] = CloudNumber.fromXDIAddress(relation1.getTargetXDIAddress());
+        }
 
-		if (relation2 != null) {
+        if (relation2 != null) {
 
-			cloudNumbers[1] = CloudNumber.fromXDIAddress(relation2.getTargetXDIAddress());
-		}
+            cloudNumbers[1] = CloudNumber.fromXDIAddress(relation2.getTargetXDIAddress());
+        }
 
-		// done
+        // done
 
-		log.debug("In RN: For verified phone " + verifiedPhone + " and verified email " + verifiedEmail + " found Cloud Numbers " + Arrays.asList(cloudNumbers));
-		return cloudNumbers;
-	}
+        log.debug("In RN: For verified phone " + verifiedPhone + " and verified email " + verifiedEmail
+                + " found Cloud Numbers " + Arrays.asList(cloudNumbers));
+        return cloudNumbers;
+    }
 
-	@Deprecated
-	public CloudNumber registerCloudNameInRN(CloudName cloudName) throws Xdi2ClientException {
+    @Deprecated
+    public CloudNumber registerCloudNameInRN(CloudName cloudName) throws Xdi2ClientException {
 
-		// prepare message 1 to RN
+        // prepare message 1 to RN
 
-		MessageEnvelope messageEnvelope1 = new MessageEnvelope();
-		MessageCollection messageCollection1 = this.createMessageCollectionToRN(messageEnvelope1);
-		Message message1 = messageCollection1.createMessage();
+        MessageEnvelope messageEnvelope1 = new MessageEnvelope();
+        MessageCollection messageCollection1 = this.createMessageCollectionToRN(messageEnvelope1);
+        Message message1 = messageCollection1.createMessage();
 
-		XDIStatement targetStatementSet1 = XDIStatement.fromRelationComponents(
-				XDIAddress.fromComponent(cloudName.getPeerRootXDIArc()), 
-				XDIDictionaryConstants.XDI_ADD_REF, 
-				XDIConstants.XDI_ADD_COMMON_VARIABLE);
+        XDIStatement targetStatementSet1 = XDIStatement.fromRelationComponents(
+                XDIAddress.fromComponent(cloudName.getPeerRootXDIArc()), XDIDictionaryConstants.XDI_ADD_REF,
+                XDIConstants.XDI_ADD_COMMON_VARIABLE);
 
-		message1.createSetOperation(targetStatementSet1);
+        message1.createSetOperation(targetStatementSet1);
 
-		// send message 1 and read result
+        // send message 1 and read result
 
-		this.prepareMessageToRN(message1);
-		long startTime = System.currentTimeMillis();
-		MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope1);
-		long endTime = System.currentTimeMillis();
-		log.info("registerCloudNameInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
-	                - startTime);
-		ContextNode  contextnode = messageResult.getGraph().getDeepContextNode(XDIAddress.fromComponent(cloudName.getPeerRootXDIArc()));
-		Relation relation = contextnode == null ? null : contextnode.getRelation(XDIDictionaryConstants.XDI_ADD_REF);
-		
-		if (relation == null) throw new RuntimeException("Cloud Number not registered.");
+        this.prepareMessageToRN(message1);
+        long startTime = System.currentTimeMillis();
+        MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope1);
+        long endTime = System.currentTimeMillis();
+        log.info("registerCloudNameInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime,
+                endTime - startTime);
+        ContextNode contextnode = messageResult.getGraph().getDeepContextNode(
+                XDIAddress.fromComponent(cloudName.getPeerRootXDIArc()));
+        Relation relation = contextnode == null ? null : contextnode.getRelation(XDIDictionaryConstants.XDI_ADD_REF);
 
-		CloudNumber cloudNumber = CloudNumber.fromPeerRootXDIArc(relation.getTargetXDIAddress().getFirstXDIArc());
+        if (relation == null)
+            throw new RuntimeException("Cloud Number not registered.");
 
-		// prepare message 2 to RN
+        CloudNumber cloudNumber = CloudNumber.fromPeerRootXDIArc(relation.getTargetXDIAddress().getFirstXDIArc());
 
-		MessageEnvelope messageEnvelope2 = new MessageEnvelope();
-		MessageCollection messageCollection2 = this.createMessageCollectionToCSP(messageEnvelope2);
+        // prepare message 2 to RN
 
-		Message message2 = messageCollection2.createMessage();
+        MessageEnvelope messageEnvelope2 = new MessageEnvelope();
+        MessageCollection messageCollection2 = this.createMessageCollectionToCSP(messageEnvelope2);
 
-		String cloudXdiEndpoint = this.makeCloudXdiEndpoint(cloudNumber);
+        Message message2 = messageCollection2.createMessage();
 
-		XDIStatement targetStatementSet2 = XDIStatement.fromLiteralComponents(
-				XDIAddressUtil.concatXDIAddresses(cloudNumber.getXDIAddress(), XDIAddress.create("<$xdi><$uri>")), 
-				cloudXdiEndpoint);
+        String cloudXdiEndpoint = this.makeCloudXdiEndpoint(cloudNumber);
 
-		message2.createSetOperation(targetStatementSet2);
+        XDIStatement targetStatementSet2 = XDIStatement.fromLiteralComponents(
+                XDIAddressUtil.concatXDIAddresses(cloudNumber.getXDIAddress(), XDIAddress.create("<$xdi><$uri>")),
+                cloudXdiEndpoint);
 
-		// send message 2
+        message2.createSetOperation(targetStatementSet2);
 
-		this.prepareMessageToRN(message2);
-		this.getXdiClientRNRegistrationService().send(messageEnvelope2);
+        // send message 2
 
-		// done
+        this.prepareMessageToRN(message2);
+        this.getXdiClientRNRegistrationService().send(messageEnvelope2);
 
-		log.debug("In RN: Cloud Name " + cloudName + " registered with Cloud Number " + cloudNumber);
+        // done
 
-		return cloudNumber;
-	}
+        log.debug("In RN: Cloud Name " + cloudName + " registered with Cloud Number " + cloudNumber);
 
-	@Override
-	public void registerCloudNameInRN(CloudName cloudName, CloudNumber cloudNumber, String verifiedPhone, String verifiedEmail, NeustarRNDiscountCode neustarRNDiscountCode) throws Xdi2ClientException {
+        return cloudNumber;
+    }
 
-		// prepare message 1 to RN
+    @Override
+    public void registerCloudNameInRN(CloudName cloudName, CloudNumber cloudNumber, String verifiedPhone,
+            String verifiedEmail, NeustarRNDiscountCode neustarRNDiscountCode) throws Xdi2ClientException {
 
-		MessageEnvelope messageEnvelope = new MessageEnvelope();
-		MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
+        // prepare message 1 to RN
 
-		Message message1 = messageCollection.createMessage(-1);
+        MessageEnvelope messageEnvelope = new MessageEnvelope();
+        MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
 
-		List<XDIStatement> targetStatementsSet = new ArrayList<XDIStatement> ();
+        Message message1 = messageCollection.createMessage(-1);
 
-		targetStatementsSet.add(XDIStatement.fromRelationComponents(
-				XDIAddress.fromComponent(cloudName.getPeerRootXDIArc()), 
-				XDIDictionaryConstants.XDI_ADD_REF, 
-				XDIAddress.fromComponent(cloudNumber.getPeerRootXDIArc())));
+        List<XDIStatement> targetStatementsSet = new ArrayList<XDIStatement>();
 
-		targetStatementsSet.add(XDIStatement.fromRelationComponents(
-				XDIAddress.fromComponent(cloudNumber.getPeerRootXDIArc()),
-				XDIDictionaryConstants.XDI_ADD_IS_REF, 
-				XDIAddress.fromComponent(cloudName.getPeerRootXDIArc())));
+        targetStatementsSet.add(XDIStatement.fromRelationComponents(
+                XDIAddress.fromComponent(cloudName.getPeerRootXDIArc()), XDIDictionaryConstants.XDI_ADD_REF,
+                XDIAddress.fromComponent(cloudNumber.getPeerRootXDIArc())));
 
-		Operation setOperation = message1.createSetOperation(targetStatementsSet.iterator());
+        targetStatementsSet.add(XDIStatement.fromRelationComponents(
+                XDIAddress.fromComponent(cloudNumber.getPeerRootXDIArc()), XDIDictionaryConstants.XDI_ADD_IS_REF,
+                XDIAddress.fromComponent(cloudName.getPeerRootXDIArc())));
 
-		if (neustarRNDiscountCode != null) {
+        Operation setOperation = message1.createSetOperation(targetStatementsSet.iterator());
 
-		    setOperation.setParameter(XDIDiscountCodeConstants.XRI_S_PARAMETER_NEUSTAR_RN_DISCOUNTCODE, neustarRNDiscountCode.toString());
-		}
+        if (neustarRNDiscountCode != null) {
 
-		// prepare message 2 to RN
+            setOperation.setParameter(XDIDiscountCodeConstants.XRI_S_PARAMETER_NEUSTAR_RN_DISCOUNTCODE,
+                    neustarRNDiscountCode.toString());
+        }
 
-		Message message2 = messageCollection.createMessage(-1);
+        // prepare message 2 to RN
 
-		String cloudXdiEndpoint = this.makeCloudXdiEndpoint(cloudNumber);
+        Message message2 = messageCollection.createMessage(-1);
 
-		List<XDIStatement> targetStatementsSet2 = new ArrayList<XDIStatement> ();
+        String cloudXdiEndpoint = this.makeCloudXdiEndpoint(cloudNumber);
 
-		targetStatementsSet2.add(XDIStatement.fromLiteralComponents(
-				XDIAddressUtil.concatXDIAddresses(cloudNumber.getPeerRootXDIArc(), XDIAddress.create("<$xdi><$uri>")), 
-				cloudXdiEndpoint));
+        List<XDIStatement> targetStatementsSet2 = new ArrayList<XDIStatement>();
 
-		message2.createSetOperation(targetStatementsSet2.iterator());
+        targetStatementsSet2.add(XDIStatement.fromLiteralComponents(
+                XDIAddressUtil.concatXDIAddresses(cloudNumber.getPeerRootXDIArc(), XDIAddress.create("<$xdi><$uri>")),
+                cloudXdiEndpoint));
 
-		// prepare message 3 to RN
+        message2.createSetOperation(targetStatementsSet2.iterator());
 
-		Message message3 = messageCollection.createMessage(-1);
+        // prepare message 3 to RN
 
-		List<XDIStatement> targetStatementsSet3 = new ArrayList<XDIStatement> ();
+        Message message3 = messageCollection.createMessage(-1);
 
-		if (verifiedPhone != null) {
+        List<XDIStatement> targetStatementsSet3 = new ArrayList<XDIStatement>();
 
-			targetStatementsSet3.add(XDIStatement.fromRelationComponents(
-					XDIAddressUtil.concatXDIAddresses(this.getCspInformation().getRnCloudNumber().getXDIAddress(), XRI_S_AC_VERIFIED_DIGEST_PHONE, XDIAddress.fromComponent(XdiAbstractInstanceUnordered.createXDIArc(true, true, false, XDIArc.literalFromDigest(verifiedPhone)))),
-					XRI_S_IS_PHONE,
-					cloudNumber.getXDIAddress()));
-		}
+        if (verifiedPhone != null) {
 
-		if (verifiedEmail != null) {
+            targetStatementsSet3.add(XDIStatement.fromRelationComponents(XDIAddressUtil.concatXDIAddresses(
+                    this.getCspInformation().getRnCloudNumber().getXDIAddress(),
+                    XRI_S_AC_VERIFIED_DIGEST_PHONE,
+                    XDIAddress.fromComponent(XdiAbstractInstanceUnordered.createXDIArc(true, true, false,
+                            XDIArc.literalFromDigest(verifiedPhone)))), XRI_S_IS_PHONE, cloudNumber.getXDIAddress()));
+        }
 
-			targetStatementsSet3.add(XDIStatement.fromRelationComponents(
-					XDIAddressUtil.concatXDIAddresses(this.getCspInformation().getRnCloudNumber().getXDIAddress(), XRI_S_AC_VERIFIED_DIGEST_EMAIL, XDIAddress.fromComponent(XdiAbstractInstanceUnordered.createXDIArc(true, true, false, XDIArc.literalFromDigest(verifiedEmail)))),
-					XRI_S_IS_EMAIL,
-					cloudNumber.getXDIAddress()));
-		}
+        if (verifiedEmail != null) {
 
-		message3.createSetOperation(targetStatementsSet3.iterator());
+            targetStatementsSet3.add(XDIStatement.fromRelationComponents(XDIAddressUtil.concatXDIAddresses(
+                    this.getCspInformation().getRnCloudNumber().getXDIAddress(),
+                    XRI_S_AC_VERIFIED_DIGEST_EMAIL,
+                    XDIAddress.fromComponent(XdiAbstractInstanceUnordered.createXDIArc(true, true, false,
+                            XDIArc.literalFromDigest(verifiedEmail)))), XRI_S_IS_EMAIL, cloudNumber.getXDIAddress()));
+        }
 
-		// send messages
+        message3.createSetOperation(targetStatementsSet3.iterator());
 
-		this.prepareMessageToRN(message1);
-		this.prepareMessageToRN(message2);
-		this.prepareMessageToRN(message3);
+        // send messages
 
-		log.debug("registerCloudNameInRN :: Message " + messageEnvelope.getGraph().toString());
-		long startTime = System.currentTimeMillis();
-		MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope);
-		long endTime = System.currentTimeMillis();
-		log.info("registerCloudNameInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
-	                - startTime);
+        this.prepareMessageToRN(message1);
+        this.prepareMessageToRN(message2);
+        this.prepareMessageToRN(message3);
 
-		log.debug("registerCloudNameInRN :: Message Response " + messageResult.getGraph().toString());
-		// Not required in the new native XDI registry. So commenting this for now and later on can be removed.
-		/*Relation relation = messageResult.getGraph().getDeepRelation(XDIAddress.fromComponent(cloudName.getPeerRootXDIArc()), XDIDictionaryConstants.XDI_ADD_REF);
-		if (relation == null) throw new RuntimeException("Cloud Name not registered.");
+        log.debug("registerCloudNameInRN :: Message " + messageEnvelope.getGraph().toString());
+        long startTime = System.currentTimeMillis();
+        MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope);
+        long endTime = System.currentTimeMillis();
+        log.info("registerCloudNameInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime,
+                endTime - startTime);
 
-		CloudNumber registeredCloudNumber = CloudNumber.fromPeerRootXri(relation.getTargetContextNodeXri());
-		if (! registeredCloudNumber.equals(cloudNumber)) throw new RuntimeException("Registered Cloud Number " + registeredCloudNumber + " does not match requested Cloud Number " + cloudNumber);
-        */
-		// done
+        log.debug("registerCloudNameInRN :: Message Response " + messageResult.getGraph().toString());
+        // Not required in the new native XDI registry. So commenting this for
+        // now and later on can be removed.
+        /*
+         * Relation relation =
+         * messageResult.getGraph().getDeepRelation(XDIAddress
+         * .fromComponent(cloudName.getPeerRootXDIArc()),
+         * XDIDictionaryConstants.XDI_ADD_REF); if (relation == null) throw new
+         * RuntimeException("Cloud Name not registered.");
+         * 
+         * CloudNumber registeredCloudNumber =
+         * CloudNumber.fromPeerRootXri(relation.getTargetContextNodeXri()); if
+         * (! registeredCloudNumber.equals(cloudNumber)) throw new
+         * RuntimeException("Registered Cloud Number " + registeredCloudNumber +
+         * " does not match requested Cloud Number " + cloudNumber);
+         */
+        // done
 
-		log.debug("In RN: Cloud Name " + cloudName + " registered with Cloud Number " + cloudNumber);
-	}
+        log.debug("In RN: Cloud Name " + cloudName + " registered with Cloud Number " + cloudNumber);
+    }
 
-	@Override
-	public void registerCloudNameInCSP(CloudName cloudName, CloudNumber cloudNumber) throws Xdi2ClientException {
+    @Override
+    public void registerCloudNameInCSP(CloudName cloudName, CloudNumber cloudNumber) throws Xdi2ClientException {
 
-		// prepare message to CSP
+        // prepare message to CSP
 
-		MessageEnvelope messageEnvelope = new MessageEnvelope();
-		MessageCollection messageCollection = this.createMessageCollectionToCSP(messageEnvelope);
+        MessageEnvelope messageEnvelope = new MessageEnvelope();
+        MessageCollection messageCollection = this.createMessageCollectionToCSP(messageEnvelope);
 
-		Message message = messageCollection.createMessage();
+        Message message = messageCollection.createMessage();
 
-		List<XDIStatement> targetStatementsSet = new ArrayList<XDIStatement> ();
+        List<XDIStatement> targetStatementsSet = new ArrayList<XDIStatement>();
 
-		targetStatementsSet.add(XDIStatement.fromRelationComponents(
-				XDIAddress.fromComponent(cloudName.getPeerRootXDIArc()), 
-				XDIDictionaryConstants.XDI_ADD_REF, 
-				XDIAddress.fromComponent(cloudNumber.getPeerRootXDIArc())));
+        targetStatementsSet.add(XDIStatement.fromRelationComponents(
+                XDIAddress.fromComponent(cloudName.getPeerRootXDIArc()), XDIDictionaryConstants.XDI_ADD_REF,
+                XDIAddress.fromComponent(cloudNumber.getPeerRootXDIArc())));
 
-		targetStatementsSet.add(XDIStatement.fromRelationComponents(
-				XDIAddress.fromComponent(cloudNumber.getPeerRootXDIArc()),
-				XDIDictionaryConstants.XDI_ADD_IS_REF, 
-				XDIAddress.fromComponent(cloudName.getPeerRootXDIArc())));
+        targetStatementsSet.add(XDIStatement.fromRelationComponents(
+                XDIAddress.fromComponent(cloudNumber.getPeerRootXDIArc()), XDIDictionaryConstants.XDI_ADD_IS_REF,
+                XDIAddress.fromComponent(cloudName.getPeerRootXDIArc())));
 
-		message.createSetOperation(targetStatementsSet.iterator());
+        message.createSetOperation(targetStatementsSet.iterator());
 
-		// send message
+        // send message
 
-		this.prepareMessageToCSP(message);
-		log.debug("registerCloudNameInCSP :: Message  " + messageEnvelope.getGraph().toString());
-		long startTime = System.currentTimeMillis();
-		this.getXdiClientCSPRegistry().send(messageEnvelope);
-		long endTime = System.currentTimeMillis();
-		log.info("registerCloudNameInCSP Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
-	                - startTime);
+        this.prepareMessageToCSP(message);
+        log.debug("registerCloudNameInCSP :: Message  " + messageEnvelope.getGraph().toString());
+        long startTime = System.currentTimeMillis();
+        this.getXdiClientCSPRegistry().send(messageEnvelope);
+        long endTime = System.currentTimeMillis();
+        log.info("registerCloudNameInCSP Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime,
+                endTime - startTime);
 
-		// done
+        // done
 
-		log.debug("In CSP: Cloud Name " + cloudName + " registered with Cloud Number " + cloudNumber);
-	}
+        log.debug("In CSP: Cloud Name " + cloudName + " registered with Cloud Number " + cloudNumber);
+    }
 
-	@Override
-	public void registerCloudNameInCloud(CloudName cloudName, CloudNumber cloudNumber, String secretToken) throws Xdi2ClientException {
+    @Override
+    public void registerCloudNameInCloud(CloudName cloudName, CloudNumber cloudNumber, String secretToken)
+            throws Xdi2ClientException {
 
-		// prepare message to Cloud
+        // prepare message to Cloud
 
-		MessageEnvelope messageEnvelope = new MessageEnvelope();
-		MessageCollection messageCollection = this.createMessageCollectionToCloud(messageEnvelope, cloudNumber);
+        MessageEnvelope messageEnvelope = new MessageEnvelope();
+        MessageCollection messageCollection = this.createMessageCollectionToCloud(messageEnvelope, cloudNumber);
 
-		Message message = messageCollection.createMessage();
+        Message message = messageCollection.createMessage();
 
-		List<XDIStatement> targetStatementsSet = new ArrayList<XDIStatement> ();
+        List<XDIStatement> targetStatementsSet = new ArrayList<XDIStatement>();
 
-		targetStatementsSet.add(XDIStatement.fromRelationComponents(
-				XDIAddress.fromComponent(cloudName.getPeerRootXDIArc()), 
-				XDIDictionaryConstants.XDI_ADD_REF, 
-				XDIAddress.fromComponent(cloudNumber.getPeerRootXDIArc())));
+        targetStatementsSet.add(XDIStatement.fromRelationComponents(
+                XDIAddress.fromComponent(cloudName.getPeerRootXDIArc()), XDIDictionaryConstants.XDI_ADD_REF,
+                XDIAddress.fromComponent(cloudNumber.getPeerRootXDIArc())));
 
-		targetStatementsSet.add(XDIStatement.fromRelationComponents(
-				cloudName.getXDIAddress(), 
-				XDIDictionaryConstants.XDI_ADD_REF, 
-				cloudNumber.getXDIAddress()));
+        targetStatementsSet.add(XDIStatement.fromRelationComponents(cloudName.getXDIAddress(),
+                XDIDictionaryConstants.XDI_ADD_REF, cloudNumber.getXDIAddress()));
 
-		targetStatementsSet.add(XDIStatement.fromRelationComponents(
-				cloudNumber.getXDIAddress(), 
-				XDIDictionaryConstants.XDI_ADD_IS_REF, 
-				cloudName.getXDIAddress()));
+        targetStatementsSet.add(XDIStatement.fromRelationComponents(cloudNumber.getXDIAddress(),
+                XDIDictionaryConstants.XDI_ADD_IS_REF, cloudName.getXDIAddress()));
 
-		Graph publicLinkContractGraph = MemoryGraphFactory.getInstance().openGraph();
-		GraphUtil.setOwnerXDIAddress(publicLinkContractGraph, cloudNumber.getXDIAddress());
-		PublicLinkContract publicLinkContract = PublicLinkContract.findPublicLinkContract(publicLinkContractGraph, true);
-		publicLinkContract.setPermissionTargetXDIStatement(XDILinkContractConstants.XDI_ADD_GET, XDIStatement.fromRelationComponents(cloudName.getXDIAddress(), XDIDictionaryConstants.XDI_ADD_REF, cloudNumber.getXDIAddress()));
+        Graph publicLinkContractGraph = MemoryGraphFactory.getInstance().openGraph();
+        GraphUtil.setOwnerXDIAddress(publicLinkContractGraph, cloudNumber.getXDIAddress());
+        PublicLinkContract publicLinkContract = PublicLinkContract
+                .findPublicLinkContract(publicLinkContractGraph, true);
+        publicLinkContract.setPermissionTargetXDIStatement(XDILinkContractConstants.XDI_ADD_GET, XDIStatement
+                .fromRelationComponents(cloudName.getXDIAddress(), XDIDictionaryConstants.XDI_ADD_REF,
+                        cloudNumber.getXDIAddress()));
 
-		for (XDIStatement publicLinkContractStatementXri : new MappingXDIStatementIterator(new SelectingNotImpliedStatementIterator(publicLinkContractGraph.getAllStatements()))) {
-			targetStatementsSet.add(publicLinkContractStatementXri);
-		}
+        for (XDIStatement publicLinkContractStatementXri : new MappingXDIStatementIterator(
+                new SelectingNotImpliedStatementIterator(publicLinkContractGraph.getAllStatements()))) {
+            targetStatementsSet.add(publicLinkContractStatementXri);
+        }
 
-		message.createSetOperation(targetStatementsSet.iterator());
+        message.createSetOperation(targetStatementsSet.iterator());
 
-		// send message
+        // send message
 
-		this.prepareMessageToCloud(message, cloudNumber, secretToken);
-		String cloudXdiEndpoint = this.makeCloudXdiEndpoint(cloudNumber);
+        this.prepareMessageToCloud(message, cloudNumber, secretToken);
+        String cloudXdiEndpoint = this.makeCloudXdiEndpoint(cloudNumber);
 
-		XDIClient xdiClientCloud = new XDIHttpClient(cloudXdiEndpoint);
+        XDIClient xdiClientCloud = new XDIHttpClient(cloudXdiEndpoint);
 
-		log.debug("registerCloudNameInCloud :: Message  " + messageEnvelope.getGraph().toString());
+        log.debug("registerCloudNameInCloud :: Message  " + messageEnvelope.getGraph().toString());
 
-		long startTime = System.currentTimeMillis();
-		xdiClientCloud.send(messageEnvelope);
-		long endTime = System.currentTimeMillis();
-		log.info("registerCloudNameInCloud Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
-	                - startTime);
+        long startTime = System.currentTimeMillis();
+        xdiClientCloud.send(messageEnvelope);
+        long endTime = System.currentTimeMillis();
+        log.info("registerCloudNameInCloud Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime,
+                endTime - startTime);
 
-		// done
+        // done
 
-		log.debug("In Cloud: Cloud Name " + cloudName + " registered with Cloud Number " + cloudNumber);
-	}
+        log.debug("In Cloud: Cloud Name " + cloudName + " registered with Cloud Number " + cloudNumber);
+    }
 
-	@Override
-	public void deleteCloudNameInRN(CloudName cloudName, CloudNumber cloudNumber) throws Xdi2ClientException {
+    @Override
+    public void deleteCloudNameInRN(CloudName cloudName, CloudNumber cloudNumber) throws Xdi2ClientException {
 
-		// prepare message to RN
+        // prepare message to RN
 
-		MessageEnvelope messageEnvelope = new MessageEnvelope();
-		MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
+        MessageEnvelope messageEnvelope = new MessageEnvelope();
+        MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
 
-		Message message = messageCollection.createMessage();
+        Message message = messageCollection.createMessage();
 
-		List<XDIStatement> targetStatementsDel = new ArrayList<XDIStatement> ();
+        List<XDIStatement> targetStatementsDel = new ArrayList<XDIStatement>();
 
-		targetStatementsDel.add(XDIStatement.fromRelationComponents(
-				XDIAddress.fromComponent(cloudName.getPeerRootXDIArc()), 
-				XDIDictionaryConstants.XDI_ADD_REF, 
-				XDIAddress.fromComponent(cloudNumber.getPeerRootXDIArc())));
+        targetStatementsDel.add(XDIStatement.fromRelationComponents(
+                XDIAddress.fromComponent(cloudName.getPeerRootXDIArc()), XDIDictionaryConstants.XDI_ADD_REF,
+                XDIAddress.fromComponent(cloudNumber.getPeerRootXDIArc())));
 
-		targetStatementsDel.add(XDIStatement.fromRelationComponents(
-				XDIAddress.fromComponent(cloudNumber.getPeerRootXDIArc()),
-				XDIDictionaryConstants.XDI_ADD_IS_REF, 
-				XDIAddress.fromComponent(cloudName.getPeerRootXDIArc())));
+        targetStatementsDel.add(XDIStatement.fromRelationComponents(
+                XDIAddress.fromComponent(cloudNumber.getPeerRootXDIArc()), XDIDictionaryConstants.XDI_ADD_IS_REF,
+                XDIAddress.fromComponent(cloudName.getPeerRootXDIArc())));
 
-		message.createDelOperation(targetStatementsDel.iterator());
+        message.createDelOperation(targetStatementsDel.iterator());
 
-		// send message
+        // send message
 
-		this.prepareMessageToRN(message);
-		log.debug("deleteCloudNameInRN :: Message  " + messageEnvelope.getGraph().toString());
-		long startTime = System.currentTimeMillis();
-		this.getXdiClientRNRegistrationService().send(messageEnvelope);
-		long endTime = System.currentTimeMillis();
-		log.info("deleteCloudNameInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
-	                - startTime);
+        this.prepareMessageToRN(message);
+        log.debug("deleteCloudNameInRN :: Message  " + messageEnvelope.getGraph().toString());
+        long startTime = System.currentTimeMillis();
+        this.getXdiClientRNRegistrationService().send(messageEnvelope);
+        long endTime = System.currentTimeMillis();
+        log.info("deleteCloudNameInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime,
+                endTime - startTime);
 
-		// done
+        // done
 
-		log.debug("In RN: Cloud Name " + cloudName + " deleted.");
-	}
+        log.debug("In RN: Cloud Name " + cloudName + " deleted.");
+    }
 
-	@Override
-	public void setCloudXdiEndpointInRN(CloudNumber cloudNumber, String cloudXdiEndpoint) throws Xdi2ClientException {
+    @Override
+    public void setCloudXdiEndpointInRN(CloudNumber cloudNumber, String cloudXdiEndpoint) throws Xdi2ClientException {
 
-		// auto-generate XDI endpoint
+        // auto-generate XDI endpoint
 
-		if (cloudXdiEndpoint == null) cloudXdiEndpoint = this.makeCloudXdiEndpoint(cloudNumber);
+        if (cloudXdiEndpoint == null)
+            cloudXdiEndpoint = this.makeCloudXdiEndpoint(cloudNumber);
 
-		// prepare message to RN
+        // prepare message to RN
 
-		MessageEnvelope messageEnvelope = new MessageEnvelope();
-		MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
+        MessageEnvelope messageEnvelope = new MessageEnvelope();
+        MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
 
-		Message message = messageCollection.createMessage();
+        Message message = messageCollection.createMessage();
 
-		XDIStatement targetStatementSet = XDIStatement.fromLiteralComponents(
-				XDIAddressUtil.concatXDIAddresses(cloudNumber.getPeerRootXDIArc(), XDIAddress.create("<$xdi><$uri>")), 
-				cloudXdiEndpoint);
+        XDIStatement targetStatementSet = XDIStatement.fromLiteralComponents(
+                XDIAddressUtil.concatXDIAddresses(cloudNumber.getPeerRootXDIArc(), XDIAddress.create("<$xdi><$uri>")),
+                cloudXdiEndpoint);
 
-		message.createSetOperation(targetStatementSet);
+        message.createSetOperation(targetStatementSet);
 
-		// send message
+        // send message
 
-		this.prepareMessageToRN(message);
-		log.debug("setCloudXdiEndpointInRN :: Message  " + messageEnvelope.getGraph().toString());
-		long startTime = System.currentTimeMillis();
-		this.getXdiClientRNRegistrationService().send(messageEnvelope);
-		long endTime = System.currentTimeMillis();
-		log.info("setCloudXdiEndpointInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
-	                - startTime);
+        this.prepareMessageToRN(message);
+        log.debug("setCloudXdiEndpointInRN :: Message  " + messageEnvelope.getGraph().toString());
+        long startTime = System.currentTimeMillis();
+        this.getXdiClientRNRegistrationService().send(messageEnvelope);
+        long endTime = System.currentTimeMillis();
+        log.info("setCloudXdiEndpointInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime,
+                endTime - startTime);
 
-		// done
+        // done
 
-		log.debug("In RN: Cloud XDI endpoint " + cloudXdiEndpoint + " set for Cloud Number " + cloudNumber);
-	}
+        log.debug("In RN: Cloud XDI endpoint " + cloudXdiEndpoint + " set for Cloud Number " + cloudNumber);
+    }
 
-	@Override
-	public void setPhoneAndEmailInRN(CloudNumber cloudNumber, String verifiedPhone, String verifiedEmail) throws Xdi2ClientException {
+    @Override
+    public void setPhoneAndEmailInRN(CloudNumber cloudNumber, String verifiedPhone, String verifiedEmail)
+            throws Xdi2ClientException {
 
-		// prepare message to RN
+        // prepare message to RN
 
-		MessageEnvelope messageEnvelope = new MessageEnvelope();
-		MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
+        MessageEnvelope messageEnvelope = new MessageEnvelope();
+        MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
 
-		Message message = messageCollection.createMessage();
+        Message message = messageCollection.createMessage();
 
-		List<XDIStatement> targetStatementsSet = new ArrayList<XDIStatement> ();
+        List<XDIStatement> targetStatementsSet = new ArrayList<XDIStatement>();
 
-		if (verifiedPhone != null) {
+        if (verifiedPhone != null) {
 
-			targetStatementsSet.add(XDIStatement.fromRelationComponents(
-					XDIAddressUtil.concatXDIAddresses(this.getCspInformation().getRnCloudNumber().getXDIAddress(), XRI_S_AC_VERIFIED_DIGEST_PHONE, XDIAddress.fromComponent(XdiAbstractInstanceUnordered.createXDIArc(true, true, false, XDIArc.literalFromDigest(verifiedPhone)))),
-					XRI_S_IS_PHONE,
-					cloudNumber.getXDIAddress()));
-		}
+            targetStatementsSet.add(XDIStatement.fromRelationComponents(XDIAddressUtil.concatXDIAddresses(
+                    this.getCspInformation().getRnCloudNumber().getXDIAddress(),
+                    XRI_S_AC_VERIFIED_DIGEST_PHONE,
+                    XDIAddress.fromComponent(XdiAbstractInstanceUnordered.createXDIArc(true, true, false,
+                            XDIArc.literalFromDigest(verifiedPhone)))), XRI_S_IS_PHONE, cloudNumber.getXDIAddress()));
+        }
 
-		if (verifiedEmail != null) {
+        if (verifiedEmail != null) {
 
-			targetStatementsSet.add(XDIStatement.fromRelationComponents(
-					XDIAddressUtil.concatXDIAddresses(this.getCspInformation().getRnCloudNumber().getXDIAddress(), XRI_S_AC_VERIFIED_DIGEST_EMAIL, XDIAddress.fromComponent(XdiAbstractInstanceUnordered.createXDIArc(true, true, false, XDIArc.literalFromDigest(verifiedEmail)))),
-					XRI_S_IS_EMAIL,
-					cloudNumber.getXDIAddress()));
-		}
+            targetStatementsSet.add(XDIStatement.fromRelationComponents(XDIAddressUtil.concatXDIAddresses(
+                    this.getCspInformation().getRnCloudNumber().getXDIAddress(),
+                    XRI_S_AC_VERIFIED_DIGEST_EMAIL,
+                    XDIAddress.fromComponent(XdiAbstractInstanceUnordered.createXDIArc(true, true, false,
+                            XDIArc.literalFromDigest(verifiedEmail)))), XRI_S_IS_EMAIL, cloudNumber.getXDIAddress()));
+        }
 
-		this.prepareMessageToRN(message);
-		message.createSetOperation(targetStatementsSet.iterator());
+        this.prepareMessageToRN(message);
+        message.createSetOperation(targetStatementsSet.iterator());
 
-		// send message
+        // send message
 
-		long startTime = System.currentTimeMillis();
-		this.getXdiClientRNRegistrationService().send(messageEnvelope);
-		long endTime = System.currentTimeMillis();
-		log.info("setPhoneAndEmailInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
-	                - startTime);
+        long startTime = System.currentTimeMillis();
+        this.getXdiClientRNRegistrationService().send(messageEnvelope);
+        long endTime = System.currentTimeMillis();
+        log.info("setPhoneAndEmailInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime,
+                endTime - startTime);
 
-		// done
+        // done
 
-		log.debug("In RN: Verified phone " + verifiedPhone + " and verified e-mail " + verifiedEmail + " set for Cloud Number " + cloudNumber);
-	}
+        log.debug("In RN: Verified phone " + verifiedPhone + " and verified e-mail " + verifiedEmail
+                + " set for Cloud Number " + cloudNumber);
+    }
 
-	@Override
-	public void setRespectNetworkMembershipInRN(CloudNumber cloudNumber, Date expirationTime, RespectNetworkRNDiscountCode respectNetworkRNDiscountCode)  throws Xdi2ClientException {
+    @Override
+    public void setRespectNetworkMembershipInRN(CloudNumber cloudNumber, Date expirationTime,
+            RespectNetworkRNDiscountCode respectNetworkRNDiscountCode) throws Xdi2ClientException {
 
-		// prepare message to RN
+        // prepare message to RN
 
-		MessageEnvelope messageEnvelope = new MessageEnvelope();
-		MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
+        MessageEnvelope messageEnvelope = new MessageEnvelope();
+        MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
 
-		Message message = messageCollection.createMessage();
+        Message message = messageCollection.createMessage();
 
-		List<XDIStatement> targetStatements = new ArrayList<XDIStatement> ();
+        List<XDIStatement> targetStatements = new ArrayList<XDIStatement>();
 
-		targetStatements.add(XDIStatement.fromRelationComponents(
-				this.getCspInformation().getRnCloudNumber().getXDIAddress(),
-				XRI_S_MEMBER,
-				cloudNumber.getXDIAddress()));
+        targetStatements.add(XDIStatement.fromRelationComponents(this.getCspInformation().getRnCloudNumber()
+                .getXDIAddress(), XRI_S_MEMBER, cloudNumber.getXDIAddress()));
 
-		if (expirationTime != null) {
+        if (expirationTime != null) {
 
-			Graph expirationTimeGraph = MemoryGraphFactory.getInstance().openGraph();
-			XdiInnerRoot expirationTimeXdiInnerRoot = XdiCommonRoot.findCommonRoot(expirationTimeGraph).getInnerRoot(this.getCspInformation().getRnCloudNumber().getXDIAddress(), XRI_S_MEMBER, true);
-			expirationTimeXdiInnerRoot.getContextNode().setStatement(XDIStatement.fromLiteralComponents(XDIAddressUtil.concatXDIAddresses(cloudNumber.getXDIAddress(), XRI_S_AS_MEMBER_EXPIRATION_TIME), Timestamps.timestampToString(expirationTime)));
-			for (XDIStatement expirationTimeStatementXri : new MappingXDIStatementIterator(new SelectingNotImpliedStatementIterator(expirationTimeGraph.getAllStatements()))) {
-				targetStatements.add(expirationTimeStatementXri);
-			}
-		}
+            Graph expirationTimeGraph = MemoryGraphFactory.getInstance().openGraph();
+            XdiInnerRoot expirationTimeXdiInnerRoot = XdiCommonRoot.findCommonRoot(expirationTimeGraph).getInnerRoot(
+                    this.getCspInformation().getRnCloudNumber().getXDIAddress(), XRI_S_MEMBER, true);
+            expirationTimeXdiInnerRoot.getContextNode().setStatement(
+                    XDIStatement.fromLiteralComponents(XDIAddressUtil.concatXDIAddresses(cloudNumber.getXDIAddress(),
+                            XRI_S_AS_MEMBER_EXPIRATION_TIME), Timestamps.timestampToString(expirationTime)));
+            for (XDIStatement expirationTimeStatementXri : new MappingXDIStatementIterator(
+                    new SelectingNotImpliedStatementIterator(expirationTimeGraph.getAllStatements()))) {
+                targetStatements.add(expirationTimeStatementXri);
+            }
+        }
 
-		Operation operation = message.createSetOperation(targetStatements.iterator());
+        Operation operation = message.createSetOperation(targetStatements.iterator());
 
-		if (respectNetworkRNDiscountCode != null) {
+        if (respectNetworkRNDiscountCode != null) {
 
-			operation.setParameter(XDIDiscountCodeConstants.XRI_S_PARAMETER_RESPECTNETWORK_RN_DISCOUNTCODE, respectNetworkRNDiscountCode.toString());
-		}
+            operation.setParameter(XDIDiscountCodeConstants.XRI_S_PARAMETER_RESPECTNETWORK_RN_DISCOUNTCODE,
+                    respectNetworkRNDiscountCode.toString());
+        }
 
-		// send message
+        // send message
 
-		this.prepareMessageToRN(message);
-		log.debug("setRespectNetworkMembershipInRN :: Message  " + messageEnvelope.getGraph().toString());
-		long startTime = System.currentTimeMillis();
-		this.getXdiClientRNRegistrationService().send(messageEnvelope);
-		long endTime = System.currentTimeMillis();
-		log.info("setRespectNetworkMembershipInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
-	                - startTime);
+        this.prepareMessageToRN(message);
+        log.debug("setRespectNetworkMembershipInRN :: Message  " + messageEnvelope.getGraph().toString());
+        long startTime = System.currentTimeMillis();
+        this.getXdiClientRNRegistrationService().send(messageEnvelope);
+        long endTime = System.currentTimeMillis();
+        log.info("setRespectNetworkMembershipInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime,
+                startTime, endTime - startTime);
 
-		// done
+        // done
 
-		log.debug("In RN: Respect Network membership set for Cloud Number " + cloudNumber);
-	}
+        log.debug("In RN: Respect Network membership set for Cloud Number " + cloudNumber);
+    }
 
-	@Override
-	public boolean checkRespectNetworkMembershipInRN(CloudNumber cloudNumber) throws Xdi2ClientException {
+    @Override
+    public boolean checkRespectNetworkMembershipInRN(CloudNumber cloudNumber) throws Xdi2ClientException {
 
-		// prepare message to RN
+        // prepare message to RN
 
-		MessageEnvelope messageEnvelope = new MessageEnvelope();
-		MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
+        MessageEnvelope messageEnvelope = new MessageEnvelope();
+        MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
 
-		Message message = messageCollection.createMessage();
+        Message message = messageCollection.createMessage();
 
-		XDIStatement targetStatement = XDIStatement.fromRelationComponents(
-				this.getCspInformation().getRnCloudNumber().getXDIAddress(),
-				XRI_S_MEMBER,
-				cloudNumber.getXDIAddress());
+        XDIStatement targetStatement = XDIStatement.fromRelationComponents(this.getCspInformation().getRnCloudNumber()
+                .getXDIAddress(), XRI_S_MEMBER, cloudNumber.getXDIAddress());
 
-		message.createGetOperation(targetStatement);
+        message.createGetOperation(targetStatement);
 
-		// Send message and read result
+        // Send message and read result
 
-		this.prepareMessageToRN(message);
-		long startTime = System.currentTimeMillis();
-		MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope);
-		long endTime = System.currentTimeMillis();
-		log.info("checkRespectNetworkMembershipInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
-	                - startTime);
+        this.prepareMessageToRN(message);
+        long startTime = System.currentTimeMillis();
+        MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope);
+        long endTime = System.currentTimeMillis();
+        log.info("checkRespectNetworkMembershipInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime,
+                startTime, endTime - startTime);
 
-		boolean member = messageResult.getGraph().containsStatement(targetStatement);
+        boolean member = messageResult.getGraph().containsStatement(targetStatement);
 
-		// done
+        // done
 
-		log.debug("In RN: Respect Network membership " + member + " retrieved for Cloud Number " + cloudNumber);
+        log.debug("In RN: Respect Network membership " + member + " retrieved for Cloud Number " + cloudNumber);
 
-		return member;
-	}
+        return member;
+    }
 
-	@Override
-	public void setRespectFirstMembershipInRN(CloudNumber cloudNumber)  throws Xdi2ClientException {
+    @Override
+    public void setRespectFirstMembershipInRN(CloudNumber cloudNumber) throws Xdi2ClientException {
 
-		// prepare message to RN
+        // prepare message to RN
 
-		MessageEnvelope messageEnvelope = new MessageEnvelope();
-		MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
+        MessageEnvelope messageEnvelope = new MessageEnvelope();
+        MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
 
-		Message message = messageCollection.createMessage();
+        Message message = messageCollection.createMessage();
 
-		List<XDIStatement> targetStatements = new ArrayList<XDIStatement> ();
+        List<XDIStatement> targetStatements = new ArrayList<XDIStatement>();
 
-		targetStatements.add(XDIStatement.fromRelationComponents(
-				this.getCspInformation().getRnCloudNumber().getXDIAddress(),
-				XRI_S_FIRST_MEMBER,
-				cloudNumber.getXDIAddress()));
+        targetStatements.add(XDIStatement.fromRelationComponents(this.getCspInformation().getRnCloudNumber()
+                .getXDIAddress(), XRI_S_FIRST_MEMBER, cloudNumber.getXDIAddress()));
 
-		message.createSetOperation(targetStatements.iterator());
+        message.createSetOperation(targetStatements.iterator());
 
-		// send message
+        // send message
 
-		this.prepareMessageToRN(message);
-		long startTime = System.currentTimeMillis();
-		this.getXdiClientRNRegistrationService().send(messageEnvelope);
-		long endTime = System.currentTimeMillis();
-		log.info("setRespectFirstMembershipInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
-	                - startTime);
+        this.prepareMessageToRN(message);
+        long startTime = System.currentTimeMillis();
+        this.getXdiClientRNRegistrationService().send(messageEnvelope);
+        long endTime = System.currentTimeMillis();
+        log.info("setRespectFirstMembershipInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime,
+                startTime, endTime - startTime);
 
-		// done
+        // done
 
-		log.debug("In RN: Respect First membership set for Cloud Number " + cloudNumber);
-	}
+        log.debug("In RN: Respect First membership set for Cloud Number " + cloudNumber);
+    }
 
-	@Override
-	public boolean checkRespectFirstMembershipInRN(CloudNumber cloudNumber) throws Xdi2ClientException {
+    @Override
+    public boolean checkRespectFirstMembershipInRN(CloudNumber cloudNumber) throws Xdi2ClientException {
 
-		// prepare message to RN
+        // prepare message to RN
 
-		MessageEnvelope messageEnvelope = new MessageEnvelope();
-		MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
+        MessageEnvelope messageEnvelope = new MessageEnvelope();
+        MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
 
-		Message message = messageCollection.createMessage();
+        Message message = messageCollection.createMessage();
 
-		XDIStatement targetStatement = XDIStatement.fromRelationComponents(
-				this.getCspInformation().getRnCloudNumber().getXDIAddress(),
-				XRI_S_FIRST_MEMBER,
-				cloudNumber.getXDIAddress());
+        XDIStatement targetStatement = XDIStatement.fromRelationComponents(this.getCspInformation().getRnCloudNumber()
+                .getXDIAddress(), XRI_S_FIRST_MEMBER, cloudNumber.getXDIAddress());
 
-		message.createGetOperation(targetStatement);
+        message.createGetOperation(targetStatement);
 
-		// send message and read result
+        // send message and read result
 
-		this.prepareMessageToRN(message);
-		long startTime = System.currentTimeMillis();
-		MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope);
-		long endTime = System.currentTimeMillis();
-		log.info("checkRespectFirstMembershipInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
-	                - startTime);
+        this.prepareMessageToRN(message);
+        long startTime = System.currentTimeMillis();
+        MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope);
+        long endTime = System.currentTimeMillis();
+        log.info("checkRespectFirstMembershipInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime,
+                startTime, endTime - startTime);
 
-		boolean member = messageResult.getGraph().containsStatement(targetStatement);
+        boolean member = messageResult.getGraph().containsStatement(targetStatement);
 
-		// done
+        // done
 
-		log.debug("In RN: Respect First membership " + member + " retrieved for Cloud Number " + cloudNumber);
+        log.debug("In RN: Respect First membership " + member + " retrieved for Cloud Number " + cloudNumber);
 
-		return member;
-	}
+        return member;
+    }
 
-	@Override
-	public void setCloudXdiEndpointInCSP(CloudNumber cloudNumber, String cloudXdiEndpoint) throws Xdi2ClientException {
+    @Override
+    public void setCloudXdiEndpointInCSP(CloudNumber cloudNumber, String cloudXdiEndpoint) throws Xdi2ClientException {
 
-		// auto-generate XDI endpoint
+        // auto-generate XDI endpoint
 
-		if (cloudXdiEndpoint == null) cloudXdiEndpoint = this.makeCloudXdiEndpoint(cloudNumber);
+        if (cloudXdiEndpoint == null)
+            cloudXdiEndpoint = this.makeCloudXdiEndpoint(cloudNumber);
 
-		// prepare message to CSP
+        // prepare message to CSP
 
-		MessageEnvelope messageEnvelope = new MessageEnvelope();
-		MessageCollection messageCollection = this.createMessageCollectionToCSP(messageEnvelope);
+        MessageEnvelope messageEnvelope = new MessageEnvelope();
+        MessageCollection messageCollection = this.createMessageCollectionToCSP(messageEnvelope);
 
-		Message message = messageCollection.createMessage();
+        Message message = messageCollection.createMessage();
 
-		XDIStatement targetStatementSet = XDIStatement.fromLiteralComponents(
-				XDIAddressUtil.concatXDIAddresses(cloudNumber.getPeerRootXDIArc(), XDIAddress.create("<$xdi><$uri>")), 
-				cloudXdiEndpoint);
+        XDIStatement targetStatementSet = XDIStatement.fromLiteralComponents(
+                XDIAddressUtil.concatXDIAddresses(cloudNumber.getPeerRootXDIArc(), XDIAddress.create("<$xdi><$uri>")),
+                cloudXdiEndpoint);
 
-		message.createSetOperation(targetStatementSet);
+        message.createSetOperation(targetStatementSet);
 
-		// send message
+        // send message
 
-		this.prepareMessageToCSP(message);
-		log.debug("setCloudXdiEndpointInCSP :: Message  " + messageEnvelope.getGraph().toString());
-		long startTime = System.currentTimeMillis();
-		this.getXdiClientCSPRegistry().send(messageEnvelope);
-		long endTime = System.currentTimeMillis();
-		log.info("setCloudXdiEndpointInCSP Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
-	                - startTime);
+        this.prepareMessageToCSP(message);
+        log.debug("setCloudXdiEndpointInCSP :: Message  " + messageEnvelope.getGraph().toString());
+        long startTime = System.currentTimeMillis();
+        this.getXdiClientCSPRegistry().send(messageEnvelope);
+        long endTime = System.currentTimeMillis();
+        log.info("setCloudXdiEndpointInCSP Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime,
+                endTime - startTime);
 
-		// done
+        // done
 
-		log.debug("In CSP: Cloud XDI endpoint " + cloudXdiEndpoint + " set for Cloud Number " + cloudNumber);
-	}
+        log.debug("In CSP: Cloud XDI endpoint " + cloudXdiEndpoint + " set for Cloud Number " + cloudNumber);
+    }
 
-	@Override
-	public void setCloudSecretTokenInCSP(CloudNumber cloudNumber, String secretToken) throws Xdi2ClientException {
+    @Override
+    public void setCloudSecretTokenInCSP(CloudNumber cloudNumber, String secretToken) throws Xdi2ClientException {
 
-		// prepare message to CSP
+        // prepare message to CSP
 
-		MessageEnvelope messageEnvelope = new MessageEnvelope();
-		MessageCollection messageCollection = this.createMessageCollectionToCSP(messageEnvelope);
+        MessageEnvelope messageEnvelope = new MessageEnvelope();
+        MessageCollection messageCollection = this.createMessageCollectionToCSP(messageEnvelope);
 
-		Message message = messageCollection.createMessage();
+        Message message = messageCollection.createMessage();
 
-		XDIStatement targetStatementsDoDigestSecretToken = XDIStatement.fromLiteralComponents(
-				XDIAddressUtil.concatXDIAddresses(XDIAddress.fromComponent(cloudNumber.getPeerRootXDIArc()), XDISecurityConstants.XDI_ADD_DIGEST_SECRET_TOKEN), 
-				secretToken);
+        XDIStatement targetStatementsDoDigestSecretToken = XDIStatement.fromLiteralComponents(XDIAddressUtil
+                .concatXDIAddresses(XDIAddress.fromComponent(cloudNumber.getPeerRootXDIArc()),
+                        XDISecurityConstants.XDI_ADD_DIGEST_SECRET_TOKEN), secretToken);
 
-		message.createOperation(XDIAddress.create("$do<$digest><$secret><$token>"), targetStatementsDoDigestSecretToken);
+        message.createOperation(XDIAddress.create("$do<$digest><$secret><$token>"), targetStatementsDoDigestSecretToken);
 
-		// send message
+        // send message
 
-		this.prepareMessageToCSP(message);
-		long startTime = System.currentTimeMillis();
-		this.getXdiClientCSPRegistry().send(messageEnvelope);
-		long endTime = System.currentTimeMillis();
-		log.info("setCloudSecretTokenInCSP Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
-	                - startTime);
+        this.prepareMessageToCSP(message);
+        long startTime = System.currentTimeMillis();
+        this.getXdiClientCSPRegistry().send(messageEnvelope);
+        long endTime = System.currentTimeMillis();
+        log.info("setCloudSecretTokenInCSP Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime,
+                endTime - startTime);
 
-		// done
+        // done
 
-		log.debug("In CSP: Secret token set for Cloud Number " + cloudNumber);
-	}
+        log.debug("In CSP: Secret token set for Cloud Number " + cloudNumber);
+    }
 
-	@Override
-	public CloudName[] checkCloudNamesInCSP(CloudNumber cloudNumber) throws Xdi2ClientException {
+    @Override
+    public CloudName[] checkCloudNamesInCSP(CloudNumber cloudNumber) throws Xdi2ClientException {
 
-		// prepare message to CSP
+        // prepare message to CSP
 
-		MessageEnvelope messageEnvelope = new MessageEnvelope();
-		MessageCollection messageCollection = this.createMessageCollectionToCSP(messageEnvelope);
+        MessageEnvelope messageEnvelope = new MessageEnvelope();
+        MessageCollection messageCollection = this.createMessageCollectionToCSP(messageEnvelope);
 
-		Message message = messageCollection.createMessage();
+        Message message = messageCollection.createMessage();
 
-		XDIStatement targetStatementGet = XDIStatement.fromRelationComponents(
-				XDIAddress.fromComponent(cloudNumber.getPeerRootXDIArc()),
-				XDIDictionaryConstants.XDI_ADD_IS_REF,
-				XDIConstants.XDI_ADD_COMMON_VARIABLE);
+        XDIStatement targetStatementGet = XDIStatement.fromRelationComponents(
+                XDIAddress.fromComponent(cloudNumber.getPeerRootXDIArc()), XDIDictionaryConstants.XDI_ADD_IS_REF,
+                XDIConstants.XDI_ADD_COMMON_VARIABLE);
 
-		message.createGetOperation(targetStatementGet);
+        message.createGetOperation(targetStatementGet);
 
-		// send message and read results
+        // send message and read results
 
-		this.prepareMessageToCSP(message);
-		long startTime = System.currentTimeMillis();
-		MessagingResponse messageResult = this.getXdiClientCSPRegistry().send(messageEnvelope);
-		long endTime = System.currentTimeMillis();
-		log.info("checkCloudNamesInCSP Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
-	                - startTime);
-		ContextNode cotextNode = messageResult.getGraph().getDeepContextNode(XDIAddress.fromComponent(cloudNumber.getPeerRootXDIArc()));
-		ReadOnlyIterator<Relation> relations = cotextNode == null ? null : cotextNode.getRelations(XDIDictionaryConstants.XDI_ADD_IS_REF);
-		
-		List<CloudName> cloudNames = new ArrayList<CloudName> ();
+        this.prepareMessageToCSP(message);
+        long startTime = System.currentTimeMillis();
+        MessagingResponse messageResult = this.getXdiClientCSPRegistry().send(messageEnvelope);
+        long endTime = System.currentTimeMillis();
+        log.info("checkCloudNamesInCSP Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime,
+                endTime - startTime);
+        ContextNode cotextNode = messageResult.getGraph().getDeepContextNode(
+                XDIAddress.fromComponent(cloudNumber.getPeerRootXDIArc()));
+        ReadOnlyIterator<Relation> relations = cotextNode == null ? null : cotextNode
+                .getRelations(XDIDictionaryConstants.XDI_ADD_IS_REF);
 
-		for (Relation relation : relations) {
-		    cloudNames.add(CloudName.fromPeerRootXDIArc(relation.getTargetXDIAddress().getFirstXDIArc()));
-		}
-	/*	CloudName[] cloudNames = new IteratorArrayMaker<CloudName> (
-				new NotNullIterator<CloudName> (
-						new MappingCloudNameIterator(
-								new MappingRelationTargetXDIAddressIterator(relations)
-								))).array(CloudName.class); */
+        List<CloudName> cloudNames = new ArrayList<CloudName>();
 
-		// done
+        for (Relation relation : relations) {
+            cloudNames.add(CloudName.fromPeerRootXDIArc(relation.getTargetXDIAddress().getFirstXDIArc()));
+        }
+        /*
+         * CloudName[] cloudNames = new IteratorArrayMaker<CloudName> ( new
+         * NotNullIterator<CloudName> ( new MappingCloudNameIterator( new
+         * MappingRelationTargetXDIAddressIterator(relations)
+         * ))).array(CloudName.class);
+         */
 
-		log.debug("In CSP: For Cloud Number " + cloudNumber + " found Cloud Names " + cloudNames.toString());
-		return cloudNames.toArray(new CloudName[cloudNames.size()]);
-	}
+        // done
 
-	@Override
-	public void authenticateInCloud(CloudNumber cloudNumber, String secretToken) throws Xdi2ClientException {
+        log.debug("In CSP: For Cloud Number " + cloudNumber + " found Cloud Names " + cloudNames.toString());
+        return cloudNames.toArray(new CloudName[cloudNames.size()]);
+    }
 
-		// prepare message to Cloud
+    @Override
+    public void authenticateInCloud(CloudNumber cloudNumber, String secretToken) throws Xdi2ClientException {
 
-		MessageEnvelope messageEnvelope = new MessageEnvelope();
-		MessageCollection messageCollection = this.createMessageCollectionToCloud(messageEnvelope, cloudNumber);
+        // prepare message to Cloud
 
-		Message message = messageCollection.createMessage();
+        MessageEnvelope messageEnvelope = new MessageEnvelope();
+        MessageCollection messageCollection = this.createMessageCollectionToCloud(messageEnvelope, cloudNumber);
 
-		XDIAddress targetAddress = RootLinkContract.createRootLinkContractXDIAddress(cloudNumber.getXDIAddress());
+        Message message = messageCollection.createMessage();
 
-		message.createGetOperation(targetAddress);
+        XDIAddress targetAddress = RootLinkContract.createRootLinkContractXDIAddress(cloudNumber.getXDIAddress());
 
-		// send message
+        message.createGetOperation(targetAddress);
 
-		String cloudXdiEndpoint = this.makeCloudXdiEndpoint(cloudNumber);
+        // send message
 
-		log.debug("authenticateInCloud :: cloudXdiEndpoint  :" + cloudXdiEndpoint );
+        String cloudXdiEndpoint = this.makeCloudXdiEndpoint(cloudNumber);
 
-		XDIClient xdiClientCloud = new XDIHttpClient(cloudXdiEndpoint);
+        log.debug("authenticateInCloud :: cloudXdiEndpoint  :" + cloudXdiEndpoint);
 
-		this.prepareMessageToCloud(message, cloudNumber, secretToken);
-		log.debug("authenticateInCloud :: Message  :" + messageEnvelope.getGraph().toString() );
-		long startTime = System.currentTimeMillis();
-		xdiClientCloud.send(messageEnvelope);
+        XDIClient xdiClientCloud = new XDIHttpClient(cloudXdiEndpoint);
 
-		long endTime = System.currentTimeMillis();
-		log.info("authenticateInCloud Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
-	                - startTime);
-		// done
+        this.prepareMessageToCloud(message, cloudNumber, secretToken);
+        log.debug("authenticateInCloud :: Message  :" + messageEnvelope.getGraph().toString());
+        long startTime = System.currentTimeMillis();
+        xdiClientCloud.send(messageEnvelope);
 
-		log.debug("In Cloud: Authenticated Cloud Number");
-	}
+        long endTime = System.currentTimeMillis();
+        log.info("authenticateInCloud Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime,
+                endTime - startTime);
+        // done
 
-	@Override
-	public void setCloudServicesInCloud(CloudNumber cloudNumber, String secretToken, Map<XDIAddress, String> services) throws Xdi2ClientException {
+        log.debug("In Cloud: Authenticated Cloud Number");
+    }
 
-		// prepare message to Cloud
+    @Override
+    public void setCloudServicesInCloud(CloudNumber cloudNumber, String secretToken, Map<XDIAddress, String> services)
+            throws Xdi2ClientException {
 
-		MessageEnvelope messageEnvelope = new MessageEnvelope();
-		MessageCollection messageCollection = this.createMessageCollectionToCloud(messageEnvelope, cloudNumber);
+        // prepare message to Cloud
 
-		Message message = messageCollection.createMessage();
+        MessageEnvelope messageEnvelope = new MessageEnvelope();
+        MessageCollection messageCollection = this.createMessageCollectionToCloud(messageEnvelope, cloudNumber);
 
-		List<XDIStatement> targetStatementsSet = new ArrayList<XDIStatement> (services.size() * 2);
+        Message message = messageCollection.createMessage();
 
-		for (Entry<XDIAddress, String> entry : services.entrySet()) {
+        List<XDIStatement> targetStatementsSet = new ArrayList<XDIStatement>(services.size() * 2);
 
-			targetStatementsSet.add(XDIStatement.fromLiteralComponents(
-					XDIAddressUtil.concatXDIAddresses(cloudNumber.getXDIAddress(), entry.getKey(), XDIClientConstants.XDI_ADD_AS_URI),
-					entry.getValue()));
+        for (Entry<XDIAddress, String> entry : services.entrySet()) {
 
-			targetStatementsSet.add(XDIStatement.fromRelationComponents(
-					PublicLinkContract.createPublicLinkContractXDIAddress(cloudNumber.getXDIAddress()),
-					XDILinkContractConstants.XDI_ADD_GET,
-					XDIAddressUtil.concatXDIAddresses(cloudNumber.getXDIAddress(), entry.getKey(), XDIClientConstants.XDI_ADD_AS_URI)));
-		}
+            targetStatementsSet.add(XDIStatement.fromLiteralComponents(XDIAddressUtil.concatXDIAddresses(
+                    cloudNumber.getXDIAddress(), entry.getKey(), XDIClientConstants.XDI_ADD_AS_URI), entry.getValue()));
 
-		this.prepareMessageToCloud(message, cloudNumber, secretToken);
-		message.createSetOperation(targetStatementsSet.iterator());
+            targetStatementsSet.add(XDIStatement.fromRelationComponents(PublicLinkContract
+                    .createPublicLinkContractXDIAddress(cloudNumber.getXDIAddress()),
+                    XDILinkContractConstants.XDI_ADD_GET, XDIAddressUtil.concatXDIAddresses(
+                            cloudNumber.getXDIAddress(), entry.getKey(), XDIClientConstants.XDI_ADD_AS_URI)));
+        }
 
-		// send message
+        this.prepareMessageToCloud(message, cloudNumber, secretToken);
+        message.createSetOperation(targetStatementsSet.iterator());
 
-		String cloudXdiEndpoint = this.makeCloudXdiEndpoint(cloudNumber);
+        // send message
 
-		XDIClient xdiClientCloud = new XDIHttpClient(cloudXdiEndpoint);
+        String cloudXdiEndpoint = this.makeCloudXdiEndpoint(cloudNumber);
 
-		long startTime = System.currentTimeMillis();
-		xdiClientCloud.send(messageEnvelope);
-		long endTime = System.currentTimeMillis();
-		log.info("setCloudServicesInCloud Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
-	                - startTime);
+        XDIClient xdiClientCloud = new XDIHttpClient(cloudXdiEndpoint);
 
-		// done
+        long startTime = System.currentTimeMillis();
+        xdiClientCloud.send(messageEnvelope);
+        long endTime = System.currentTimeMillis();
+        log.info("setCloudServicesInCloud Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime,
+                endTime - startTime);
 
-		log.debug("In Cloud: For Cloud Number " + cloudNumber + " registered services " + services);
-	}
+        // done
 
+        log.debug("In Cloud: For Cloud Number " + cloudNumber + " registered services " + services);
+    }
 
-	@Override
-	public void setCloudServicesForCSPInCSP(CloudNumber cloudNumber, String secretToken, String cspXdiEndpoint, Map<XDIAddress, String> services) throws Xdi2ClientException {
+    @Override
+    public void setCloudServicesForCSPInCSP(CloudNumber cloudNumber, String secretToken, String cspXdiEndpoint,
+            Map<XDIAddress, String> services) throws Xdi2ClientException {
 
-		// prepare message to Cloud
+        // prepare message to Cloud
 
-		MessageEnvelope messageEnvelope = new MessageEnvelope();
-		MessageCollection messageCollection = this.createMessageCollectionToCloud(messageEnvelope, cloudNumber);
+        MessageEnvelope messageEnvelope = new MessageEnvelope();
+        MessageCollection messageCollection = this.createMessageCollectionToCloud(messageEnvelope, cloudNumber);
 
-		Message message = messageCollection.createMessage();
+        Message message = messageCollection.createMessage();
 
-		List<XDIStatement> targetStatementsSet = new ArrayList<XDIStatement> (services.size() * 2);
+        List<XDIStatement> targetStatementsSet = new ArrayList<XDIStatement>(services.size() * 2);
 
-		for (Entry<XDIAddress, String> entry : services.entrySet()) {
+        for (Entry<XDIAddress, String> entry : services.entrySet()) {
 
-			targetStatementsSet.add(XDIStatement.fromLiteralComponents(
-					XDIAddressUtil.concatXDIAddresses(cloudNumber.getXDIAddress(), entry.getKey(), XDIClientConstants.XDI_ADD_AS_URI),
-					entry.getValue()));
+            targetStatementsSet.add(XDIStatement.fromLiteralComponents(XDIAddressUtil.concatXDIAddresses(
+                    cloudNumber.getXDIAddress(), entry.getKey(), XDIClientConstants.XDI_ADD_AS_URI), entry.getValue()));
 
-			targetStatementsSet.add(XDIStatement.fromRelationComponents(
-					PublicLinkContract.createPublicLinkContractXDIAddress(cloudNumber.getXDIAddress()),
-					XDILinkContractConstants.XDI_ADD_GET,
-					XDIAddressUtil.concatXDIAddresses(cloudNumber.getXDIAddress(), entry.getKey(), XDIClientConstants.XDI_ADD_AS_URI)));
-		}
+            targetStatementsSet.add(XDIStatement.fromRelationComponents(PublicLinkContract
+                    .createPublicLinkContractXDIAddress(cloudNumber.getXDIAddress()),
+                    XDILinkContractConstants.XDI_ADD_GET, XDIAddressUtil.concatXDIAddresses(
+                            cloudNumber.getXDIAddress(), entry.getKey(), XDIClientConstants.XDI_ADD_AS_URI)));
+        }
 
-		this.prepareMessageToCloud(message, cloudNumber, secretToken);
-		message.createSetOperation(targetStatementsSet.iterator());
+        this.prepareMessageToCloud(message, cloudNumber, secretToken);
+        message.createSetOperation(targetStatementsSet.iterator());
 
-		log.debug("setCloudServicesForCSPInCSP :: Message envelope to CSP \n" );
-		printMessage(messageEnvelope);
+        log.debug("setCloudServicesForCSPInCSP :: Message envelope to CSP \n");
+        printMessage(messageEnvelope);
 
-		// send message
+        // send message
 
-		XDIClient xdiCSPCloud = new XDIHttpClient(cspXdiEndpoint);
+        XDIClient xdiCSPCloud = new XDIHttpClient(cspXdiEndpoint);
 
-		long startTime = System.currentTimeMillis();
-		xdiCSPCloud.send(messageEnvelope);
-		long endTime = System.currentTimeMillis();
-		log.info("setCloudServicesForCSPInCSP Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
-	                - startTime);
+        long startTime = System.currentTimeMillis();
+        xdiCSPCloud.send(messageEnvelope);
+        long endTime = System.currentTimeMillis();
+        log.info("setCloudServicesForCSPInCSP Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime,
+                startTime, endTime - startTime);
 
-		// done
+        // done
 
-		log.debug("In Cloud: For Cloud Number " + cloudNumber + " registered services " + services);
-	}
+        log.debug("In Cloud: For Cloud Number " + cloudNumber + " registered services " + services);
+    }
 
-	@Override
-	public void setPhoneAndEmailInCloud(CloudNumber cloudNumber, String secretToken, String verifiedPhone, String verifiedEmail) throws Xdi2ClientException {
+    @Override
+    public void setPhoneAndEmailInCloud(CloudNumber cloudNumber, String secretToken, String verifiedPhone,
+            String verifiedEmail) throws Xdi2ClientException {
 
-		// prepare message to Cloud
+        // prepare message to Cloud
 
-		MessageEnvelope messageEnvelope = new MessageEnvelope();
-		MessageCollection messageCollection = this.createMessageCollectionToCloud(messageEnvelope, cloudNumber);
+        MessageEnvelope messageEnvelope = new MessageEnvelope();
+        MessageCollection messageCollection = this.createMessageCollectionToCloud(messageEnvelope, cloudNumber);
 
-		Message message = messageCollection.createMessage();
+        Message message = messageCollection.createMessage();
 
-		List<XDIStatement> targetStatementsSet = new ArrayList<XDIStatement> ();
+        List<XDIStatement> targetStatementsSet = new ArrayList<XDIStatement>();
 
-		if (verifiedPhone != null) {
+        if (verifiedPhone != null) {
 
-			targetStatementsSet.add(XDIStatement.fromLiteralComponents(
-					XDIAddressUtil.concatXDIAddresses(cloudNumber.getXDIAddress(), XRI_S_AS_VERIFIED_PHONE),
-					verifiedPhone));
-		}
+            targetStatementsSet.add(XDIStatement.fromLiteralComponents(
+                    XDIAddressUtil.concatXDIAddresses(cloudNumber.getXDIAddress(), XRI_S_AS_VERIFIED_PHONE),
+                    verifiedPhone));
+        }
 
-		if (verifiedEmail != null) {
+        if (verifiedEmail != null) {
 
-			targetStatementsSet.add(XDIStatement.fromLiteralComponents(
-					XDIAddressUtil.concatXDIAddresses(cloudNumber.getXDIAddress(), XRI_S_AS_VERIFIED_EMAIL),
-					verifiedEmail));
-		}
+            targetStatementsSet.add(XDIStatement.fromLiteralComponents(
+                    XDIAddressUtil.concatXDIAddresses(cloudNumber.getXDIAddress(), XRI_S_AS_VERIFIED_EMAIL),
+                    verifiedEmail));
+        }
 
-		this.prepareMessageToCloud(message, cloudNumber, secretToken);
-		message.createSetOperation(targetStatementsSet.iterator());
+        this.prepareMessageToCloud(message, cloudNumber, secretToken);
+        message.createSetOperation(targetStatementsSet.iterator());
 
-		// send message
+        // send message
 
-		String cloudXdiEndpoint = this.makeCloudXdiEndpoint(cloudNumber);
+        String cloudXdiEndpoint = this.makeCloudXdiEndpoint(cloudNumber);
 
-		XDIClient xdiClientCloud = new XDIHttpClient(cloudXdiEndpoint);
+        XDIClient xdiClientCloud = new XDIHttpClient(cloudXdiEndpoint);
 
-		long startTime = System.currentTimeMillis();
-		xdiClientCloud.send(messageEnvelope);
-		long endTime = System.currentTimeMillis();
-		log.info("setPhoneAndEmailInCloud Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
-	                - startTime);
+        long startTime = System.currentTimeMillis();
+        xdiClientCloud.send(messageEnvelope);
+        long endTime = System.currentTimeMillis();
+        log.info("setPhoneAndEmailInCloud Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime,
+                endTime - startTime);
 
-		// done
+        // done
 
-		log.debug("In Cloud: Verified phone " + verifiedPhone + " and verified e-mail " + verifiedEmail + " set for Cloud Number " + cloudNumber);
-	}
+        log.debug("In Cloud: Verified phone " + verifiedPhone + " and verified e-mail " + verifiedEmail
+                + " set for Cloud Number " + cloudNumber);
+    }
 
-	@Override
-    public void createDefaultProfile(CloudName cloudName, CloudNumber cloudNumber, String secretToken) throws Xdi2ClientException {
+    @Override
+    public void createDefaultProfile(CloudName cloudName, CloudNumber cloudNumber, String secretToken)
+            throws Xdi2ClientException {
         // prepare message to Cloud
 
         MessageEnvelope messageEnvelope = new MessageEnvelope();
@@ -1117,15 +1154,13 @@ public class BasicCSP implements CSP {
         xdiStatements.add(XDIStatement.fromLiteralComponents(
                 XDIAddressUtil.concatXDIAddresses(profileAddress, XRI_S_AS_PROFILE_CARD_NAME), "Main"));
         targetStatementsSet.add(XDIStatement.fromRelationComponents(
-                    XDIAddressUtil.concatXDIAddresses(profileAddress, XRI_S_AS_PHONE),
-                    XDIDictionaryConstants.XDI_ADD_REF,
-                    XDIAddressUtil.concatXDIAddresses(cloudNumber.getXDIAddress(), XRI_S_AS_VERIFIED_PHONE)));
-            
+                XDIAddressUtil.concatXDIAddresses(profileAddress, XRI_S_AS_PHONE), XDIDictionaryConstants.XDI_ADD_REF,
+                XDIAddressUtil.concatXDIAddresses(cloudNumber.getXDIAddress(), XRI_S_AS_VERIFIED_PHONE)));
+
         targetStatementsSet.add(XDIStatement.fromRelationComponents(
-                    XDIAddressUtil.concatXDIAddresses(profileAddress, XRI_S_AS_EMAIL),
-                    XDIDictionaryConstants.XDI_ADD_REF,
-                    XDIAddressUtil.concatXDIAddresses(cloudNumber.getXDIAddress(), XRI_S_AS_VERIFIED_EMAIL)));
-         
+                XDIAddressUtil.concatXDIAddresses(profileAddress, XRI_S_AS_EMAIL), XDIDictionaryConstants.XDI_ADD_REF,
+                XDIAddressUtil.concatXDIAddresses(cloudNumber.getXDIAddress(), XRI_S_AS_VERIFIED_EMAIL)));
+
         DateFormat dateFormat = XDITimestampsConstants.FORMATS_TIMESTAMP[0];
         dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         String registrationDate = dateFormat.format(Calendar.getInstance().getTime());
@@ -1149,12 +1184,12 @@ public class BasicCSP implements CSP {
         long startTime = System.currentTimeMillis();
         xdiClientCloud.send(messageEnvelope);
         long endTime = System.currentTimeMillis();
-		log.info("createDefaultProfile Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
-	                - startTime);
+        log.info("createDefaultProfile Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime,
+                endTime - startTime);
 
         MessageEnvelope messageEnvelope1 = new MessageEnvelope();
         MessageCollection messageCollection1 = this.createMessageCollectionToCloud(messageEnvelope1, cloudNumber);
-        
+
         Message message1 = messageCollection1.createMessage(-1);
         this.prepareMessageToCloud(message1, cloudNumber, secretToken);
         message1.createSetOperation(xdiStatements.iterator());
@@ -1166,244 +1201,233 @@ public class BasicCSP implements CSP {
         xdiClientCloud.send(messageEnvelope1);
     }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public long getRespectFirstMemberCount()
-			throws Xdi2ClientException {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long getRespectFirstMemberCount() throws Xdi2ClientException {
 
-		long numberOfMembers = 0;
+        long numberOfMembers = 0;
 
-		// prepare message to RN
-		MessageEnvelope messageEnvelope = new MessageEnvelope();
-		MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
+        // prepare message to RN
+        MessageEnvelope messageEnvelope = new MessageEnvelope();
+        MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
 
-		Message message = messageCollection.createMessage();
+        Message message = messageCollection.createMessage();
 
-		XDIStatement targetStatementGet = XDIStatement.fromRelationComponents(
-				this.getCspInformation().getRnCloudNumber().getXDIAddress(),
-				XRI_S_MEMBER,
-				XDIConstants.XDI_ADD_COMMON_VARIABLE);
+        XDIStatement targetStatementGet = XDIStatement.fromRelationComponents(this.getCspInformation()
+                .getRnCloudNumber().getXDIAddress(), XRI_S_MEMBER, XDIConstants.XDI_ADD_COMMON_VARIABLE);
 
-		message.createGetOperation(targetStatementGet);
+        message.createGetOperation(targetStatementGet);
 
-		// Send message and read result
+        // Send message and read result
 
-		this.prepareMessageToRN(message);
+        this.prepareMessageToRN(message);
 
-		long startTime = System.currentTimeMillis();
-		MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope);
-		long endTime = System.currentTimeMillis();
-		log.info("getRespectFirstMemberCount Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
-	                - startTime);
-        ContextNode cotextNode = messageResult.getGraph().getDeepContextNode(this.getCspInformation().getRnCloudNumber().getXDIAddress());
+        long startTime = System.currentTimeMillis();
+        MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope);
+        long endTime = System.currentTimeMillis();
+        log.info("getRespectFirstMemberCount Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime,
+                endTime - startTime);
+        ContextNode cotextNode = messageResult.getGraph().getDeepContextNode(
+                this.getCspInformation().getRnCloudNumber().getXDIAddress());
         ReadOnlyIterator<Relation> relations = cotextNode == null ? null : cotextNode.getRelations(XRI_S_MEMBER);
-        if(relations != null) {
+        if (relations != null) {
             while (relations.hasNext()) {
-    			relations.next();
-    			numberOfMembers++;
-    		}
+                relations.next();
+                numberOfMembers++;
+            }
         }
-		// done
-		log.debug("In RN: getRespectFirstMemberCount = " + numberOfMembers);
-		return numberOfMembers;
-	}
+        // done
+        log.debug("In RN: getRespectFirstMemberCount = " + numberOfMembers);
+        return numberOfMembers;
+    }
 
+    /*
+     * Helper methods
+     */
 
-	/*
-	 * Helper methods
-	 */
+    private String makeCloudXdiEndpoint(CloudNumber cloudNumber) {
 
-	private String makeCloudXdiEndpoint(CloudNumber cloudNumber) {
+        try {
+            return cspInformation.getCspCloudBaseXdiEndpoint() + URLEncoder.encode(cloudNumber.toString(), "UTF-8");
+        } catch (UnsupportedEncodingException ex) {
 
-		try {
-			return cspInformation.getCspCloudBaseXdiEndpoint() + URLEncoder.encode(cloudNumber.toString(), "UTF-8");
-		} catch (UnsupportedEncodingException ex) {
+            throw new RuntimeException(ex.getMessage(), ex);
+        }
+    }
 
-			throw new RuntimeException(ex.getMessage(), ex);
-		}
-	}
+    private MessageCollection createMessageCollectionToRN(MessageEnvelope messageEnvelope) {
 
-	private MessageCollection createMessageCollectionToRN(MessageEnvelope messageEnvelope) {
+        return messageEnvelope.getMessageCollection(this.getCspInformation().getCspCloudNumber().getXDIAddress(), true);
+    }
 
-		return messageEnvelope.getMessageCollection(this.getCspInformation().getCspCloudNumber().getXDIAddress(), true);
-	}
+    private MessageCollection createMessageCollectionToCSP(MessageEnvelope messageEnvelope) {
 
-	private MessageCollection createMessageCollectionToCSP(MessageEnvelope messageEnvelope) {
+        return messageEnvelope.getMessageCollection(this.getCspInformation().getCspCloudNumber().getXDIAddress(), true);
+    }
 
-		return messageEnvelope.getMessageCollection(this.getCspInformation().getCspCloudNumber().getXDIAddress(), true);
-	}
+    private MessageCollection createMessageCollectionToCloud(MessageEnvelope messageEnvelope, CloudNumber cloudNumber) {
 
-	private MessageCollection createMessageCollectionToCloud(MessageEnvelope messageEnvelope, CloudNumber cloudNumber) {
+        return messageEnvelope.getMessageCollection(cloudNumber.getXDIAddress(), true);
+    }
 
-		return messageEnvelope.getMessageCollection(cloudNumber.getXDIAddress(), true);
-	}
+    private void prepareMessageToRN(Message message) {
 
-	private void prepareMessageToRN(Message message) {
+        message.setToPeerRootXDIArc(this.getCspInformation().getRnCloudNumber().getPeerRootXDIArc());
+        message.setLinkContractXDIAddress(this.getCspInformation().getRnCspLinkContract());
 
-		message.setToPeerRootXDIArc(this.getCspInformation().getRnCloudNumber().getPeerRootXDIArc());
-		message.setLinkContractXDIAddress(this.getCspInformation().getRnCspLinkContract());
+        if (this.getCspInformation().getRnCspSecretToken() != null
+                && !this.getCspInformation().getRnCspSecretToken().isEmpty()) {
 
-		if (this.getCspInformation().getRnCspSecretToken() != null && !this.getCspInformation().getRnCspSecretToken().isEmpty()) {
+            message.setSecretToken(this.getCspInformation().getRnCspSecretToken());
+        } else {
+            log.debug("RN Secret token is null. Will try to retrieve CSP private key for signing messages.");
+            try {
+                BasicCSPInformation basicCSP = (BasicCSPInformation) this.getCspInformation();
+                if (basicCSP.getCspSignaturePrivateKey() == null) {
+                    basicCSP.retrieveCspSignaturePrivateKey();
+                }
+            } catch (Xdi2ClientException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (GeneralSecurityException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
 
-			message.setSecretToken(this.getCspInformation().getRnCspSecretToken());
-		} else
-		{
-			log.debug("RN Secret token is null. Will try to retrieve CSP private key for signing messages.");
-			try
-			{
-				BasicCSPInformation basicCSP = (BasicCSPInformation) this.getCspInformation();
-				if(basicCSP.getCspSignaturePrivateKey() == null)
-				{
-					basicCSP.retrieveCspSignaturePrivateKey();
-				}
-			} catch (Xdi2ClientException e)
-			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (GeneralSecurityException e)
-			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+        if (this.getCspInformation().getCspSignaturePrivateKey() != null) {
+            log.debug("CSP Private Key is not null. Signing Messages with it.");
 
-		if (this.getCspInformation().getCspSignaturePrivateKey() != null) {
-			log.debug("CSP Private Key is not null. Signing Messages with it.");
+            RSASignature signature = (RSASignature) message.createSignature(RSASignature.DIGEST_ALGORITHM_SHA, 256,
+                    RSASignature.KEY_ALGORITHM_RSA, 2048, true);
 
-			RSASignature signature = (RSASignature)message.createSignature(RSASignature.DIGEST_ALGORITHM_SHA, 256, RSASignature.KEY_ALGORITHM_RSA, 2048, true);
+            try {
+                new RSAStaticPrivateKeySignatureCreator(this.getCspInformation().getCspSignaturePrivateKey())
+                        .createSignature(signature);
+            } catch (GeneralSecurityException ex) {
 
-			try {
-				new RSAStaticPrivateKeySignatureCreator(this.getCspInformation().getCspSignaturePrivateKey()).createSignature(signature);
-			} catch (GeneralSecurityException ex) {
+                throw new RuntimeException(ex.getMessage(), ex);
+            }
+        } else {
+            log.debug("CSP Private Key is null. Cannot sign Messages to RN.");
+        }
+    }
 
-				throw new RuntimeException(ex.getMessage(), ex);
-			}
-		}
-		else
-		{
-			log.debug("CSP Private Key is null. Cannot sign Messages to RN.");
-		}
-	}
+    private void prepareMessageToCSP(Message message) {
 
-	private void prepareMessageToCSP(Message message) {
+        message.setToPeerRootXDIArc(this.getCspInformation().getCspCloudNumber().getPeerRootXDIArc());
+        message.setLinkContractXDIAddress(RootLinkContract.createRootLinkContractXDIAddress(this.getCspInformation()
+                .getCspCloudNumber().getXDIAddress()));
 
-		message.setToPeerRootXDIArc(this.getCspInformation().getCspCloudNumber().getPeerRootXDIArc());
-		message.setLinkContractXDIAddress(RootLinkContract.createRootLinkContractXDIAddress(this.getCspInformation().getCspCloudNumber().getXDIAddress()));
+        if (this.getCspInformation().getCspSecretToken() != null) {
 
-		if (this.getCspInformation().getCspSecretToken() != null) {
+            message.setSecretToken(this.getCspInformation().getCspSecretToken());
+        }
 
-			message.setSecretToken(this.getCspInformation().getCspSecretToken());
-		}
+        if (this.getCspInformation().getCspSignaturePrivateKey() != null) {
 
-		if (this.getCspInformation().getCspSignaturePrivateKey() != null) {
+            RSASignature signature = (RSASignature) message.createSignature(RSASignature.DIGEST_ALGORITHM_SHA, 256,
+                    RSASignature.KEY_ALGORITHM_RSA, 2048, true);
 
-			RSASignature signature = (RSASignature)message.createSignature(RSASignature.DIGEST_ALGORITHM_SHA, 256, RSASignature.KEY_ALGORITHM_RSA, 2048, true);
+            try {
 
-			try {
+                new RSAStaticPrivateKeySignatureCreator(this.getCspInformation().getCspSignaturePrivateKey())
+                        .createSignature(signature);
+            } catch (GeneralSecurityException ex) {
 
-				new RSAStaticPrivateKeySignatureCreator(this.getCspInformation().getCspSignaturePrivateKey()).createSignature(signature);
-			} catch (GeneralSecurityException ex) {
+                throw new RuntimeException(ex.getMessage(), ex);
+            }
+        }
+    }
 
-				throw new RuntimeException(ex.getMessage(), ex);
-			}
-		}
-	}
+    private void prepareMessageToCloud(Message message, CloudNumber cloudNumber, String secretToken) {
 
-	private void prepareMessageToCloud(Message message, CloudNumber cloudNumber, String secretToken) {
+        message.setToPeerRootXDIArc(cloudNumber.getPeerRootXDIArc());
+        message.setLinkContractXDIAddress(RootLinkContract.createRootLinkContractXDIAddress(cloudNumber.getXDIAddress()));
 
-		message.setToPeerRootXDIArc(cloudNumber.getPeerRootXDIArc());
- 		message.setLinkContractXDIAddress(RootLinkContract.createRootLinkContractXDIAddress(cloudNumber.getXDIAddress()));
+        if (secretToken != null) {
 
-		if (secretToken != null) {
+            message.setSecretToken(secretToken);
+        }
+    }
 
-			message.setSecretToken(secretToken);
-		}
-	}
+    /*
+     * Dependency Methods
+     */
 
+    /**
+     * {@inheritDoc}
+     */
+    public void setGuardianshipInCloud(CSPInformation cspInformation, CloudNumber guardian, CloudNumber dependent,
+            Date dependentBirthDate, boolean withConsent, Date bornBeforeDate, Date bornAfterDate, String secretToken,
+            PrivateKey guardianPrivateSigningKey, String dependentToken) throws Xdi2ClientException {
 
-	/*
-	 * Dependency  Methods
-	 */
+        // Prepare message to guardian Cloud
 
+        MessageEnvelope messageEnvelope = new MessageEnvelope();
+        MessageCollection messageCollection = this.createMessageCollectionToCloud(messageEnvelope, guardian);
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public void setGuardianshipInCloud(CSPInformation cspInformation, CloudNumber guardian,
-			CloudNumber dependent, Date dependentBirthDate, boolean withConsent, Date bornBeforeDate,
-	        Date bornAfterDate, String secretToken, PrivateKey guardianPrivateSigningKey, String dependentToken)
-					throws Xdi2ClientException {
+        Message message = messageCollection.createMessage();
 
-		// Prepare message to guardian Cloud
+        // Update Guardian's Graph
 
-		MessageEnvelope messageEnvelope = new MessageEnvelope();
-		MessageCollection messageCollection = this.createMessageCollectionToCloud(messageEnvelope, guardian);
+        this.prepareMessageToCloud(message, guardian, secretToken);
 
-		Message message = messageCollection.createMessage();
+        List<XDIStatement> targetStatements = new ArrayList<XDIStatement>();
 
-		//Update Guardian's Graph
+        // Create the Relational Entry in the Guardian Graph
+        targetStatements.add(XDIStatement.fromRelationComponents(guardian.getXDIAddress(), XRI_S_IS_GUARDIAN,
+                dependent.getXDIAddress()));
 
-		this.prepareMessageToCloud(message, guardian, secretToken);
+        message.createSetOperation(targetStatements.iterator());
 
-		List<XDIStatement> targetStatements = new ArrayList<XDIStatement> ();
+        // send message
+        String cloudXdiEndpoint = this.makeCloudXdiEndpoint(guardian);
+        XDIClient xdiClientCloud = new XDIHttpClient(cloudXdiEndpoint);
+        log.debug("setGuardianshipInCloud :: Message1  " + messageEnvelope.getGraph().toString());
+        long startTime = System.currentTimeMillis();
+        xdiClientCloud.send(messageEnvelope);
+        long endTime = System.currentTimeMillis();
+        log.info("setGuardianshipInCloud Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime,
+                endTime - startTime);
 
-		//Create the Relational Entry in the Guardian  Graph
-		targetStatements.add(XDIStatement.fromRelationComponents(
-				guardian.getXDIAddress(),
-				XRI_S_IS_GUARDIAN,
-				dependent.getXDIAddress()));
+        // done
+        log.debug("In Guardian User Cloud: Creating is Guardian Relationship between " + guardian.toString() + " and "
+                + dependent.toString());
 
-		message.createSetOperation(targetStatements.iterator());
+        // Prepare message to Dependent's Cloud
 
-		// send message
-		String cloudXdiEndpoint = this.makeCloudXdiEndpoint(guardian);
-		XDIClient xdiClientCloud = new XDIHttpClient(cloudXdiEndpoint);
-		log.debug("setGuardianshipInCloud :: Message1  " + messageEnvelope.getGraph().toString());
-		long startTime = System.currentTimeMillis();
-		xdiClientCloud.send(messageEnvelope);
-		long endTime = System.currentTimeMillis();
-		log.info("setGuardianshipInCloud Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
-	                - startTime);
+        MessageEnvelope messageEnvelope2 = new MessageEnvelope();
+        MessageCollection messageCollection2 = this.createMessageCollectionToCloud(messageEnvelope2, dependent);
 
-		// done
-		log.debug("In Guardian User Cloud: Creating is Guardian Relationship between " + guardian.toString() + " and " + dependent.toString() );
+        Message message2 = messageCollection2.createMessage();
 
+        // Update Dependent's Graph
 
-		// Prepare message to Dependent's Cloud
+        this.prepareMessageToCloud(message2, dependent, dependentToken);
+        List<XDIStatement> targetStatements2 = new ArrayList<XDIStatement>();
 
-		MessageEnvelope messageEnvelope2 = new MessageEnvelope();
-		MessageCollection messageCollection2 = this.createMessageCollectionToCloud(messageEnvelope2, dependent);
+        // Generating and Adding Dependent Statements
+        List<XDIStatement> dependentStatements = createDependentXDIStatements(guardian, dependent, dependentBirthDate,
+                bornBeforeDate, bornAfterDate, guardianPrivateSigningKey);
+        targetStatements2.addAll(dependentStatements);
 
-		Message message2 = messageCollection2.createMessage();
+        if (withConsent) {
 
-		//Update Dependent's Graph
-
-		this.prepareMessageToCloud(message2, dependent, dependentToken);        
-		List<XDIStatement> targetStatements2 = new ArrayList<XDIStatement> ();
-
-
-		//Generating and Adding Dependent Statements
-		List<XDIStatement> dependentStatements =  createDependentXDIStatements( guardian,  dependent, dependentBirthDate, bornBeforeDate,
-				bornAfterDate, guardianPrivateSigningKey);
-		targetStatements2.addAll(dependentStatements);
-
-
-
-		if (withConsent) {    
-
-			//Generating and Adding Consent Statements
-			List<XDIStatement> consentStatements =  createConsentXDIStatements(guardian,  dependent, guardianPrivateSigningKey);
-			targetStatements2.addAll(consentStatements);
-		} else {
-			throw new Xdi2ClientException("Consent required for this operation");
-		}
-		 // Set link contract and policies so that parent/guardian can fetch all
+            // Generating and Adding Consent Statements
+            List<XDIStatement> consentStatements = createConsentXDIStatements(guardian, dependent,
+                    guardianPrivateSigningKey);
+            targetStatements2.addAll(consentStatements);
+        } else {
+            throw new Xdi2ClientException("Consent required for this operation");
+        }
+        // Set link contract and policies so that parent/guardian can fetch all
         // the information from child's cloud.
         Graph parentChildLinkContractGraph = MemoryGraphFactory.getInstance().openGraph();
         GenericLinkContract linkContract = GenericLinkContract.findGenericLinkContract(parentChildLinkContractGraph,
-                dependent.getXDIAddress(), guardian.getXDIAddress(), null, null,true);
+                dependent.getXDIAddress(), guardian.getXDIAddress(), null, null, true);
 
         PolicyAnd policy = linkContract.getPolicyRoot(true).createAndPolicy(true);
         PolicyUtil.createSenderIsOperator(policy, guardian.getXDIAddress());
@@ -1417,7 +1441,8 @@ public class BasicCSP implements CSP {
         MessageEnvelope msgEnvelope = new MessageEnvelope();
         Message parentChildMsg = msgEnvelope.createMessage(dependent.getXDIAddress());
         parentChildMsg.setToPeerRootXDIArc(dependent.getPeerRootXDIArc());
-        parentChildMsg.setLinkContractXDIAddress(RootLinkContract.createRootLinkContractXDIAddress(dependent.getXDIAddress()));
+        parentChildMsg.setLinkContractXDIAddress(RootLinkContract.createRootLinkContractXDIAddress(dependent
+                .getXDIAddress()));
         parentChildMsg.setSecretToken(dependentToken);
         parentChildMsg.createSetOperation(parentChildLinkContractGraph);
 
@@ -1434,1245 +1459,1185 @@ public class BasicCSP implements CSP {
         // done
         log.debug("In Dependent User Cloud: Creating Guardian Relationship between " + dependent.toString() + " and "
                 + guardian.toString());
-	}
+    }
 
+    /**
+     * {@inheritDoc}
+     */
+    public void setGuardianshipInCSP(CSPInformation cspInformation, CloudNumber guardian, CloudNumber dependent,
+            Date dependentBirthDate, boolean withConsent, Date bornBeforeDate, Date bornAfterDate,
+            PrivateKey guardianPrivateSigningKey) throws Xdi2ClientException {
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public void setGuardianshipInCSP(CSPInformation cspInformation, CloudNumber guardian,
-			CloudNumber dependent, Date dependentBirthDate, boolean withConsent, Date bornBeforeDate,
-	        Date bornAfterDate, PrivateKey guardianPrivateSigningKey)
-					throws Xdi2ClientException {
+        // Prepare message to Guardian Sub Graph in CSP Graph
 
-		// Prepare message to Guardian Sub Graph in CSP Graph
+        MessageEnvelope messageEnvelope = new MessageEnvelope();
+        MessageCollection messageCollection = this.createMessageCollectionToCSP(messageEnvelope);
 
-		MessageEnvelope messageEnvelope = new MessageEnvelope();
-		MessageCollection messageCollection = this.createMessageCollectionToCSP(messageEnvelope);
+        Message message = messageCollection.createMessage();
 
-		Message message = messageCollection.createMessage();
+        List<XDIStatement> targetStatements = new ArrayList<XDIStatement>();
 
-		List<XDIStatement> targetStatements = new ArrayList<XDIStatement> ();
+        // Create the Relational Entry in the Guardian Sub Graph
+        targetStatements.add(XDIStatement.fromRelationComponents(guardian.getXDIAddress(), XRI_S_IS_GUARDIAN,
+                dependent.getXDIAddress()));
 
+        // Generating and Adding Dependent Statements
+        List<XDIStatement> dependentStatements = createDependentXDIStatements(guardian, dependent, dependentBirthDate,
+                bornBeforeDate, bornAfterDate, guardianPrivateSigningKey);
+        targetStatements.addAll(dependentStatements);
 
-		//Create the Relational Entry in the Guardian Sub Graph
-		targetStatements.add(XDIStatement.fromRelationComponents(
-				guardian.getXDIAddress(),
-				XRI_S_IS_GUARDIAN,
-				dependent.getXDIAddress()));
+        if (withConsent) {
+            // Generating and Adding Consent Statements
+            List<XDIStatement> consentStatements = createConsentXDIStatements(guardian, dependent,
+                    guardianPrivateSigningKey);
+            targetStatements.addAll(consentStatements);
+        } else {
+            throw new Xdi2ClientException("Consent required for this operation");
+        }
 
+        message.createSetOperation(targetStatements.iterator());
 
-		//Generating and Adding Dependent Statements
-		List<XDIStatement> dependentStatements =  createDependentXDIStatements(guardian, dependent, dependentBirthDate, bornBeforeDate,
-				bornAfterDate, guardianPrivateSigningKey);
-		targetStatements.addAll(dependentStatements);
+        // send message
 
+        this.prepareMessageToCSP(message);
+        log.debug("setGuardianshipInCSP :: Message  " + messageEnvelope.getGraph().toString());
+        long startTime = System.currentTimeMillis();
+        this.getXdiClientCSPRegistry().send(messageEnvelope);
+        long endTime = System.currentTimeMillis();
+        log.info("setGuardianshipInCSP Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime,
+                endTime - startTime);
 
-		if (withConsent) {     
-			//Generating and Adding Consent Statements
-			List<XDIStatement> consentStatements =  createConsentXDIStatements(guardian, dependent, guardianPrivateSigningKey);
-			targetStatements.addAll(consentStatements);
-		} else {
-			throw new Xdi2ClientException("Consent required for this operation");
-		}
+        // done
 
-		message.createSetOperation(targetStatements.iterator());
+        log.debug("In CSP Cloud: Creating  is Guardian Relationship between " + guardian.toString() + " and "
+                + dependent.toString());
+    }
 
+    /**
+     * {@inheritDoc}
+     */
+    public void setGuardianshipInRN(CSPInformation cspInformation, CloudNumber guardian, CloudNumber dependent,
+            Date dependentBirthDate, boolean withConsent, PrivateKey guardianPrivateSigningKey)
+            throws Xdi2ClientException {
 
-		// send message
+        // Prepare message to Guardian Sub Graph in RN Member Graph Service
 
-		this.prepareMessageToCSP(message);
-		log.debug("setGuardianshipInCSP :: Message  " + messageEnvelope.getGraph().toString());
-		long startTime = System.currentTimeMillis();
-		this.getXdiClientCSPRegistry().send(messageEnvelope);
-		long endTime = System.currentTimeMillis();
-		log.info("setGuardianshipInCSP Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
-	                - startTime);
+        MessageEnvelope messageEnvelope = new MessageEnvelope();
+        MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
 
-		// done
+        Message message = messageCollection.createMessage();
 
-		log.debug("In CSP Cloud: Creating  is Guardian Relationship between " + guardian.toString() + " and " + dependent.toString() );
-	}
+        List<XDIStatement> targetStatements = new ArrayList<XDIStatement>();
 
+        // Create the Relational Entry in the Guardian Sub Graph
+        targetStatements.add(XDIStatement.fromRelationComponents(guardian.getXDIAddress(), XRI_S_IS_GUARDIAN,
+                dependent.getXDIAddress()));
 
+        // Generating and Adding Dependent Statements
+        List<XDIStatement> dependentStatements = createDependentXDIStatements(guardian, dependent, dependentBirthDate,
+                null, null, guardianPrivateSigningKey);
+        targetStatements.addAll(dependentStatements);
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public void setGuardianshipInRN(CSPInformation cspInformation, CloudNumber guardian,
-			CloudNumber dependent, Date dependentBirthDate, boolean withConsent, PrivateKey guardianPrivateSigningKey)
-					throws Xdi2ClientException {
+        if (withConsent) {
+            // Generating and Adding Consent Statements
+            List<XDIStatement> consentStatements = createConsentXDIStatements(guardian, dependent,
+                    guardianPrivateSigningKey);
+            targetStatements.addAll(consentStatements);
+        } else {
+            throw new Xdi2ClientException("Consent required for this operation");
+        }
 
-		// Prepare message to Guardian Sub Graph in RN Member Graph Service
+        message.createSetOperation(targetStatements.iterator());
 
-		MessageEnvelope messageEnvelope = new MessageEnvelope();
-		MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
+        // send message
 
-		Message message = messageCollection.createMessage();
+        this.prepareMessageToRN(message);
+        long startTime = System.currentTimeMillis();
+        this.getXdiClientRNRegistrationService().send(messageEnvelope);
+        long endTime = System.currentTimeMillis();
+        log.info("setGuardianshipInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime,
+                endTime - startTime);
 
+        // done
+        log.debug("In RN: Creating is Guardian Relationship between " + guardian.toString() + " and "
+                + dependent.toString());
 
-		List<XDIStatement> targetStatements = new ArrayList<XDIStatement> ();
+    }
 
-		//Create the Relational Entry in the Guardian Sub Graph
-		targetStatements.add(XDIStatement.fromRelationComponents(
-				guardian.getXDIAddress(),
-				XRI_S_IS_GUARDIAN,
-				dependent.getXDIAddress()));
+    /**
+     * {@inheritDoc}
+     */
+    public CloudNumber[] getMyDependentsInCSP(CSPInformation cspInformation, CloudNumber guardian)
+            throws Xdi2ClientException {
 
+        // Prepare message to Guardian Sub Graph in CSP Graph
 
-		//Generating and Adding Dependent Statements
-		List<XDIStatement> dependentStatements =  createDependentXDIStatements( guardian,  dependent, dependentBirthDate, null, null, guardianPrivateSigningKey);
-		targetStatements.addAll(dependentStatements);
+        MessageEnvelope messageEnvelope = new MessageEnvelope();
+        MessageCollection messageCollection = this.createMessageCollectionToCSP(messageEnvelope);
+        Message message = messageCollection.createMessage();
 
-		if (withConsent) {     
-			//Generating and Adding Consent Statements
-			List<XDIStatement> consentStatements =  createConsentXDIStatements(guardian,  dependent, guardianPrivateSigningKey);
-			targetStatements.addAll(consentStatements);
-		} else {
-			throw new Xdi2ClientException("Consent required for this operation");
-		}
+        XDIStatement targetStatementGet = XDIStatement.fromRelationComponents(guardian.getXDIAddress(),
+                XRI_S_IS_GUARDIAN, XDIConstants.XDI_ADD_COMMON_VARIABLE);
 
-		message.createSetOperation(targetStatements.iterator());
+        message.createGetOperation(targetStatementGet);
 
-		// send message
+        // send message and read results
 
-		this.prepareMessageToRN(message);
-		long startTime = System.currentTimeMillis();
-		this.getXdiClientRNRegistrationService().send(messageEnvelope);
-		long endTime = System.currentTimeMillis();
-		log.info("setGuardianshipInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
-	                - startTime);
+        this.prepareMessageToCSP(message);
 
-		// done
-		log.debug("In RN: Creating is Guardian Relationship between " + guardian.toString() + " and " + dependent.toString() );
-
-	}
-
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public CloudNumber[] getMyDependentsInCSP(CSPInformation cspInformation, CloudNumber guardian)
-			throws Xdi2ClientException {
-
-		// Prepare message to Guardian Sub Graph in CSP Graph
-
-		MessageEnvelope messageEnvelope = new MessageEnvelope();
-		MessageCollection messageCollection = this.createMessageCollectionToCSP(messageEnvelope);
-		Message message = messageCollection.createMessage();
-
-		XDIStatement targetStatementGet = XDIStatement.fromRelationComponents(
-				guardian.getXDIAddress(),
-				XRI_S_IS_GUARDIAN,
-				XDIConstants.XDI_ADD_COMMON_VARIABLE);
-
-		message.createGetOperation(targetStatementGet);
-
-		// send message and read results
-
-		this.prepareMessageToCSP(message);
-
-		long startTime = System.currentTimeMillis();
-		MessagingResponse messageResult = this.getXdiClientCSPRegistry().send(messageEnvelope);
-		long endTime = System.currentTimeMillis();
-		log.info("getMyDependentsInCSP Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
-	                - startTime);
+        long startTime = System.currentTimeMillis();
+        MessagingResponse messageResult = this.getXdiClientCSPRegistry().send(messageEnvelope);
+        long endTime = System.currentTimeMillis();
+        log.info("getMyDependentsInCSP Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime,
+                endTime - startTime);
         ContextNode cotextNode = messageResult.getGraph().getDeepContextNode(guardian.getXDIAddress());
         ReadOnlyIterator<Relation> relations = cotextNode == null ? null : cotextNode.getRelations(XRI_S_IS_GUARDIAN);
         CloudNumber[] theDependencies = null;
-        if(relations != null) {
-        theDependencies = new IteratorArrayMaker<CloudNumber> (
-				new NotNullIterator<CloudNumber> (
-						new MappingCloudNumberIterator(
-								new MappingRelationTargetXDIAddressIterator(relations)
-								))).array(CloudNumber.class);
+        if (relations != null) {
+            theDependencies = new IteratorArrayMaker<CloudNumber>(new NotNullIterator<CloudNumber>(
+                    new MappingCloudNumberIterator(new MappingRelationTargetXDIAddressIterator(relations))))
+                    .array(CloudNumber.class);
         }
-		if (theDependencies != null && theDependencies.length == 0) {
-			theDependencies = null;
-		}
+        if (theDependencies != null && theDependencies.length == 0) {
+            theDependencies = null;
+        }
 
-		// done
-		log.debug("In CSP Cloud: Getting dependencies of " + guardian.toString() );
+        // done
+        log.debug("In CSP Cloud: Getting dependencies of " + guardian.toString());
 
-		return theDependencies;
+        return theDependencies;
 
-	}
+    }
 
+    /**
+     * {@inheritDoc}
+     */
+    public CloudNumber[] getMyGuardiansInCSP(CSPInformation cspInformation, CloudNumber dependent)
+            throws Xdi2ClientException {
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public CloudNumber[] getMyGuardiansInCSP(CSPInformation cspInformation, CloudNumber dependent)
-			throws Xdi2ClientException {
+        // Prepare message to Guardian Sub Graph in CSP Graph
 
-		// Prepare message to Guardian Sub Graph in CSP Graph
+        MessageEnvelope messageEnvelope = new MessageEnvelope();
+        MessageCollection messageCollection = this.createMessageCollectionToCSP(messageEnvelope);
+        Message message = messageCollection.createMessage();
 
-		MessageEnvelope messageEnvelope = new MessageEnvelope();
-		MessageCollection messageCollection = this.createMessageCollectionToCSP(messageEnvelope);
-		Message message = messageCollection.createMessage();
+        XDIStatement targetStatementGet = XDIStatement.fromRelationComponents(dependent.getXDIAddress(),
+                XRI_S_GUARDIAN, XDIConstants.XDI_ADD_COMMON_VARIABLE);
 
-		XDIStatement targetStatementGet = XDIStatement.fromRelationComponents(
-				dependent.getXDIAddress(),
-				XRI_S_GUARDIAN,
-				XDIConstants.XDI_ADD_COMMON_VARIABLE);
+        message.createGetOperation(targetStatementGet);
 
-		message.createGetOperation(targetStatementGet);
+        // send message and read results
 
-		// send message and read results
+        this.prepareMessageToCSP(message);
 
-		this.prepareMessageToCSP(message);
-
-		long startTime = System.currentTimeMillis();
-		MessagingResponse messageResult = this.getXdiClientCSPRegistry().send(messageEnvelope);
-		long endTime = System.currentTimeMillis();
-		log.info("getMyGuardiansInCSP Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
-	                - startTime);
+        long startTime = System.currentTimeMillis();
+        MessagingResponse messageResult = this.getXdiClientCSPRegistry().send(messageEnvelope);
+        long endTime = System.currentTimeMillis();
+        log.info("getMyGuardiansInCSP Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime,
+                endTime - startTime);
         ContextNode cotextNode = messageResult.getGraph().getDeepContextNode(dependent.getXDIAddress());
         Iterator<Relation> relations = cotextNode == null ? null : cotextNode.getRelations(XRI_S_GUARDIAN);
         CloudNumber[] theGuardians = null;
-        if(relations != null) {
-    		MappingRelationTargetXDIAddressIterator contextNodeIterator = new MappingRelationTargetXDIAddressIterator(relations);
-    
-    		ArrayList<CloudNumber> theGuardianList = new ArrayList<CloudNumber>();
-    		while (contextNodeIterator.hasNext()) {
-    			XDIAddress next = contextNodeIterator.next();
-    			// We can expect to  get inner roots as well that we want to discard from this list.
-    			// Only interested in Cloud Numbers.
-    			if (CloudNumber.isValid(next)) {
-    				theGuardianList.add(CloudNumber.create(next.toString()));
-    			} else {
-    				log.debug("Not a valid Clould Number ... : {}", next.toString());
-    			}        
-    		}
+        if (relations != null) {
+            MappingRelationTargetXDIAddressIterator contextNodeIterator = new MappingRelationTargetXDIAddressIterator(
+                    relations);
 
-    		theGuardians = theGuardianList.toArray( new CloudNumber[theGuardianList.size()]);
+            ArrayList<CloudNumber> theGuardianList = new ArrayList<CloudNumber>();
+            while (contextNodeIterator.hasNext()) {
+                XDIAddress next = contextNodeIterator.next();
+                // We can expect to get inner roots as well that we want to
+                // discard from this list.
+                // Only interested in Cloud Numbers.
+                if (CloudNumber.isValid(next)) {
+                    theGuardianList.add(CloudNumber.create(next.toString()));
+                } else {
+                    log.debug("Not a valid Clould Number ... : {}", next.toString());
+                }
+            }
+
+            theGuardians = theGuardianList.toArray(new CloudNumber[theGuardianList.size()]);
         }
-		if (theGuardians != null && theGuardians.length == 0) {
-			theGuardians = null;
-		}
+        if (theGuardians != null && theGuardians.length == 0) {
+            theGuardians = null;
+        }
 
-		// done
-		log.debug("In CSP Cloud: Getting Guardians of " + dependent.toString() );
+        // done
+        log.debug("In CSP Cloud: Getting Guardians of " + dependent.toString());
 
-		return theGuardians;
+        return theGuardians;
 
-	}
+    }
 
+    /**
+     * Create the XDIStatement that represent a Guardian's Consent and Sign it.
+     * 
+     * [=]!:uuid:1111[<#consent>]<!:uuid:6545>/$is#/[+]:uuid:0000<#parental><#
+     * consent> [=]!:uuid:1111[<#consent>]<!:uuid:6545>/$to/[=]!:uuid:3333
+     * [=]!:uuid:1111[<#consent>]<!:uuid:6545><$sig>&/&/“...”
+     * 
+     * @param guardian
+     * @param dependent
+     * @param signingKey
+     * @return XDI3 Statements
+     */
+    private List<XDIStatement> createConsentXDIStatements(CloudNumber guardian, CloudNumber dependent,
+            PrivateKey signingKey) {
 
+        List<XDIStatement> targetStatements = new ArrayList<XDIStatement>();
+        String consentUUID = "<*!:uuid:" + UUID.randomUUID() + ">";
 
-	/**
-	 * Create the XDIStatement that represent a Guardian's Consent and Sign it.
-	 * 
-	 * [=]!:uuid:1111[<#consent>]<!:uuid:6545>/$is#/[+]:uuid:0000<#parental><#consent>
-	 * [=]!:uuid:1111[<#consent>]<!:uuid:6545>/$to/[=]!:uuid:3333
-	 * [=]!:uuid:1111[<#consent>]<!:uuid:6545><$sig>&/&/“...”
-	 * 
-	 * @param guardian
-	 * @param dependent
-	 * @param signingKey
-	 * @return XDI3 Statements
-	 */ 
-	private List<XDIStatement> createConsentXDIStatements(CloudNumber guardian, CloudNumber dependent, PrivateKey signingKey) {
+        MemoryGraph g = MemoryGraphFactory.getInstance().openGraph();
 
+        // [=]!:uuid:1111[<#consent>]<!:uuid:6545>/$is#/[+]:uuid:0000<#parental><#consent>
+        XDIStatement consentStatement = XDIStatement.fromRelationComponents(XDIAddressUtil.concatXDIAddresses(
+                guardian.getXDIAddress(), XDIAddress.create("[<#consent>]"), XDIAddress.create(consentUUID)),
+                XDIDictionaryConstants.XDI_ADD_IS_TYPE, XDIAddressUtil.concatXDIAddresses(this.getCspInformation()
+                        .getRnCloudNumber().getXDIAddress(), XDIAddress.create("<#parental><#consent>")));
 
-		List<XDIStatement> targetStatements = new ArrayList<XDIStatement> ();
-		String consentUUID = "<*!:uuid:" + UUID.randomUUID() + ">";
+        g.setStatement(consentStatement);
 
+        XDIAddress consentSubjectTo = XDIAddressUtil.concatXDIAddresses(guardian.getXDIAddress(),
+                XDIAddress.create("[<#consent>]"), XDIAddress.create(consentUUID));
 
-		MemoryGraph g = MemoryGraphFactory.getInstance().openGraph();
+        // [=]!:uuid:1111[<#consent>]<!:uuid:6545>/$to/[=]!:uuid:3333
+        XDIStatement consentStatementTo = XDIStatement.fromRelationComponents(consentSubjectTo,
+                XDIAddress.create("$to"), dependent.getXDIAddress());
+        g.setStatement(consentStatementTo);
 
+        // Sign the Context: //[=]!:uuid:1111[<#consent>]<!:uuid:6545>
+        ContextNode signingNode = g.getRootContextNode().getDeepContextNode(consentSubjectTo);
 
-		//[=]!:uuid:1111[<#consent>]<!:uuid:6545>/$is#/[+]:uuid:0000<#parental><#consent>
-		XDIStatement consentStatement = XDIStatement.fromRelationComponents(
-				XDIAddressUtil.concatXDIAddresses(guardian.getXDIAddress(), XDIAddress.create("[<#consent>]"), XDIAddress.create(consentUUID)),
-				XDIDictionaryConstants.XDI_ADD_IS_TYPE,
-				XDIAddressUtil.concatXDIAddresses(this.getCspInformation().getRnCloudNumber().getXDIAddress(), XDIAddress.create("<#parental><#consent>")));
+        // now create the signature and add it to the graph
+        RSASignature s = (RSASignature) Signatures.createSignature(signingNode, "sha", 256, "rsa", 2048, true);
 
-		g.setStatement(consentStatement);
+        try {
+            new RSAStaticPrivateKeySignatureCreator(this.getCspInformation().getCspSignaturePrivateKey())
+                    .createSignature(s);
+        } catch (GeneralSecurityException e) {
+            throw new RuntimeException("Problem Signing Dependent Graph");
+        }
 
-		XDIAddress consentSubjectTo = XDIAddressUtil.concatXDIAddresses(guardian.getXDIAddress(), XDIAddress.create("[<#consent>]"), XDIAddress.create(consentUUID));
+        ContextNode c = g.getRootContextNode();
 
-		//[=]!:uuid:1111[<#consent>]<!:uuid:6545>/$to/[=]!:uuid:3333
-		XDIStatement consentStatementTo = XDIStatement.fromRelationComponents(
-				consentSubjectTo,
-				XDIAddress.create("$to"),
-				dependent.getXDIAddress());
-		g.setStatement(consentStatementTo);
+        Iterator<Statement> dependencyStatmentIterator = c.getAllStatements();
 
+        // Converting from Statement to XDIStatement
+        while (dependencyStatmentIterator.hasNext()) {
+            Statement next = dependencyStatmentIterator.next();
+            XDIStatement graphStatement = next.getXDIStatement();
+            targetStatements.add(graphStatement);
+        }
 
-		//Sign the Context: //[=]!:uuid:1111[<#consent>]<!:uuid:6545>        
-		ContextNode signingNode = g.getRootContextNode().getDeepContextNode(consentSubjectTo);
+        return targetStatements;
 
-		// now create the signature and add it to the graph
-		RSASignature s = (RSASignature)Signatures.createSignature(signingNode, "sha", 256, "rsa", 2048, true);
+    }
 
-		try {
-			new RSAStaticPrivateKeySignatureCreator(this.getCspInformation().getCspSignaturePrivateKey()).createSignature(s);
-		} catch (GeneralSecurityException e) {
-			throw new RuntimeException("Problem Signing Dependent Graph");           
-		}
+    /**
+     * Create Dependent XDI Statements and Sign them with the Guardian's Public
+     * Key.
+     * 
+     * ([=]!:uuid:3333/#guardian)[=]!:uuid:3333/#guardian/([=]!:uuid:3333/#
+     * guardian)[=]!:uuid:1111
+     * [=]!:uuid:3333<#birth><$t>&/&/"2000-04-10T22:22:22Z"
+     * 
+     * 
+     * @param guardian
+     * @param dependent
+     * @param dependentBirthDate
+     * @param signingKey
+     * @return XDIStatements
+     */
+    private List<XDIStatement> createDependentXDIStatements(CloudNumber guardian, CloudNumber dependent,
+            Date dependentBirthDate, Date bornBeforeDate, Date bornAfterDate, PrivateKey signingKey) {
 
-		ContextNode c = g.getRootContextNode();
+        XDIArc innerGraph = XDIArc.create("(" + dependent.getXDIAddress() + "/#guardian" + ")");
 
-		Iterator<Statement> dependencyStatmentIterator = c.getAllStatements();
+        MemoryGraph g = MemoryGraphFactory.getInstance().openGraph();
 
-		//Converting from Statement to  XDIStatement
-		while(dependencyStatmentIterator.hasNext()){
-			Statement next = dependencyStatmentIterator.next();
-			XDIStatement graphStatement = next.getXDIStatement();
-			targetStatements.add(graphStatement);
-		}
+        List<XDIStatement> targetStatements = new ArrayList<XDIStatement>();
 
-		return targetStatements;
+        // Create the Relational Entry in the Dependent Sub Graph
+        // [=]!:uuid:3333/#guardian/[=]!:uuid:1111
+        XDIStatement guardianStatement = XDIStatement.fromRelationComponents(dependent.getXDIAddress(), XRI_S_GUARDIAN,
+                guardian.getXDIAddress());
 
+        g.setStatement(guardianStatement);
 
-	}
+        // ([=]!:uuid:3333/#guardian)[=]!:uuid:3333
+        // /#guardian/([=]!:uuid:3333/#guardian)[=]!:uuid:1111
 
+        XDIStatement innerGuardianStatement = XDIStatement.fromRelationComponents(
+                XDIAddressUtil.concatXDIAddresses(innerGraph, dependent.getXDIAddress()), XRI_S_GUARDIAN,
+                XDIAddressUtil.concatXDIAddresses(innerGraph, guardian.getXDIAddress()));
 
-	/**
-	 * Create Dependent XDI Statements and Sign them with the Guardian's Public Key.
-	 * 
-	 * ([=]!:uuid:3333/#guardian)[=]!:uuid:3333/#guardian/([=]!:uuid:3333/#guardian)[=]!:uuid:1111
-	 * [=]!:uuid:3333<#birth><$t>&/&/"2000-04-10T22:22:22Z"
-	 * 
-	 * 
-	 * @param guardian
-	 * @param dependent
-	 * @param dependentBirthDate
-	 * @param signingKey
-	 * @return XDIStatements
-	 */
-	private List<XDIStatement> createDependentXDIStatements(CloudNumber guardian, CloudNumber dependent, Date dependentBirthDate, Date bornBeforeDate, Date bornAfterDate, PrivateKey signingKey) {
+        g.setStatement(innerGuardianStatement);
 
+        // Adding Date to Dependent's SubGraph
+        // [=]!:uuid:3333<#birth><$t>&/&/"2000-04-10T22:22:22Z")
+        if (dependentBirthDate != null) {
+            String xdiDOBFormat = Timestamps.timestampToString(dependentBirthDate);
+            XDIStatement dobStatement = XDIStatement.fromLiteralComponents(
+                    XDIAddressUtil.concatXDIAddresses(dependent.getXDIAddress(), XDIAddress.create("<#birth><$t>")),
+                    xdiDOBFormat);
 
-		XDIArc innerGraph = XDIArc.create("(" + dependent.getXDIAddress() +"/#guardian" + ")");
+            g.setStatement(dobStatement);
+        }
+        // Born before date
+        if (bornBeforeDate != null) {
+            String xdiBBAFormat = Timestamps.timestampToString(bornBeforeDate);
+            XDIStatement bbaStatement = XDIStatement.fromLiteralComponents(
+                    XDIAddressUtil.concatXDIAddresses(dependent.getXDIAddress(),
+                            XDIAddress.create("<#born><#before><$t>")), xdiBBAFormat);
 
-		MemoryGraph g = MemoryGraphFactory.getInstance().openGraph();
+            g.setStatement(bbaStatement);
+        }
 
-		List<XDIStatement> targetStatements = new ArrayList<XDIStatement> ();
+        // Born after date
+        if (bornAfterDate != null) {
+            String xdiBADFormat = Timestamps.timestampToString(bornAfterDate);
+            XDIStatement badStatement = XDIStatement.fromLiteralComponents(
+                    XDIAddressUtil.concatXDIAddresses(dependent.getXDIAddress(),
+                            XDIAddress.create("<#born><#after><$t>")), xdiBADFormat);
 
+            g.setStatement(badStatement);
+        }
+        // Sign the Context:
+        // ([=]!:uuid:3333/#guardian)[<$sig>]<[=]!:uuid:6666>&/&/”...”
+        ContextNode signingNode = g.getRootContextNode().getContextNode(innerGraph);
 
-		//Create the Relational Entry in the Dependent Sub Graph
-		//[=]!:uuid:3333/#guardian/[=]!:uuid:1111
-		XDIStatement guardianStatement = XDIStatement.fromRelationComponents(
-				dependent.getXDIAddress(),
-				XRI_S_GUARDIAN,
-				guardian.getXDIAddress());
+        // now create the signature and add it to the graph
+        RSASignature s = (RSASignature) Signatures.createSignature(signingNode, "sha", 256, "rsa", 2048, false);
 
-		g.setStatement(guardianStatement);
+        try {
+            new RSAStaticPrivateKeySignatureCreator(this.getCspInformation().getCspSignaturePrivateKey())
+                    .createSignature(s);
+        } catch (GeneralSecurityException e) {
+            log.error("Error while sining the graph is : {}", e.getMessage(), e);
+            throw new RuntimeException("Problem Signing Dependent Graph");
+        }
 
-		// ([=]!:uuid:3333/#guardian)[=]!:uuid:3333 /#guardian/([=]!:uuid:3333/#guardian)[=]!:uuid:1111
+        // Add Public Key to <$sig>
+        // ([=]!:uuid:3333/#guardian)<$sig><$public><$key>/$ref/[=]!:uuid:1111$msg$sig$keypair<$public><$key>
 
+        ContextNode signatureContextNode = s.getContextNode();
 
-		XDIStatement innerGuardianStatement = XDIStatement.fromRelationComponents(
-				XDIAddressUtil.concatXDIAddresses(innerGraph,dependent.getXDIAddress()),
-				XRI_S_GUARDIAN,
-				XDIAddressUtil.concatXDIAddresses(innerGraph, guardian.getXDIAddress()));
+        XDIAddress pk = XDIAddress.create("<$public><$key>");
 
-		g.setStatement(innerGuardianStatement);
+        signatureContextNode.setDeepContextNode(pk).setRelation(
+                XDIDictionaryConstants.XDI_ADD_REF,
+                XDIAddressUtil.concatXDIAddresses(guardian.getXDIAddress(),
+                        XDISecurityConstants.XDI_ADD_MSG_SIG_KEYPAIR_PRIVATE_KEY));
 
-		//Adding Date to Dependent's SubGraph
-		//[=]!:uuid:3333<#birth><$t>&/&/"2000-04-10T22:22:22Z")
-		if(dependentBirthDate != null) {
-			String xdiDOBFormat = Timestamps.timestampToString(dependentBirthDate);
-			XDIStatement dobStatement = XDIStatement.fromLiteralComponents(
-					XDIAddressUtil.concatXDIAddresses(dependent.getXDIAddress(), XDIAddress.create("<#birth><$t>")), 
-					xdiDOBFormat);
-	
-			g.setStatement(dobStatement);
-		}
-		// Born before date
-		if(bornBeforeDate != null) {
-			String xdiBBAFormat = Timestamps.timestampToString(bornBeforeDate);
-			XDIStatement bbaStatement = XDIStatement.fromLiteralComponents(
-					XDIAddressUtil.concatXDIAddresses(dependent.getXDIAddress(), XDIAddress.create("<#born><#before><$t>")), 
-					xdiBBAFormat);
-	
-			g.setStatement(bbaStatement);
-		}
-		
-		// Born after date
-		if(bornAfterDate != null) {
-			String xdiBADFormat = Timestamps.timestampToString(bornAfterDate);
-			XDIStatement badStatement = XDIStatement.fromLiteralComponents(
-					XDIAddressUtil.concatXDIAddresses(dependent.getXDIAddress(), XDIAddress.create("<#born><#after><$t>")), 
-					xdiBADFormat);
-	
-			g.setStatement(badStatement);
-		}
-		//Sign the Context: ([=]!:uuid:3333/#guardian)[<$sig>]<[=]!:uuid:6666>&/&/”...”        
-		ContextNode signingNode = g.getRootContextNode().getContextNode(innerGraph);
+        ContextNode c = g.getRootContextNode();
 
-		// now create the signature and add it to the graph
-		RSASignature s = (RSASignature)Signatures.createSignature(signingNode, "sha", 256, "rsa", 2048, false);
+        Iterator<Statement> dependencyStatementIterator = c.getAllStatements();
 
+        // Converting from Statement to XDIStatement
+        while (dependencyStatementIterator.hasNext()) {
+            Statement next = dependencyStatementIterator.next();
+            XDIStatement graphStatement = next.getXDIStatement();
+            targetStatements.add(graphStatement);
+        }
 
-		try {
-			new RSAStaticPrivateKeySignatureCreator(this.getCspInformation().getCspSignaturePrivateKey()).createSignature(s);
-		} catch (GeneralSecurityException e) {
-		    log.error("Error while sining the graph is : {}", e.getMessage(), e);
-			throw new RuntimeException("Problem Signing Dependent Graph");           
-		}
+        return targetStatements;
 
+    }
 
+    /*
+     * Getters and setters
+     */
 
-		//Add Public Key to <$sig> 
-		//([=]!:uuid:3333/#guardian)<$sig><$public><$key>/$ref/[=]!:uuid:1111$msg$sig$keypair<$public><$key>         
+    public CSPInformation getCspInformation() {
 
-		ContextNode signatureContextNode = s.getContextNode();
+        return this.cspInformation;
+    }
 
-		XDIAddress pk =  XDIAddress.create("<$public><$key>");
+    public void setCspInformation(CSPInformation cspInformation) {
 
-		signatureContextNode
-		.setDeepContextNode(pk)
-		.setRelation(
-				XDIDictionaryConstants.XDI_ADD_REF,
-				XDIAddressUtil.concatXDIAddresses(guardian.getXDIAddress(), XDISecurityConstants.XDI_ADD_MSG_SIG_KEYPAIR_PRIVATE_KEY));
+        this.cspInformation = cspInformation;
 
-
-		ContextNode c = g.getRootContextNode();
-
-		Iterator<Statement> dependencyStatementIterator = c.getAllStatements();
-
-		//Converting from Statement to XDIStatement
-		while(dependencyStatementIterator.hasNext()){
-			Statement next = dependencyStatementIterator.next();
-			XDIStatement graphStatement = next.getXDIStatement();
-			targetStatements.add(graphStatement);
-		}
-
-		return targetStatements;
-
-	}
-	/*
-	 * Getters and setters
-	 */
-
-	public CSPInformation getCspInformation() {
-
-		return this.cspInformation;
-	}
-
-	public void setCspInformation(CSPInformation cspInformation) {
-
-		this.cspInformation = cspInformation;
-
-		this.xdiClientCSPRegistry = new XDIHttpClient(cspInformation.getCspRegistryXdiEndpoint());
-		((XDIHttpClient) this.xdiClientCSPRegistry).setFollowRedirects(true);
-		this.xdiClientRNRegistrationService = new XDIHttpClient(cspInformation.getRnRegistrationServiceXdiEndpoint());
-		((XDIHttpClient) this.xdiClientRNRegistrationService).setFollowRedirects(true);
-	}
-
-	public XDIClient getXdiClientCSPRegistry() {
-	    this.xdiClientCSPRegistry = new XDIHttpClient(cspInformation.getCspRegistryXdiEndpoint());
+        this.xdiClientCSPRegistry = new XDIHttpClient(cspInformation.getCspRegistryXdiEndpoint());
         ((XDIHttpClient) this.xdiClientCSPRegistry).setFollowRedirects(true);
-		return this.xdiClientCSPRegistry;
-	}
-
-	public void setXdiClientCSPRegistry(XDIClient xdiClientCSPRegistry) {
-
-		this.xdiClientCSPRegistry = xdiClientCSPRegistry;
-	}
-
-	public XDIClient getXdiClientRNRegistrationService() {
-	    this.xdiClientRNRegistrationService = new XDIHttpClient(cspInformation.getRnRegistrationServiceXdiEndpoint());
+        this.xdiClientRNRegistrationService = new XDIHttpClient(cspInformation.getRnRegistrationServiceXdiEndpoint());
         ((XDIHttpClient) this.xdiClientRNRegistrationService).setFollowRedirects(true);
-		return this.xdiClientRNRegistrationService;
-	}
-
-	public void setXdiClientRNRegistrationService(XDIClient xdiClientRNRegistrationService) {
-
-		this.xdiClientRNRegistrationService = xdiClientRNRegistrationService;
-	}
-	@Override
-	public String toString(){
-		if(this.cspInformation != null){
-			return this.cspInformation.toString();
-		} else {
-			return new String("cspInformation is null");
-		}
-	}
-	public static void printMessage(MessageEnvelope messageEnvelope)
-	{
-		try {
-			XDIWriterRegistry.forFormat("XDI DISPLAY", null).write(
-					messageEnvelope.getGraph(), System.out);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-
+    }
+
+    public XDIClient getXdiClientCSPRegistry() {
+        this.xdiClientCSPRegistry = new XDIHttpClient(cspInformation.getCspRegistryXdiEndpoint());
+        ((XDIHttpClient) this.xdiClientCSPRegistry).setFollowRedirects(true);
+        return this.xdiClientCSPRegistry;
+    }
+
+    public void setXdiClientCSPRegistry(XDIClient xdiClientCSPRegistry) {
+
+        this.xdiClientCSPRegistry = xdiClientCSPRegistry;
+    }
+
+    public XDIClient getXdiClientRNRegistrationService() {
+        this.xdiClientRNRegistrationService = new XDIHttpClient(cspInformation.getRnRegistrationServiceXdiEndpoint());
+        ((XDIHttpClient) this.xdiClientRNRegistrationService).setFollowRedirects(true);
+        return this.xdiClientRNRegistrationService;
+    }
+
+    public void setXdiClientRNRegistrationService(XDIClient xdiClientRNRegistrationService) {
+
+        this.xdiClientRNRegistrationService = xdiClientRNRegistrationService;
+    }
+
+    @Override
+    public String toString() {
+        if (this.cspInformation != null) {
+            return this.cspInformation.toString();
+        } else {
+            return new String("cspInformation is null");
+        }
+    }
+
+    public static void printMessage(MessageEnvelope messageEnvelope) {
+        try {
+            XDIWriterRegistry.forFormat("XDI DISPLAY", null).write(messageEnvelope.getGraph(), System.out);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void registerAdditionalCloudNameInRN(CloudName cloudName, CloudNumber cloudNumber,
+            NeustarRNDiscountCode neustarRNDiscountCode, NeustarRNCampaignCode neustarRNCampaignCode)
+            throws Xdi2ClientException {
+
+        /*
+         * Call the Registration Service to 1) Register the Cloud Name ( with
+         * the Cloud Number) 2) Create a Member Graph Billing Record
+         * 
+         * CSP Cloud Number: [+]!:uuid:9999 Respect Network Cloud Number:
+         * [+]!:uuid:0000 Message Id: [=]!:uuid:1234 User Cloud Number:
+         * [=]!:uuid:1111
+         * 
+         * [+]!:uuid:0000[#billing]!:uuid:1234/$from/[+]!:uuid:0000
+         * [+]!:uuid:0000[#billing]!:uuid:1234/$to/[+]!:uuid:9999
+         * [+]!:uuid:0000[#billing]!:uuid:1234/#member/[=]!:uuid:1111
+         * [+]!:uuid:0000[#billing]!:uuid:1234<$t>&/&/"2014-02-01T21:25:04Z"
+         * [+]!:uuid:0000[#billing]!:uuid:1234/$is#/#debit
+         * [+]!:uuid:0000[#billing
+         * ]!:uuid:1234<#action><#name>&/&/"Additional lifetime name"
+         * [+]!:uuid:0000[#billing]!:uuid:1234<#action><#code>&/&/"0010"
+         * [+]!:uuid:0000[#billing]!:uuid:1234<#amount>&/&/19
+         * [+]!:uuid:0000[#billing]!:uuid:1234<#currency>&/&/"USD"
+         * [+]!:uuid:0000[#billing]!:uuid:1234[#status]@0<#status>&/&/"pending"
+         * [+]!:uuid:0000[#billing]!:uuid:1234[#status]@0<$t>&/&/"2014-..."
+         * [+]!:uuid:0000[#billing]!:uuid:1234[#status]@0/$from/[+]!:uuid:9999
+         * [+]!:uuid:0000[#billing]!:uuid:1234[#status]@1<#status>&/&/"pending"
+         * [+]!:uuid:0000[#billing]!:uuid:1234[#status]@1<$t>&/&/"2014-..."
+         * [+]!:uuid:0000[#billing]!:uuid:1234[#status]@1/$from/[+]!:uuid:9999
+         */
+
+        // prepare message 1 to RN
+
+        MessageEnvelope messageEnvelope = new MessageEnvelope();
+        MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
+
+        Message message1 = messageCollection.createMessage(-1);
+
+        List<XDIStatement> targetStatementsSet = new ArrayList<XDIStatement>();
+
+        targetStatementsSet.add(XDIStatement.fromRelationComponents(
+                XDIAddress.fromComponent(cloudName.getPeerRootXDIArc()), XDIDictionaryConstants.XDI_ADD_REF,
+                XDIAddress.fromComponent(cloudNumber.getPeerRootXDIArc())));
+
+        targetStatementsSet.add(XDIStatement.fromRelationComponents(
+                XDIAddress.fromComponent(cloudNumber.getPeerRootXDIArc()), XDIDictionaryConstants.XDI_ADD_IS_REF,
+                XDIAddress.fromComponent(cloudName.getPeerRootXDIArc())));
+
+        Operation operation1 = message1.createSetOperation(targetStatementsSet.iterator());
+
+        if (neustarRNDiscountCode != null) {
+            operation1.setParameter(XDIDiscountCodeConstants.XRI_S_PARAMETER_NEUSTAR_RN_DISCOUNTCODE,
+                    neustarRNDiscountCode.toString());
+        }
+        if (neustarRNCampaignCode != null) {
+            operation1.setParameter(XDIDiscountCodeConstants.XRI_S_PARAMETER_NEUSTAR_RN_CAMPAIGNCODE,
+                    neustarRNCampaignCode.toString());
+        }
+
+        this.prepareMessageToRN(message1);
 
-	@Override
-	public void registerAdditionalCloudNameInRN(CloudName cloudName, CloudNumber cloudNumber,
-			NeustarRNDiscountCode neustarRNDiscountCode, NeustarRNCampaignCode neustarRNCampaignCode)
-					throws Xdi2ClientException {
+        log.debug("registerAdditionalCloudNameInRN :: Message " + messageEnvelope.getGraph().toString());
+        long startTime = System.currentTimeMillis();
+        MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope);
+        long endTime = System.currentTimeMillis();
+        log.info("registerAdditionalCloudNameInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime,
+                startTime, endTime - startTime);
 
-		/* Call the Registration Service to 
-           1) Register the Cloud Name ( with the Cloud Number)
-           2) Create a Member Graph Billing Record
+        log.debug("registerAdditionalCloudNameInRN :: Message Response " + messageResult.getGraph().toString());
+        /*
+         * Relation relation =
+         * messageResult.getGraph().getDeepRelation(XDIAddress
+         * .fromComponent(cloudName.getPeerRootXDIArc()),
+         * XDIDictionaryConstants.XDI_ADD_REF);
+         * 
+         * if (relation == null) throw new
+         * RuntimeException("Additional Cloud Name not registered.");
+         * 
+         * CloudNumber registeredCloudNumber =
+         * CloudNumber.fromPeerRootXri(relation.getTargetContextNodeXri()); if
+         * (! registeredCloudNumber.equals(cloudNumber)) throw new
+         * RuntimeException("Registered Cloud Number " + registeredCloudNumber +
+         * " does not match requested Cloud Number " + cloudNumber);
+         */
+        // done
 
-           CSP Cloud Number: [+]!:uuid:9999
-           Respect Network Cloud Number: [+]!:uuid:0000
-           Message Id: [=]!:uuid:1234
-           User Cloud Number: [=]!:uuid:1111
+        log.debug("In RN: Additional Cloud Name " + cloudName + " registered with Cloud Number " + cloudNumber);
 
-           [+]!:uuid:0000[#billing]!:uuid:1234/$from/[+]!:uuid:0000
-           [+]!:uuid:0000[#billing]!:uuid:1234/$to/[+]!:uuid:9999
-           [+]!:uuid:0000[#billing]!:uuid:1234/#member/[=]!:uuid:1111
-           [+]!:uuid:0000[#billing]!:uuid:1234<$t>&/&/"2014-02-01T21:25:04Z"
-           [+]!:uuid:0000[#billing]!:uuid:1234/$is#/#debit
-           [+]!:uuid:0000[#billing]!:uuid:1234<#action><#name>&/&/"Additional lifetime name"
-           [+]!:uuid:0000[#billing]!:uuid:1234<#action><#code>&/&/"0010"
-           [+]!:uuid:0000[#billing]!:uuid:1234<#amount>&/&/19
-           [+]!:uuid:0000[#billing]!:uuid:1234<#currency>&/&/"USD"
-           [+]!:uuid:0000[#billing]!:uuid:1234[#status]@0<#status>&/&/"pending"
-           [+]!:uuid:0000[#billing]!:uuid:1234[#status]@0<$t>&/&/"2014-..."
-           [+]!:uuid:0000[#billing]!:uuid:1234[#status]@0/$from/[+]!:uuid:9999
-           [+]!:uuid:0000[#billing]!:uuid:1234[#status]@1<#status>&/&/"pending"
-           [+]!:uuid:0000[#billing]!:uuid:1234[#status]@1<$t>&/&/"2014-..."
-           [+]!:uuid:0000[#billing]!:uuid:1234[#status]@1/$from/[+]!:uuid:9999
-		 */
+    }
 
+    @Override
+    public void registerAdditionalCloudNameInCSP(CloudName cloudName, CloudNumber cloudNumber)
+            throws Xdi2ClientException {
 
-		// prepare message 1 to RN
+        /*
+         * We are adding the following to the CSP Graph
+         * (=alice.new)/$ref/([=]!:uuid:1111)
+         * ([=]!:uuid:1111)/$is$ref/(=alice.new)
+         */
 
-		MessageEnvelope messageEnvelope = new MessageEnvelope();
-		MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
+        this.registerCloudNameInCSP(cloudName, cloudNumber);
 
-		Message message1 = messageCollection.createMessage(-1);
+    }
 
-		List<XDIStatement> targetStatementsSet = new ArrayList<XDIStatement> ();
+    @Override
+    public void registerAdditionalCloudNameInCloud(CloudName cloudName, CloudNumber cloudNumber, String userToken)
+            throws Xdi2ClientException {
 
+        /*
+         * (=alice.new)/$ref/([=]!:uuid:1111) =alice.new/$ref/[=]!:uuid:1111
+         * 
+         * [=]!:uuid:1111/$is$ref/=alice.new
+         * [=]!:uuid:1111$to$anon$from$public$do
+         * /$get/(=alice/$ref/[=]!:uuid:1111))
+         */
 
-		targetStatementsSet.add(XDIStatement.fromRelationComponents(
-				XDIAddress.fromComponent(cloudName.getPeerRootXDIArc()), 
-				XDIDictionaryConstants.XDI_ADD_REF, 
-				XDIAddress.fromComponent(cloudNumber.getPeerRootXDIArc())));
+        this.registerCloudNameInCloud(cloudName, cloudNumber, userToken);
 
-		targetStatementsSet.add(XDIStatement.fromRelationComponents(
-				XDIAddress.fromComponent(cloudNumber.getPeerRootXDIArc()),
-				XDIDictionaryConstants.XDI_ADD_IS_REF, 
-				XDIAddress.fromComponent(cloudName.getPeerRootXDIArc())));
+        log.debug("Added Additional CloudName: " + cloudName + " to Cloud Number " + cloudNumber);
 
-		Operation operation1 = message1.createSetOperation(targetStatementsSet.iterator());
+    }
 
-		if (neustarRNDiscountCode != null) {
-			operation1.setParameter(XDIDiscountCodeConstants.XRI_S_PARAMETER_NEUSTAR_RN_DISCOUNTCODE, neustarRNDiscountCode.toString());
-		}
-		if (neustarRNCampaignCode != null) {
-			operation1.setParameter(XDIDiscountCodeConstants.XRI_S_PARAMETER_NEUSTAR_RN_CAMPAIGNCODE, neustarRNCampaignCode.toString());
-		}
+    @Override
+    public void registerThingNameInRN(CloudName thingCloudName, CloudNumber thingCloudNumber,
+            CloudNumber contactCloudNumber) throws Xdi2ClientException {
 
+        // Validate that we are dealing with "+" Names and Numbers.
+        char nameCS = thingCloudName.getCs();
 
-		this.prepareMessageToRN(message1);
+        if (nameCS != XDIConstants.CS_INSTANCE_UNORDERED) {
+            throw new Xdi2ClientException("Invalid CS in CloudName: Expecting " + XDIConstants.CS_INSTANCE_UNORDERED);
+        }
 
+        char numberCS = thingCloudNumber.getCs();
 
-		log.debug("registerAdditionalCloudNameInRN :: Message " + messageEnvelope.getGraph().toString());
-		long startTime = System.currentTimeMillis();
-		MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope);
-		long endTime = System.currentTimeMillis();
-		log.info("registerAdditionalCloudNameInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
-	                - startTime);
+        if (numberCS != XDIConstants.CS_INSTANCE_UNORDERED) {
+            throw new Xdi2ClientException("Invalid CS in CloudNumber: Expecting " + XDIConstants.CS_INSTANCE_UNORDERED);
+        }
 
-		log.debug("registerAdditionalCloudNameInRN :: Message Response " + messageResult.getGraph().toString());
-		/*Relation relation = messageResult.getGraph().getDeepRelation(XDIAddress.fromComponent(cloudName.getPeerRootXDIArc()), XDIDictionaryConstants.XDI_ADD_REF);
+        // @TODO Does the Contact have to be an "=" Number
 
-		if (relation == null) throw new RuntimeException("Additional Cloud Name not registered.");
+        // prepare message 1 to RN
 
-		CloudNumber registeredCloudNumber = CloudNumber.fromPeerRootXri(relation.getTargetContextNodeXri());
-		if (! registeredCloudNumber.equals(cloudNumber)) throw new RuntimeException("Registered Cloud Number "
-				+ registeredCloudNumber + " does not match requested Cloud Number " + cloudNumber);
-        */
-		// done
+        /*
+         * [+]!:uuid:9999[$msg]!:uuid:1234$do/$set/((+biz.name)/$ref/([+]!:uuid:5555
+         * ))
+         * [+]!:uuid:9999[$msg]!:uuid:1234$do/$set/(([+]!:uuid:5555)/$is$ref/(
+         * +biz.name))
+         */
 
-		log.debug("In RN: Additional Cloud Name " + cloudName + " registered with Cloud Number " + cloudNumber);
+        MessageEnvelope messageEnvelope = new MessageEnvelope();
+        MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
 
+        Message message1 = messageCollection.createMessage(-1);
 
+        List<XDIStatement> targetStatementsSet = new ArrayList<XDIStatement>();
 
-	}
+        targetStatementsSet.add(XDIStatement.fromRelationComponents(
+                XDIAddress.fromComponent(thingCloudName.getPeerRootXDIArc()), XDIDictionaryConstants.XDI_ADD_REF,
+                XDIAddress.fromComponent(thingCloudNumber.getPeerRootXDIArc())));
 
-	@Override
-	public void registerAdditionalCloudNameInCSP(CloudName cloudName,
-			CloudNumber cloudNumber) throws Xdi2ClientException {
+        targetStatementsSet.add(XDIStatement.fromRelationComponents(
+                XDIAddress.fromComponent(thingCloudNumber.getPeerRootXDIArc()), XDIDictionaryConstants.XDI_ADD_IS_REF,
+                XDIAddress.fromComponent(thingCloudName.getPeerRootXDIArc())));
 
-		/* 
-		  We are adding the following to the CSP Graph 
-		  (=alice.new)/$ref/([=]!:uuid:1111)
-          ([=]!:uuid:1111)/$is$ref/(=alice.new)
-		 */
+        message1.createSetOperation(targetStatementsSet.iterator());
 
-		this.registerCloudNameInCSP(cloudName, cloudNumber);
+        /*
+         * Set Billing Records
+         * 
+         * [+]!:uuid:9999[$msg]!:uuid:1234$do/$set/([+]!:uuid:5555/#billing#contact
+         * /[=]!:uuid:1111)
+         * [+]!:uuid:9999[$msg]!:uuid:1234$do/$set/([=]!:uuid:1111
+         * /$is#billing#contact/[+]!:uuid:5555)
+         */
 
+        Message message2 = messageCollection.createMessage(-1);
 
-	}
+        String cloudXdiEndpoint = this.makeCloudXdiEndpoint(thingCloudNumber);
 
-	@Override
-	public void registerAdditionalCloudNameInCloud(CloudName cloudName,
-			CloudNumber cloudNumber, String userToken) throws Xdi2ClientException {
+        List<XDIStatement> targetStatementsSet2 = new ArrayList<XDIStatement>();
 
-		/*
-		 (=alice.new)/$ref/([=]!:uuid:1111)
-         =alice.new/$ref/[=]!:uuid:1111
+        targetStatementsSet2.add(XDIStatement.fromLiteralComponents(
+                XDIAddressUtil.concatXDIAddresses(thingCloudNumber.getPeerRootXDIArc(),
+                        XDIAddress.create("<$xdi><$uri>")), cloudXdiEndpoint));
 
-         [=]!:uuid:1111/$is$ref/=alice.new
-         [=]!:uuid:1111$to$anon$from$public$do/$get/(=alice/$ref/[=]!:uuid:1111))
-		 */
+        message2.createSetOperation(targetStatementsSet2.iterator());
 
-		this.registerCloudNameInCloud(cloudName, cloudNumber, userToken);
+        this.prepareMessageToRN(message1);
+       // this.prepareMessageToRN(message2);
 
-		log.debug("Added Additional CloudName: " + cloudName + " to Cloud Number " + cloudNumber);
+        log.debug("registerThingNameInRN :: Message " + messageEnvelope.getGraph().toString());
+        long startTime = System.currentTimeMillis();
+        MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope);
+        long endTime = System.currentTimeMillis();
+        log.info("registerThingNameInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime,
+                endTime - startTime);
 
+        log.debug("registerThingNameInRN :: Message Response " + messageResult.getGraph().toString());
+        // done
 
+        log.debug("In RN: Thing Cloud Name " + thingCloudName + " registered with Cloud Number " + thingCloudNumber);
 
-	}
+    }
 
+    @Override
+    public void registerThingNameInCSP(CloudName thingCloudName, CloudNumber thingCloudNumber,
+            CloudNumber cspCloudNumber) throws Xdi2ClientException {
 
-	@Override
-	public void registerBusinessNameInRN(CloudName businessCloudName, CloudNumber businessCloudNumber,
-			CloudNumber contactCloudNumber) throws Xdi2ClientException {
+        // Validate that we are dealing with "+" Names and Numbers.
+        char nameCS = thingCloudName.getCs();
 
+        if (nameCS != XDIConstants.CS_INSTANCE_UNORDERED) {
+            throw new Xdi2ClientException("Invalid CS in CloudName: Expecting " + XDIConstants.CS_INSTANCE_UNORDERED);
+        }
 
-		// Validate that we are dealing with "+" Names and Numbers.
-		char nameCS = businessCloudName.getCs();
+        char numberCS = thingCloudNumber.getCs();
 
-		if ( nameCS != XDIConstants.CS_AUTHORITY_LEGAL ) {
-			throw new Xdi2ClientException("Invalid CS in CloudName: Expecting " + XDIConstants.CS_AUTHORITY_LEGAL);
-		}
+        if (numberCS != XDIConstants.CS_INSTANCE_UNORDERED) {
+            throw new Xdi2ClientException("Invalid CS in CloudNumber: Expecting " + XDIConstants.CS_INSTANCE_UNORDERED);
+        }
 
-		char numberCS = businessCloudNumber.getCs();
+        // @TODO Does the Contact have to be an "=" Number
 
-		if ( numberCS != XDIConstants.CS_AUTHORITY_LEGAL ) {
-			throw new Xdi2ClientException("Invalid CS in CloudNumber: Expecting " + XDIConstants.CS_AUTHORITY_LEGAL);
-		}
+        // prepare message 1 to RN
 
-		//@TODO  Does the Contact have to  be an "=" Number 
+        /*
+         * [+]!:uuid:9999[$msg]!:uuid:1234$do/$set/((+biz.name)/$ref/([+]!:uuid:5555
+         * ))
+         * [+]!:uuid:9999[$msg]!:uuid:1234$do/$set/(([+]!:uuid:5555)/$is$ref/(
+         * +biz.name))
+         */
 
+        MessageEnvelope messageEnvelope = new MessageEnvelope();
+        MessageCollection messageCollection = this.createMessageCollectionToCSP(messageEnvelope);
 
-		// prepare message 1 to RN
+        Message message1 = messageCollection.createMessage(-1);
 
-		/*
-	         [+]!:uuid:9999[$msg]!:uuid:1234$do/$set/((+biz.name)/$ref/([+]!:uuid:5555))
-             [+]!:uuid:9999[$msg]!:uuid:1234$do/$set/(([+]!:uuid:5555)/$is$ref/(+biz.name))
+        List<XDIStatement> targetStatementsSet = new ArrayList<XDIStatement>();
 
-		 */
+        targetStatementsSet.add(XDIStatement.fromRelationComponents(
+                XDIAddress.fromComponent(thingCloudName.getPeerRootXDIArc()), XDIDictionaryConstants.XDI_ADD_REF,
+                XDIAddress.fromComponent(thingCloudNumber.getPeerRootXDIArc())));
 
-		MessageEnvelope messageEnvelope = new MessageEnvelope();
-		MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
+        targetStatementsSet.add(XDIStatement.fromRelationComponents(
+                XDIAddress.fromComponent(thingCloudNumber.getPeerRootXDIArc()), XDIDictionaryConstants.XDI_ADD_IS_REF,
+                XDIAddress.fromComponent(thingCloudName.getPeerRootXDIArc())));
 
-		Message message1 = messageCollection.createMessage(-1);
+        message1.createSetOperation(targetStatementsSet.iterator());
 
-		List<XDIStatement> targetStatementsSet = new ArrayList<XDIStatement> ();
+        /*
+         * Set Billing Records
+         * 
+         * [+]!:uuid:9999[$msg]!:uuid:1234$do/$set/([+]!:uuid:5555/#billing#contact
+         * /[=]!:uuid:1111)
+         * [+]!:uuid:9999[$msg]!:uuid:1234$do/$set/([=]!:uuid:1111
+         * /$is#billing#contact/[+]!:uuid:5555)
+         */
 
-		targetStatementsSet.add(XDIStatement.fromRelationComponents(
-				XDIAddress.fromComponent(businessCloudName.getPeerRootXDIArc()), 
-				XDIDictionaryConstants.XDI_ADD_REF, 
-				XDIAddress.fromComponent(businessCloudNumber.getPeerRootXDIArc())));
+        Message message2 = messageCollection.createMessage(-1);
 
-		targetStatementsSet.add(XDIStatement.fromRelationComponents(
-				XDIAddress.fromComponent(businessCloudNumber.getPeerRootXDIArc()),
-				XDIDictionaryConstants.XDI_ADD_IS_REF, 
-				XDIAddress.fromComponent(businessCloudName.getPeerRootXDIArc())));
+        String cloudXdiEndpoint = this.makeCloudXdiEndpoint(thingCloudNumber);
 
-		message1.createSetOperation(targetStatementsSet.iterator());
+        List<XDIStatement> targetStatementsSet2 = new ArrayList<XDIStatement>();
 
+        targetStatementsSet2.add(XDIStatement.fromLiteralComponents(
+                XDIAddressUtil.concatXDIAddresses(thingCloudNumber.getPeerRootXDIArc(),
+                        XDIAddress.create("<$xdi><$uri>")), cloudXdiEndpoint));
+        targetStatementsSet2.add(XDIStatement.fromRelationComponents(thingCloudNumber.getXDIAddress(), XRI_S_DEVELOPER,
+                cspInformation.getCspCloudNumber().getXDIAddress()));
+        targetStatementsSet2.add(XDIStatement.fromRelationComponents(cspInformation.getCspCloudNumber().getXDIAddress(), XRI_S_IS_DEVELOPER,
+                thingCloudNumber.getXDIAddress()));
+        // *!:uuid:cf9979ad-a652-492d-b1fa-b25f60e1e03e/#developer/+!:uuid:140087e7-f751-4026-a80f-c7fd775b9f27
+        // +!:uuid:140087e7-f751-4026-a80f-c7fd775b9f27/$is#developer/*!:uuid:cf9979ad-a652-492d-b1fa-b25f60e1e03e
+        message2.createSetOperation(targetStatementsSet2.iterator());
 
-		/*
-		Set Billing Records
+        this.prepareMessageToCSP(message1);
+        this.prepareMessageToCSP(message2);
 
-        [+]!:uuid:9999[$msg]!:uuid:1234$do/$set/([+]!:uuid:5555/#billing#contact/[=]!:uuid:1111)
-        [+]!:uuid:9999[$msg]!:uuid:1234$do/$set/([=]!:uuid:1111/$is#billing#contact/[+]!:uuid:5555) 
-		 */
+        log.debug("registerThingNameInCSP :: Message " + messageEnvelope.getGraph().toString());
+        long startTime = System.currentTimeMillis();
+        MessagingResponse messageResult = this.getXdiClientCSPRegistry().send(messageEnvelope);
+        long endTime = System.currentTimeMillis();
+        log.info("registerThingNameInCSP Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime,
+                endTime - startTime);
 
+        log.debug("registerThingNameInCSP :: Message Response " + messageResult.getGraph().toString());
+        // done
 
-		Message message2 = messageCollection.createMessage(-1);
+        log.debug("In CSP: Thing Cloud Name " + thingCloudName + " registered with Cloud Number " + thingCloudNumber);
 
-		List<XDIStatement> targetStatementBillingSet = new ArrayList<XDIStatement> ();
+    }
 
+    @Override
+    public void registerThingNameInCloud(CloudName thingCloudName, CloudNumber thingCloudNumber,
+            CloudNumber contactCloudNumber) throws Xdi2ClientException {
 
-		targetStatementBillingSet.add(XDIStatement.fromRelationComponents(
-				XDIAddress.fromComponent(businessCloudNumber.getPeerRootXDIArc()), 
-				XRI_S_BILLING_CONTACT, 
-				XDIAddress.fromComponent(contactCloudNumber.getPeerRootXDIArc())));
+        // Validate that we are dealing with "+" Names and Numbers.
+        char nameCS = thingCloudName.getCs();
 
-		targetStatementBillingSet.add(XDIStatement.fromRelationComponents(
-				XDIAddress.fromComponent(contactCloudNumber.getPeerRootXDIArc()),
-				XRI_S_IS_BILLING_CONTACT, 
-				XDIAddress.fromComponent(businessCloudNumber.getPeerRootXDIArc())));
+        if (nameCS != XDIConstants.CS_INSTANCE_UNORDERED) {
+            throw new Xdi2ClientException("Invalid CS in CloudName: Expecting " + XDIConstants.CS_INSTANCE_UNORDERED);
+        }
 
-		message2.createSetOperation(targetStatementBillingSet.iterator());
+        char numberCS = thingCloudNumber.getCs();
 
+        if (numberCS != XDIConstants.CS_INSTANCE_UNORDERED) {
+            throw new Xdi2ClientException("Invalid CS in CloudNumber: Expecting " + XDIConstants.CS_INSTANCE_UNORDERED);
+        }
 
-		this.prepareMessageToRN(message1);
-		this.prepareMessageToRN(message2);
+        // @TODO Does the Contact have to be an "=" Number
 
+        // prepare message 1 to RN
 
-		log.debug("registerBusinessCloudNameInRN :: Message " + messageEnvelope.getGraph().toString());
-		long startTime = System.currentTimeMillis();
-		MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope);
-		long endTime = System.currentTimeMillis();
-		log.info("registerBusinessNameInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
-	                - startTime);
+        /*
+         * (+biz.name)/$ref/([+]!:uuid:5555)
+         * ([+]!:uuid:5555)/$is$ref/(+biz.name)
+         */
 
-		log.debug("registerBusinessCloudNameInRN :: Message Response " + messageResult.getGraph().toString());
-        ContextNode cotextNode = messageResult.getGraph().getDeepContextNode(XDIAddress.fromComponent(businessCloudName.getPeerRootXDIArc()));
-        Relation relation = cotextNode == null ? null : cotextNode.getRelation(XDIDictionaryConstants.XDI_ADD_REF);
-		if (relation == null) throw new RuntimeException("Additional Cloud Name not registered.");
+        // prepare message to Cloud
 
+        MessageEnvelope messageEnvelope = new MessageEnvelope();
+        MessageCollection messageCollection = this.createMessageCollectionToCloud(messageEnvelope, thingCloudNumber);
 
-		CloudNumber registeredCloudNumber = CloudNumber.fromPeerRootXDIArc(relation.getTargetXDIAddress().getFirstXDIArc());
-		if (! registeredCloudNumber.equals(businessCloudNumber)) throw new RuntimeException("Registered Cloud Number "
-				+ registeredCloudNumber + " does not match requested Cloud Number " + businessCloudNumber);
+        Message message = messageCollection.createMessage();
 
-		// done
+        List<XDIStatement> targetStatementsSet = new ArrayList<XDIStatement>();
 
-		log.debug("In RN: Business Cloud Name " + businessCloudName + " registered with Cloud Number " + businessCloudNumber);
+        targetStatementsSet.add(XDIStatement.fromRelationComponents(
+                XDIAddress.fromComponent(thingCloudName.getPeerRootXDIArc()), XDIDictionaryConstants.XDI_ADD_REF,
+                XDIAddress.fromComponent(thingCloudNumber.getPeerRootXDIArc())));
 
-	}
+        targetStatementsSet.add(XDIStatement.fromRelationComponents(thingCloudName.getXDIAddress(),
+                XDIDictionaryConstants.XDI_ADD_REF, thingCloudNumber.getXDIAddress()));
 
-	@Override
-	public void registerBusinessNameInCSP(CloudName businessCloudName, CloudNumber businessCloudNumber,
-			CloudNumber contactCloudNumber) throws Xdi2ClientException {
+        targetStatementsSet.add(XDIStatement.fromRelationComponents(thingCloudNumber.getXDIAddress(),
+                XDIDictionaryConstants.XDI_ADD_IS_REF, thingCloudName.getXDIAddress()));
 
+        Graph publicLinkContractGraph = MemoryGraphFactory.getInstance().openGraph();
+        GraphUtil.setOwnerXDIAddress(publicLinkContractGraph, thingCloudNumber.getXDIAddress());
+        PublicLinkContract publicLinkContract = PublicLinkContract
+                .findPublicLinkContract(publicLinkContractGraph, true);
+        publicLinkContract.setPermissionTargetXDIStatement(XDILinkContractConstants.XDI_ADD_GET, XDIStatement
+                .fromRelationComponents(thingCloudName.getXDIAddress(), XDIDictionaryConstants.XDI_ADD_REF,
+                        thingCloudNumber.getXDIAddress()));
 
-		// Validate that we are dealing with "+" Names and Numbers.
-		char nameCS = businessCloudName.getCs();
+        for (XDIStatement publicLinkContractStatementXri : new MappingXDIStatementIterator(
+                new SelectingNotImpliedStatementIterator(publicLinkContractGraph.getAllStatements()))) {
+            targetStatementsSet.add(publicLinkContractStatementXri);
+        }
 
-		if ( nameCS != XDIConstants.CS_AUTHORITY_LEGAL ) {
-			throw new Xdi2ClientException("Invalid CS in CloudName: Expecting " + XDIConstants.CS_AUTHORITY_LEGAL);
-		}
+     // Set link contract and policies so that parent/guardian can fetch all
+        // the information from child's cloud.
+        Graph parentChildLinkContractGraph = MemoryGraphFactory.getInstance().openGraph();
+        GenericLinkContract linkContract = GenericLinkContract.findGenericLinkContract(parentChildLinkContractGraph,
+                thingCloudNumber.getXDIAddress(), cspInformation.getCspCloudNumber().getXDIAddress(), null, null, true);
 
-		char numberCS = businessCloudNumber.getCs();
+        PolicyAnd policy = linkContract.getPolicyRoot(true).createAndPolicy(true);
+        PolicyUtil.createSenderIsOperator(policy, cspInformation.getCspCloudNumber().getXDIAddress());
+        PolicyUtil.createSignatureValidOperator(policy);
 
-		if ( numberCS != XDIConstants.CS_AUTHORITY_LEGAL ) {
-			throw new Xdi2ClientException("Invalid CS in CloudNumber: Expecting " + XDIConstants.CS_AUTHORITY_LEGAL);
-		}
-
-		//@TODO  Does the Contact have to  be an "=" Number 
-
-
-		// prepare message 1 to RN
-
-		/*
-	         [+]!:uuid:9999[$msg]!:uuid:1234$do/$set/((+biz.name)/$ref/([+]!:uuid:5555))
-             [+]!:uuid:9999[$msg]!:uuid:1234$do/$set/(([+]!:uuid:5555)/$is$ref/(+biz.name))
-
-		 */
-
-		MessageEnvelope messageEnvelope = new MessageEnvelope();
-		MessageCollection messageCollection = this.createMessageCollectionToCSP(messageEnvelope);
-
-		Message message1 = messageCollection.createMessage(-1);
-
-		List<XDIStatement> targetStatementsSet = new ArrayList<XDIStatement> ();
-
-		targetStatementsSet.add(XDIStatement.fromRelationComponents(
-				XDIAddress.fromComponent(businessCloudName.getPeerRootXDIArc()), 
-				XDIDictionaryConstants.XDI_ADD_REF, 
-				XDIAddress.fromComponent(businessCloudNumber.getPeerRootXDIArc())));
-
-		targetStatementsSet.add(XDIStatement.fromRelationComponents(
-				XDIAddress.fromComponent(businessCloudNumber.getPeerRootXDIArc()),
-				XDIDictionaryConstants.XDI_ADD_IS_REF, 
-				XDIAddress.fromComponent(businessCloudName.getPeerRootXDIArc())));
-
-		message1.createSetOperation(targetStatementsSet.iterator());
-
-
-		/*
-		Set Billing Records
-
-        [+]!:uuid:9999[$msg]!:uuid:1234$do/$set/([+]!:uuid:5555/#billing#contact/[=]!:uuid:1111)
-        [+]!:uuid:9999[$msg]!:uuid:1234$do/$set/([=]!:uuid:1111/$is#billing#contact/[+]!:uuid:5555) 
-		 */
-
-
-		Message message2 = messageCollection.createMessage(-1);
-
-		List<XDIStatement> targetStatementBillingSet = new ArrayList<XDIStatement> ();
-
-
-		targetStatementBillingSet.add(XDIStatement.fromRelationComponents(
-				XDIAddress.fromComponent(businessCloudNumber.getPeerRootXDIArc()), 
-				XRI_S_BILLING_CONTACT, 
-				XDIAddress.fromComponent(contactCloudNumber.getPeerRootXDIArc())));
-
-		targetStatementBillingSet.add(XDIStatement.fromRelationComponents(
-				XDIAddress.fromComponent(contactCloudNumber.getPeerRootXDIArc()),
-				XRI_S_IS_BILLING_CONTACT, 
-				XDIAddress.fromComponent(businessCloudNumber.getPeerRootXDIArc())));
-
-		message2.createSetOperation(targetStatementBillingSet.iterator());
-
-
-		this.prepareMessageToRN(message1);
-		this.prepareMessageToRN(message2);
-
-
-		log.debug("registerBusinessCloudNameInRN :: Message " + messageEnvelope.getGraph().toString());
-		long startTime = System.currentTimeMillis();
-		MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope);
-		long endTime = System.currentTimeMillis();
-		log.info("registerBusinessNameInCSP Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
-	                - startTime);
-
-		log.debug("registerBusinessCloudNameInRN :: Message Response " + messageResult.getGraph().toString());
-        ContextNode cotextNode = messageResult.getGraph().getDeepContextNode(XDIAddress.fromComponent(businessCloudName.getPeerRootXDIArc()));
-        Relation relation = cotextNode == null ? null : cotextNode.getRelation(XDIDictionaryConstants.XDI_ADD_REF);
-
-        if (relation == null) throw new RuntimeException("Additional Cloud Name not registered in CSP Graph.");
-
-
-		CloudNumber registeredCloudNumber = CloudNumber.fromPeerRootXDIArc(relation.getTargetXDIAddress().getFirstXDIArc());
-		if (! registeredCloudNumber.equals(businessCloudNumber)) throw new RuntimeException("Registered Cloud Number "
-				+ registeredCloudNumber + " does not match requested Cloud Number " + businessCloudNumber);
-
-		// done
-
-		log.debug("In CSP: Business Cloud Name " + businessCloudName + " registered with Cloud Number " + businessCloudNumber);
-
-	}
-
-
-	@Override
-	public void registerBusinessNameInCloud(CloudName businessCloudName, CloudNumber businessCloudNumber,
-			CloudNumber contactCloudNumber) throws Xdi2ClientException {
-
-
-
-		// Validate that we are dealing with "+" Names and Numbers.
-		char nameCS = businessCloudName.getCs();
-
-		if ( nameCS != XDIConstants.CS_AUTHORITY_LEGAL ) {
-			throw new Xdi2ClientException("Invalid CS in CloudName: Expecting " + XDIConstants.CS_AUTHORITY_LEGAL);
-		}
-
-		char numberCS = businessCloudNumber.getCs();
-
-		if ( numberCS != XDIConstants.CS_AUTHORITY_LEGAL ) {
-			throw new Xdi2ClientException("Invalid CS in CloudNumber: Expecting " + XDIConstants.CS_AUTHORITY_LEGAL);
-		}
-
-		//@TODO  Does the Contact have to  be an "=" Number 
-
-
-		// prepare message 1 to RN
-
-		/*
-	    	(+biz.name)/$ref/([+]!:uuid:5555)
-		    ([+]!:uuid:5555)/$is$ref/(+biz.name)
-
-		 */
-
-		MessageEnvelope messageEnvelope = new MessageEnvelope();
-		MessageCollection messageCollection = this.createMessageCollectionToCSP(messageEnvelope);
-
-		Message message1 = messageCollection.createMessage(-1);
-
-		List<XDIStatement> targetStatementsSet = new ArrayList<XDIStatement> ();
-
-		targetStatementsSet.add(XDIStatement.fromRelationComponents(
-				XDIAddress.fromComponent(businessCloudName.getPeerRootXDIArc()), 
-				XDIDictionaryConstants.XDI_ADD_REF, 
-				XDIAddress.fromComponent(businessCloudNumber.getPeerRootXDIArc())));
-
-		targetStatementsSet.add(XDIStatement.fromRelationComponents(
-				XDIAddress.fromComponent(businessCloudNumber.getPeerRootXDIArc()),
-				XDIDictionaryConstants.XDI_ADD_IS_REF, 
-				XDIAddress.fromComponent(businessCloudName.getPeerRootXDIArc())));
-
-		message1.createSetOperation(targetStatementsSet.iterator());
-
-
-		/*
-		    Set Billing Records
-		    [=]!:uuid:1111/$is#billing#contact/[+]!:uuid:5555
-		 */
-
-
-		Message message2 = messageCollection.createMessage(-1);
-
-		List<XDIStatement> targetStatementBillingSet = new ArrayList<XDIStatement> ();
-
-		/* [=]!:uuid:1111/$is#billing#contact/[+]!:uuid:5555 */
-		targetStatementBillingSet.add(XDIStatement.fromRelationComponents(
-				XDIAddress.fromComponent(contactCloudNumber.getPeerRootXDIArc()),
-				XRI_S_IS_BILLING_CONTACT, 
-				XDIAddress.fromComponent(businessCloudNumber.getPeerRootXDIArc())));
-
-
-		List<XDIStatement> signedBillingStatments = createSignedBillingXDIStatements(businessCloudNumber,
-				contactCloudNumber);
-		targetStatementBillingSet.addAll(signedBillingStatments);
-
-
-		message2.createSetOperation(targetStatementBillingSet.iterator());
-
-		this.prepareMessageToRN(message1);
-		this.prepareMessageToRN(message2);
-
-
-		log.debug("registerBusinessCloudNameInRN :: Message " + messageEnvelope.getGraph().toString());
-		long startTime = System.currentTimeMillis();
-		MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope);
-		long endTime = System.currentTimeMillis();
-		log.info("registerBusinessNameInCloud Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
-	                - startTime);
-
-		log.debug("registerBusinessCloudNameInRN :: Message Response " + messageResult.getGraph().toString());
+        linkContract.setPermissionTargetXDIAddress(XDILinkContractConstants.XDI_ADD_ALL,
+                XDIAddressUtil.concatXDIAddresses(XDIConstants.XDI_ADD_ROOT));
         
-		ContextNode cotextNode = messageResult.getGraph().getDeepContextNode(XDIAddress.fromComponent(businessCloudName.getPeerRootXDIArc()));
-        Relation relation = cotextNode == null ? null : cotextNode.getRelation(XDIDictionaryConstants.XDI_ADD_REF);
+        for (XDIStatement publicLinkContractStatementXri : new MappingXDIStatementIterator(
+                new SelectingNotImpliedStatementIterator(parentChildLinkContractGraph.getAllStatements()))) {
+            targetStatementsSet.add(publicLinkContractStatementXri);
+        }
+        message.createSetOperation(targetStatementsSet.iterator());
+     
+        // send message
 
-        if (relation == null) throw new RuntimeException("Additional Cloud Name not registered in CSP Graph.");
+        this.prepareMessageToCloud(message, thingCloudNumber, null);
+        String cloudXdiEndpoint = this.makeCloudXdiEndpoint(thingCloudNumber);
 
+        XDIClient xdiClientCloud = new XDIHttpClient(cloudXdiEndpoint);
 
-		CloudNumber registeredCloudNumber = CloudNumber.fromPeerRootXDIArc(relation.getTargetXDIAddress().getFirstXDIArc());
-		if (! registeredCloudNumber.equals(businessCloudNumber)) throw new RuntimeException("Registered Cloud Number "
-				+ registeredCloudNumber + " does not match requested Cloud Number " + businessCloudNumber);
+        log.debug("registerThingNameInCloud :: Message  " + messageEnvelope.getGraph().toString());
 
-		// done
+        long startTime = System.currentTimeMillis();
+        xdiClientCloud.send(messageEnvelope);
+        long endTime = System.currentTimeMillis();
+        log.info("registerThingNameInCloud Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime,
+                endTime - startTime);
 
-		log.debug("In CSP: Business Cloud Name " + businessCloudName + " registered with Cloud Number " + businessCloudNumber);
+        // done
+        log.debug("In CSP: Thing Cloud Name " + thingCloudName + " registered with Cloud Number " + thingCloudNumber);
 
-	}
+    }
 
+    /**
+     * Create the XDIStatement that represent a Billing Contact and Sign it.
+     * 
+     * 
+     * @param businessCloudNumber
+     *            uuid:5555
+     * @param contactCloudNumber
+     *            uuid:1111
+     * @param signingKey
+     * @return XDI3 Statements
+     */
+    private List<XDIStatement> createSignedBillingXDIStatements(CloudNumber businessCloudNumber,
+            CloudNumber contactCloudNumber) throws Xdi2ClientException {
 
-	/**
-	 * Create the XDIStatement that represent a Billing Contact and Sign it.
-	 * 
-	 * 
-	 * @param businessCloudNumber uuid:5555
-	 * @param contactCloudNumber uuid:1111
-	 * @param signingKey 
-	 * @return XDI3 Statements
-	 */ 
-	private List<XDIStatement> createSignedBillingXDIStatements(CloudNumber businessCloudNumber,
-			CloudNumber contactCloudNumber) throws Xdi2ClientException {
+        /*
+         * ([=]!:uuid:1111/$is#billing#contact)[=]!:uuid:1111/
+         * $is#billing#contact/
+         * ([=]!:uuid:1111/$is#billing#contact)[+]!:uuid:5555
+         * 
+         * 
+         * ([=]!:uuid:1111/$is#billing#contact)[<$sig>]<!:uuid:7846>&/&/”...”
+         * ([=
+         * ]!:uuid:1111/$is#billing#contact)[<$sig>]<!:uuid:7846>/$is#/([=]!:uuid
+         * :1111/$is#billing#contact)$sha$256$rsa$2048
+         * ([=]!:uuid:1111/$is#billing
+         * #contact)[<$sig>]<!:uuid:7846><$public><$key
+         * >/$ref/([=]!:uuid:1111/$is
+         * #billing#contact)[+]!:uuid:9999$sig$keypair<$public><$key>
+         */
 
-		/*
-		([=]!:uuid:1111/$is#billing#contact)[=]!:uuid:1111/
-		$is#billing#contact/
-		([=]!:uuid:1111/$is#billing#contact)[+]!:uuid:5555
+        PrivateKey signingKey;
 
+        try {
+            BasicCSPInformation basicCSP = (BasicCSPInformation) this.getCspInformation();
+            if (basicCSP.getCspSignaturePrivateKey() == null) {
+                basicCSP.retrieveCspSignaturePrivateKey();
+            }
 
-		([=]!:uuid:1111/$is#billing#contact)[<$sig>]<!:uuid:7846>&/&/”...”
-		([=]!:uuid:1111/$is#billing#contact)[<$sig>]<!:uuid:7846>/$is#/([=]!:uuid:1111/$is#billing#contact)$sha$256$rsa$2048	
-		([=]!:uuid:1111/$is#billing#contact)[<$sig>]<!:uuid:7846><$public><$key>/$ref/([=]!:uuid:1111/$is#billing#contact)[+]!:uuid:9999$sig$keypair<$public><$key>
-		 */
+        } catch (Xdi2ClientException e) {
+            String errorMsg = "Problem Retrieving CSP Private Key" + e.getMessage();
+            log.warn(errorMsg);
+            throw new Xdi2ClientException(errorMsg);
+        } catch (GeneralSecurityException e) {
+            String errorMsg = "Problem Retrieving CSP Private Key" + e.getMessage();
+            log.warn(errorMsg);
+            throw new Xdi2ClientException(errorMsg);
+        }
 
-		PrivateKey signingKey;
+        if (this.getCspInformation().getCspSignaturePrivateKey() != null) {
+            log.debug("CSP Private Key is not null. Signing Messages with it.");
+            signingKey = this.getCspInformation().getCspSignaturePrivateKey();
+        } else {
+            String errorMsg = "Problem Retrieving CSP Private Key: Key is Null";
+            log.warn(errorMsg);
+            throw new Xdi2ClientException(errorMsg);
+        }
 
-		try
-		{
-			BasicCSPInformation basicCSP = (BasicCSPInformation) this.getCspInformation();
-			if(basicCSP.getCspSignaturePrivateKey() == null)
-			{
-				basicCSP.retrieveCspSignaturePrivateKey();
-			}
+        List<XDIStatement> targetStatements = new ArrayList<XDIStatement>();
 
-		} catch (Xdi2ClientException e) {
-			String errorMsg = "Problem Retrieving CSP Private Key" + e.getMessage();
-			log.warn(errorMsg);
-			throw new Xdi2ClientException(errorMsg);
-		} catch (GeneralSecurityException e){
-			String errorMsg = "Problem Retrieving CSP Private Key" + e.getMessage();
-			log.warn(errorMsg);
-			throw new Xdi2ClientException(errorMsg);
-		}
+        MemoryGraph g = MemoryGraphFactory.getInstance().openGraph();
 
+        /* ([=]!:uuid:1111/$is#billing#contact) */
+        XDIAddress contactIsBC = XDIAddress.create("(" + contactCloudNumber.getXDIAddress() + "/"
+                + XRI_S_IS_BILLING_CONTACT + ")");
 
-		if (this.getCspInformation().getCspSignaturePrivateKey() != null) {
-			log.debug("CSP Private Key is not null. Signing Messages with it.");
-			signingKey = this.getCspInformation().getCspSignaturePrivateKey();
-		} else {
-			String errorMsg = "Problem Retrieving CSP Private Key: Key is Null";
-			log.warn(errorMsg);
-			throw new Xdi2ClientException(errorMsg);
-		}
+        XDIStatement contactBillingStatement = XDIStatement.fromRelationComponents(
+                XDIAddressUtil.concatXDIAddresses(contactIsBC, XDIAddress.create(contactCloudNumber.toString())),
+                XRI_S_IS_BILLING_CONTACT,
+                XDIAddressUtil.concatXDIAddresses(contactIsBC, this.getCspInformation().getRnCloudNumber()
+                        .getXDIAddress()));
 
-		List<XDIStatement> targetStatements = new ArrayList<XDIStatement> ();
+        g.setStatement(contactBillingStatement);
 
+        // Sign the Context: //[=]!:uuid:1111[<#consent>]<!:uuid:6545>
+        ContextNode signingNode = g.getRootContextNode().getDeepContextNode(contactIsBC);
 
-		MemoryGraph g = MemoryGraphFactory.getInstance().openGraph();
+        // now create the signature and add it to the graph
+        RSASignature s = (RSASignature) Signatures.createSignature(signingNode, "sha", 256, "rsa", 2048, true);
 
-		/* ([=]!:uuid:1111/$is#billing#contact) */
-		XDIAddress contactIsBC = XDIAddress.create("(" + contactCloudNumber.getXDIAddress() +"/" + XRI_S_IS_BILLING_CONTACT +")");
+        try {
+            new RSAStaticPrivateKeySignatureCreator(this.getCspInformation().getCspSignaturePrivateKey())
+                    .createSignature(s);
+        } catch (GeneralSecurityException e) {
+            throw new RuntimeException("Problem Signing Billing Contact  Graph");
+        }
 
+        ContextNode c = g.getRootContextNode();
 
-		XDIStatement contactBillingStatement = XDIStatement.fromRelationComponents(
-				XDIAddressUtil.concatXDIAddresses( contactIsBC, XDIAddress.create(contactCloudNumber.toString())),
-				XRI_S_IS_BILLING_CONTACT,
-				XDIAddressUtil.concatXDIAddresses(contactIsBC, this.getCspInformation().getRnCloudNumber().getXDIAddress()));
+        Iterator<Statement> billingContactStatmentIterator = c.getAllStatements();
 
-		g.setStatement(contactBillingStatement);
+        // Converting from Statement to XDIStatement
+        while (billingContactStatmentIterator.hasNext()) {
+            Statement next = billingContactStatmentIterator.next();
+            XDIStatement graphStatement = next.getXDIStatement();
+            targetStatements.add(graphStatement);
+        }
 
+        return targetStatements;
 
-		//Sign the Context: //[=]!:uuid:1111[<#consent>]<!:uuid:6545>        
-		ContextNode signingNode = g.getRootContextNode().getDeepContextNode(contactIsBC);
+    }
 
-		// now create the signature and add it to the graph
-		RSASignature s = (RSASignature)Signatures.createSignature(signingNode, "sha", 256, "rsa", 2048, true);
+    @Override
+    public void updatePhoneInRN(CloudNumber cloudNumber, String verifiedPhone, String oldVerifiedPhone)
+            throws Xdi2ClientException {
 
-		try {
-			new RSAStaticPrivateKeySignatureCreator(this.getCspInformation().getCspSignaturePrivateKey()).createSignature(s);
-		} catch (GeneralSecurityException e) {
-			throw new RuntimeException("Problem Signing Billing Contact  Graph");           
-		}
+        // prepare message to RN
 
-		ContextNode c = g.getRootContextNode();
+        MessageEnvelope messageEnvelope = new MessageEnvelope();
+        MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
 
-		Iterator<Statement> billingContactStatmentIterator = c.getAllStatements();
+        Message message = messageCollection.createMessage();
 
-		//Converting from Statement to  XDIStatement
-		while(billingContactStatmentIterator.hasNext()){
-			Statement next = billingContactStatmentIterator.next();
-			XDIStatement graphStatement = next.getXDIStatement();
-			targetStatements.add(graphStatement);
-		}
+        List<XDIStatement> targetStatementsSet = new ArrayList<XDIStatement>();
 
-		return targetStatements;
+        if (oldVerifiedPhone != null) {
+            targetStatementsSet
+                    .add(XDIStatement.fromRelationComponents(XDIAddressUtil.concatXDIAddresses(this.getCspInformation()
+                            .getRnCloudNumber().getXDIAddress(), XRI_S_AC_VERIFIED_DIGEST_PHONE, XDIAddress
+                            .fromComponent(XdiAbstractInstanceUnordered.createXDIArc(true, true, false,
+                                    XDIArc.literalFromDigest(oldVerifiedPhone)))), XRI_S_IS_PHONE, cloudNumber
+                            .getXDIAddress()));
+        }
 
+        this.prepareMessageToRN(message);
+        message.createDelOperation(targetStatementsSet.iterator());
 
-	}
+        // send message
+        long startTime = System.currentTimeMillis();
+        this.getXdiClientRNRegistrationService().send(messageEnvelope);
+        long endTime = System.currentTimeMillis();
+        log.info("updatePhoneInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
+                - startTime);
 
-	@Override
-	public void updatePhoneInRN(CloudNumber cloudNumber, String verifiedPhone, String oldVerifiedPhone) throws Xdi2ClientException {
+        // update(set) new phone number
+        setPhoneAndEmailInRN(cloudNumber, verifiedPhone, null);
+        // done
 
-		// prepare message to RN
+        log.debug("Updated RN: Verified phone " + oldVerifiedPhone + " with new  Verified phone " + verifiedPhone
+                + " for Cloud Number " + cloudNumber);
+    }
 
-		MessageEnvelope messageEnvelope = new MessageEnvelope();
-		MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
+    @Override
+    public void updateEmailInRN(CloudNumber cloudNumber, String verifiedEmail, String oldVerifiedEmail)
+            throws Xdi2ClientException {
 
-		Message message = messageCollection.createMessage();
+        // prepare message to RN
 
-		List<XDIStatement> targetStatementsSet = new ArrayList<XDIStatement> ();
+        MessageEnvelope messageEnvelope = new MessageEnvelope();
+        MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
 
-		if (oldVerifiedPhone != null) {
-			targetStatementsSet.add(XDIStatement.fromRelationComponents(
-					XDIAddressUtil.concatXDIAddresses(this.getCspInformation().getRnCloudNumber().getXDIAddress(), XRI_S_AC_VERIFIED_DIGEST_PHONE, XDIAddress.fromComponent(XdiAbstractInstanceUnordered.createXDIArc(true, true, false, XDIArc.literalFromDigest(oldVerifiedPhone)))),
-					XRI_S_IS_PHONE,
-					cloudNumber.getXDIAddress()));
-		}
+        Message message = messageCollection.createMessage();
 
-		this.prepareMessageToRN(message);
-		message.createDelOperation(targetStatementsSet.iterator());
+        List<XDIStatement> targetStatementsSet = new ArrayList<XDIStatement>();
 
-		// send message
-		long startTime = System.currentTimeMillis();
-		this.getXdiClientRNRegistrationService().send(messageEnvelope);
-		long endTime = System.currentTimeMillis();
-		log.info("updatePhoneInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
-	                - startTime);
+        if (oldVerifiedEmail != null) {
+            targetStatementsSet
+                    .add(XDIStatement.fromRelationComponents(XDIAddressUtil.concatXDIAddresses(this.getCspInformation()
+                            .getRnCloudNumber().getXDIAddress(), XRI_S_AC_VERIFIED_DIGEST_EMAIL, XDIAddress
+                            .fromComponent(XdiAbstractInstanceUnordered.createXDIArc(true, true, false,
+                                    XDIArc.literalFromDigest(oldVerifiedEmail)))), XRI_S_IS_EMAIL, cloudNumber
+                            .getXDIAddress()));
+        }
 
-		//update(set) new phone number
-		setPhoneAndEmailInRN(cloudNumber, verifiedPhone, null);
-		// done
+        this.prepareMessageToRN(message);
+        message.createDelOperation(targetStatementsSet.iterator());
 
-		log.debug("Updated RN: Verified phone " + oldVerifiedPhone + " with new  Verified phone " + verifiedPhone + " for Cloud Number " + cloudNumber);		
-	}
+        // send message
+        long startTime = System.currentTimeMillis();
+        this.getXdiClientRNRegistrationService().send(messageEnvelope);
+        long endTime = System.currentTimeMillis();
+        log.info("updateEmailInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
+                - startTime);
 
-	@Override
-	public void updateEmailInRN(CloudNumber cloudNumber, String verifiedEmail, String oldVerifiedEmail) throws Xdi2ClientException {
+        // update(set) new email
+        setPhoneAndEmailInRN(cloudNumber, null, verifiedEmail);
+        // done
 
-		// prepare message to RN
+        log.debug("Updated RN: Verified phone " + oldVerifiedEmail + " with new  Verified phone " + verifiedEmail
+                + " for Cloud Number " + cloudNumber);
 
-		MessageEnvelope messageEnvelope = new MessageEnvelope();
-		MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
+    }
 
-		Message message = messageCollection.createMessage();
+    @Override
+    public CloudNumber getMemberRegistrar(CloudNumber cloudNumber) throws Xdi2ClientException {
 
-		List<XDIStatement> targetStatementsSet = new ArrayList<XDIStatement> ();
+        // prepare message to CSP
 
-		if (oldVerifiedEmail != null) {
-			targetStatementsSet.add(XDIStatement.fromRelationComponents(
-					XDIAddressUtil.concatXDIAddresses(this.getCspInformation().getRnCloudNumber().getXDIAddress(), XRI_S_AC_VERIFIED_DIGEST_EMAIL, XDIAddress.fromComponent(XdiAbstractInstanceUnordered.createXDIArc(true, true, false, XDIArc.literalFromDigest(oldVerifiedEmail)))),
-					XRI_S_IS_EMAIL,
-					cloudNumber.getXDIAddress()));
-		}
+        MessageEnvelope messageEnvelope = new MessageEnvelope();
+        MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
 
-		this.prepareMessageToRN(message);
-		message.createDelOperation(targetStatementsSet.iterator());
+        Message message = messageCollection.createMessage();
 
-		// send message
-		long startTime = System.currentTimeMillis();
-		this.getXdiClientRNRegistrationService().send(messageEnvelope);
-		long endTime = System.currentTimeMillis();
-		log.info("updateEmailInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
-	                - startTime);
+        XDIStatement targetAddress = XDIStatement.fromRelationComponents(cloudNumber.getXDIAddress(), XRI_S_REGISTRAR,
+                XDIConstants.XDI_ADD_COMMON_VARIABLE);
+        message.createGetOperation(targetAddress);
 
-		//update(set) new email
-		setPhoneAndEmailInRN(cloudNumber, null, verifiedEmail);
-		// done
+        // send message and read results
 
-		log.debug("Updated RN: Verified phone " + oldVerifiedEmail + " with new  Verified phone " + verifiedEmail + " for Cloud Number " + cloudNumber);	
-		
-	}
+        this.prepareMessageToRN(message);
 
-	@Override
-	public CloudNumber getMemberRegistrar(CloudNumber cloudNumber) throws Xdi2ClientException {
-
-		// prepare message to CSP
-
-		MessageEnvelope messageEnvelope = new MessageEnvelope();
-		MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
-
-		Message message = messageCollection.createMessage();
-
-
-		XDIStatement targetAddress = XDIStatement.fromRelationComponents(cloudNumber.getXDIAddress(),XRI_S_REGISTRAR, XDIConstants.XDI_ADD_COMMON_VARIABLE);
-		message.createGetOperation(targetAddress);
-
-		// send message and read results
-
-		this.prepareMessageToRN(message);
-		
-		long startTime = System.currentTimeMillis();
-		MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope);
-		long endTime = System.currentTimeMillis();
-		log.info("getMemberRegistrar Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
-	                - startTime);
+        long startTime = System.currentTimeMillis();
+        MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope);
+        long endTime = System.currentTimeMillis();
+        log.info("getMemberRegistrar Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
+                - startTime);
         ContextNode cotextNode = messageResult.getGraph().getDeepContextNode(cloudNumber.getXDIAddress());
         Relation relation = cotextNode == null ? null : cotextNode.getRelation(XRI_S_REGISTRAR);
 
-		CloudNumber cspCloudNumber = null;
-		if (relation != null) {
-			cspCloudNumber = CloudNumber.fromPeerRootXDIArc(relation.getTargetXDIAddress().getFirstXDIArc());
-		}
+        CloudNumber cspCloudNumber = null;
+        if (relation != null) {
+            cspCloudNumber = CloudNumber.fromPeerRootXDIArc(relation.getTargetXDIAddress().getFirstXDIArc());
+        }
 
-		// done
+        // done
 
-		log.debug("In RN: For Cloud Number " + cloudNumber + " found CSP Cloud Number " + cspCloudNumber);
-		return cspCloudNumber;
-	
-	}
+        log.debug("In RN: For Cloud Number " + cloudNumber + " found CSP Cloud Number " + cspCloudNumber);
+        return cspCloudNumber;
 
-	@Override
-	public void transferCloudInCSP(CloudNumber cloudNumber, CloudName[] cloudNames, String secretToken) throws Xdi2ClientException{		
-		//register cloud in CSP
-		registerCloudInCSP(cloudNumber, secretToken);
-		
-		//register cloudNames in CSP
-		MessageEnvelope messageEnvelope = new MessageEnvelope();
-		MessageCollection messageCollection = this.createMessageCollectionToCSP(messageEnvelope);
+    }
 
-		Message message = messageCollection.createMessage();
-		List<XDIStatement> targetStatementsSet = new ArrayList<XDIStatement> ();
-		for(CloudName cloudName:cloudNames){
-			targetStatementsSet.add(XDIStatement.fromRelationComponents(
-					XDIAddress.fromComponent(cloudName.getPeerRootXDIArc()), 
-					XDIDictionaryConstants.XDI_ADD_REF, 
-					XDIAddress.fromComponent(cloudNumber.getPeerRootXDIArc())));
+    @Override
+    public void transferCloudInCSP(CloudNumber cloudNumber, CloudName[] cloudNames, String secretToken)
+            throws Xdi2ClientException {
+        // register cloud in CSP
+        registerCloudInCSP(cloudNumber, secretToken);
 
-			targetStatementsSet.add(XDIStatement.fromRelationComponents(
-					XDIAddress.fromComponent(cloudNumber.getPeerRootXDIArc()),
-					XDIDictionaryConstants.XDI_ADD_IS_REF, 
-					XDIAddress.fromComponent(cloudName.getPeerRootXDIArc())));
-		}
-		message.createSetOperation(targetStatementsSet.iterator());
-		// send message
+        // register cloudNames in CSP
+        MessageEnvelope messageEnvelope = new MessageEnvelope();
+        MessageCollection messageCollection = this.createMessageCollectionToCSP(messageEnvelope);
 
-		this.prepareMessageToCSP(message);
-		log.debug("registerCloudNamesInCSP :: Message  "+ messageEnvelope.getGraph().toString());
-		long startTime = System.currentTimeMillis();
-		this.getXdiClientCSPRegistry().send(messageEnvelope);
-		long endTime = System.currentTimeMillis();
-		log.info("transferCloudInCSP Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
-	                - startTime);
+        Message message = messageCollection.createMessage();
+        List<XDIStatement> targetStatementsSet = new ArrayList<XDIStatement>();
+        for (CloudName cloudName : cloudNames) {
+            targetStatementsSet.add(XDIStatement.fromRelationComponents(
+                    XDIAddress.fromComponent(cloudName.getPeerRootXDIArc()), XDIDictionaryConstants.XDI_ADD_REF,
+                    XDIAddress.fromComponent(cloudNumber.getPeerRootXDIArc())));
 
-		//set registrar
-		setCloudXdiEndpointInCSP(cloudNumber, null);
-	}
-	
-	@Override
-	public void deleteCloudInCSP(CloudNumber cloudNumber, String secretToken) throws Xdi2ClientException{
-		// prepare message to CSP
-		MessageEnvelope messageEnvelope = new MessageEnvelope();
-		MessageCollection messageCollection = this.createMessageCollectionToCSP(messageEnvelope);
-		Message message = messageCollection.createMessage();
-		
-		XDIAddress targetAddress = XDIAddress.fromComponent(cloudNumber.getPeerRootXDIArc());
-		message.createDelOperation(targetAddress);
+            targetStatementsSet.add(XDIStatement.fromRelationComponents(
+                    XDIAddress.fromComponent(cloudNumber.getPeerRootXDIArc()), XDIDictionaryConstants.XDI_ADD_IS_REF,
+                    XDIAddress.fromComponent(cloudName.getPeerRootXDIArc())));
+        }
+        message.createSetOperation(targetStatementsSet.iterator());
+        // send message
 
-		// send message
-		this.prepareMessageToCSP(message);
-		long startTime = System.currentTimeMillis();
-		this.getXdiClientCSPRegistry().send(messageEnvelope);
-		long endTime = System.currentTimeMillis();
-		log.info("deleteCloudInCSP Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
-	                - startTime);
-	}
-	
-	
-	@Override
-	public void changeMemberRegistrarInRN(CloudNumber cloudNumber) throws Xdi2ClientException {
-		//check if cloudNumber has a registrar assignd already
-		CloudNumber currentMemberRegistrar = getMemberRegistrar(cloudNumber);
-		//delete existing registrar
-		if(currentMemberRegistrar!=null){
-			deleteMemberRegistrar(cloudNumber, currentMemberRegistrar);
-		}
-		currentMemberRegistrar = getMemberRegistrar(cloudNumber);
-		//if delete successfull update with new registrar
-		if(currentMemberRegistrar==null){
-			// prepare message to CSP
-	
-			MessageEnvelope messageEnvelope = new MessageEnvelope();
-			MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
-	
-			Message message = messageCollection.createMessage();
-	
-	
-			XDIStatement targetAddress = XDIStatement.fromRelationComponents(cloudNumber.getXDIAddress(),XRI_S_REGISTRAR,getCspInformation().getCspCloudNumber().getXDIAddress());
-			message.createSetOperation(targetAddress);
-	
-			// send message and read results
-	
-			this.prepareMessageToRN(message);
-			
-			long startTime = System.currentTimeMillis();
-			this.getXdiClientRNRegistrationService().send(messageEnvelope);
-			long endTime = System.currentTimeMillis();
-			log.info("changeMemberRegistrarInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
-		                - startTime);
+        this.prepareMessageToCSP(message);
+        log.debug("registerCloudNamesInCSP :: Message  " + messageEnvelope.getGraph().toString());
+        long startTime = System.currentTimeMillis();
+        this.getXdiClientCSPRegistry().send(messageEnvelope);
+        long endTime = System.currentTimeMillis();
+        log.info("transferCloudInCSP Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
+                - startTime);
 
-			log.debug("In RN: updated member registrar for:" + cloudNumber +" with CSP Cloud Number: "+getCspInformation().getCspCloudNumber().getXDIAddress());
-		}
-	}
-	
-	/**
-	 * deletes current member registrar for cloud number
-	 * @param cloudNumber
-	 * @param oldMemberRegistrar
-	 * @throws Xdi2ClientException
-	 */
-	private void deleteMemberRegistrar(CloudNumber cloudNumber, CloudNumber currentMemberRegistrar) throws Xdi2ClientException {
+        // set registrar
+        setCloudXdiEndpointInCSP(cloudNumber, null);
+    }
 
-		// prepare message to CSP
-		MessageEnvelope messageEnvelope = new MessageEnvelope();
-		MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
+    @Override
+    public void deleteCloudInCSP(CloudNumber cloudNumber, String secretToken) throws Xdi2ClientException {
+        // prepare message to CSP
+        MessageEnvelope messageEnvelope = new MessageEnvelope();
+        MessageCollection messageCollection = this.createMessageCollectionToCSP(messageEnvelope);
+        Message message = messageCollection.createMessage();
 
-		Message message = messageCollection.createMessage();
+        XDIAddress targetAddress = XDIAddress.fromComponent(cloudNumber.getPeerRootXDIArc());
+        message.createDelOperation(targetAddress);
 
-		List<XDIStatement> targetStatementsDel = new ArrayList<XDIStatement> ();
-		XDIStatement targetAddress = XDIStatement.fromRelationComponents(cloudNumber.getXDIAddress(),XRI_S_REGISTRAR,currentMemberRegistrar.getXDIAddress());
-		targetStatementsDel.add(targetAddress);
-		message.createDelOperation(targetStatementsDel.iterator());
+        // send message
+        this.prepareMessageToCSP(message);
+        long startTime = System.currentTimeMillis();
+        this.getXdiClientCSPRegistry().send(messageEnvelope);
+        long endTime = System.currentTimeMillis();
+        log.info("deleteCloudInCSP Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
+                - startTime);
+    }
 
-		// send message and read results
-		this.prepareMessageToRN(message);
-		long startTime = System.currentTimeMillis();
-		this.getXdiClientRNRegistrationService().send(messageEnvelope);
-		long endTime = System.currentTimeMillis();
-		log.info("deleteMemberRegistrar Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
-	                - startTime);
+    @Override
+    public void changeMemberRegistrarInRN(CloudNumber cloudNumber) throws Xdi2ClientException {
+        // check if cloudNumber has a registrar assignd already
+        CloudNumber currentMemberRegistrar = getMemberRegistrar(cloudNumber);
+        // delete existing registrar
+        if (currentMemberRegistrar != null) {
+            deleteMemberRegistrar(cloudNumber, currentMemberRegistrar);
+        }
+        currentMemberRegistrar = getMemberRegistrar(cloudNumber);
+        // if delete successfull update with new registrar
+        if (currentMemberRegistrar == null) {
+            // prepare message to CSP
 
-		log.debug("Deleted current member registrar for:" + cloudNumber);
-	
-	}
-	
+            MessageEnvelope messageEnvelope = new MessageEnvelope();
+            MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
+
+            Message message = messageCollection.createMessage();
+
+            XDIStatement targetAddress = XDIStatement.fromRelationComponents(cloudNumber.getXDIAddress(),
+                    XRI_S_REGISTRAR, getCspInformation().getCspCloudNumber().getXDIAddress());
+            message.createSetOperation(targetAddress);
+
+            // send message and read results
+
+            this.prepareMessageToRN(message);
+
+            long startTime = System.currentTimeMillis();
+            this.getXdiClientRNRegistrationService().send(messageEnvelope);
+            long endTime = System.currentTimeMillis();
+            log.info("changeMemberRegistrarInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime,
+                    startTime, endTime - startTime);
+
+            log.debug("In RN: updated member registrar for:" + cloudNumber + " with CSP Cloud Number: "
+                    + getCspInformation().getCspCloudNumber().getXDIAddress());
+        }
+    }
+
+    /**
+     * deletes current member registrar for cloud number
+     * 
+     * @param cloudNumber
+     * @param oldMemberRegistrar
+     * @throws Xdi2ClientException
+     */
+    private void deleteMemberRegistrar(CloudNumber cloudNumber, CloudNumber currentMemberRegistrar)
+            throws Xdi2ClientException {
+
+        // prepare message to CSP
+        MessageEnvelope messageEnvelope = new MessageEnvelope();
+        MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
+
+        Message message = messageCollection.createMessage();
+
+        List<XDIStatement> targetStatementsDel = new ArrayList<XDIStatement>();
+        XDIStatement targetAddress = XDIStatement.fromRelationComponents(cloudNumber.getXDIAddress(), XRI_S_REGISTRAR,
+                currentMemberRegistrar.getXDIAddress());
+        targetStatementsDel.add(targetAddress);
+        message.createDelOperation(targetStatementsDel.iterator());
+
+        // send message and read results
+        this.prepareMessageToRN(message);
+        long startTime = System.currentTimeMillis();
+        this.getXdiClientRNRegistrationService().send(messageEnvelope);
+        long endTime = System.currentTimeMillis();
+        log.info("deleteMemberRegistrar Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime,
+                endTime - startTime);
+
+        log.debug("Deleted current member registrar for:" + cloudNumber);
+
+    }
+
     @Override
     public CloudNumber checkCloudNameInCSP(CloudName cloudName) throws Xdi2ClientException {
         CloudNumber cloudNumber = null;
@@ -2689,26 +2654,324 @@ public class BasicCSP implements CSP {
         message.createGetOperation(targetStatement);
 
         // send message and read result
-	    this.prepareMessageToCSP(message);
+        this.prepareMessageToCSP(message);
 
-	    log.debug("checkCloudNameInCSP :: Message envelope to CSP \n");
-	    printMessage(messageEnvelope);
+        log.debug("checkCloudNameInCSP :: Message envelope to CSP \n");
+        printMessage(messageEnvelope);
 
-	    long startTime = System.currentTimeMillis();
-	    MessagingResponse messageResult = this.getXdiClientCSPRegistry().send(messageEnvelope);
-	    long endTime = System.currentTimeMillis();
-		log.info("checkCloudNameInCSP Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime, endTime
-	                - startTime);
-		ContextNode cotextNode = messageResult.getGraph().getDeepContextNode(XDIAddress.fromComponent(cloudName.getPeerRootXDIArc()));
+        long startTime = System.currentTimeMillis();
+        MessagingResponse messageResult = this.getXdiClientCSPRegistry().send(messageEnvelope);
+        long endTime = System.currentTimeMillis();
+        log.info("checkCloudNameInCSP Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime,
+                endTime - startTime);
+        ContextNode cotextNode = messageResult.getGraph().getDeepContextNode(
+                XDIAddress.fromComponent(cloudName.getPeerRootXDIArc()));
         Relation relation = cotextNode == null ? null : cotextNode.getRelation(XDIDictionaryConstants.XDI_ADD_REF);
 
-	    if (relation != null) {
-           cloudNumber = CloudNumber.fromPeerRootXDIArc(relation.getTargetXDIAddress().getFirstXDIArc());
-	    }
+        if (relation != null) {
+            cloudNumber = CloudNumber.fromPeerRootXDIArc(relation.getTargetXDIAddress().getFirstXDIArc());
+        }
 
-	   // done
-	   log.debug("In CSP: For Cloud Name " + cloudName + " found Cloud Number " + cloudNumber);
-       return cloudNumber;
-	}
+        // done
+        log.debug("In CSP: For Cloud Name " + cloudName + " found Cloud Number " + cloudNumber);
+        return cloudNumber;
+    }
+
+    @Override
+    public void registerBusinessNameInRN(CloudName businessCloudName, CloudNumber businessCloudNumber,
+            CloudNumber contactCloudNumber) throws Xdi2ClientException {
+
+        // Validate that we are dealing with "+" Names and Numbers.
+        char nameCS = businessCloudName.getCs();
+
+        if (nameCS != XDIConstants.CS_AUTHORITY_LEGAL) {
+            throw new Xdi2ClientException("Invalid CS in CloudName: Expecting " + XDIConstants.CS_AUTHORITY_LEGAL);
+        }
+
+        char numberCS = businessCloudNumber.getCs();
+
+        if (numberCS != XDIConstants.CS_AUTHORITY_LEGAL) {
+            throw new Xdi2ClientException("Invalid CS in CloudNumber: Expecting " + XDIConstants.CS_AUTHORITY_LEGAL);
+        }
+
+        // @TODO Does the Contact have to be an "=" Number
+
+        // prepare message 1 to RN
+
+        /*
+         * [+]!:uuid:9999[$msg]!:uuid:1234$do/$set/((+biz.name)/$ref/([+]!:uuid:5555
+         * ))
+         * [+]!:uuid:9999[$msg]!:uuid:1234$do/$set/(([+]!:uuid:5555)/$is$ref/(
+         * +biz.name))
+         */
+
+        MessageEnvelope messageEnvelope = new MessageEnvelope();
+        MessageCollection messageCollection = this.createMessageCollectionToRN(messageEnvelope);
+
+        Message message1 = messageCollection.createMessage(-1);
+
+        List<XDIStatement> targetStatementsSet = new ArrayList<XDIStatement>();
+
+        targetStatementsSet.add(XDIStatement.fromRelationComponents(
+                XDIAddress.fromComponent(businessCloudName.getPeerRootXDIArc()), XDIDictionaryConstants.XDI_ADD_REF,
+                XDIAddress.fromComponent(businessCloudNumber.getPeerRootXDIArc())));
+
+        targetStatementsSet
+                .add(XDIStatement.fromRelationComponents(
+                        XDIAddress.fromComponent(businessCloudNumber.getPeerRootXDIArc()),
+                        XDIDictionaryConstants.XDI_ADD_IS_REF,
+                        XDIAddress.fromComponent(businessCloudName.getPeerRootXDIArc())));
+
+        message1.createSetOperation(targetStatementsSet.iterator());
+
+        /*
+         * Set Billing Records
+         * 
+         * [+]!:uuid:9999[$msg]!:uuid:1234$do/$set/([+]!:uuid:5555/#billing#contact
+         * /[=]!:uuid:1111)
+         * [+]!:uuid:9999[$msg]!:uuid:1234$do/$set/([=]!:uuid:1111
+         * /$is#billing#contact/[+]!:uuid:5555)
+         */
+
+        Message message2 = messageCollection.createMessage(-1);
+
+        List<XDIStatement> targetStatementBillingSet = new ArrayList<XDIStatement>();
+
+        targetStatementBillingSet.add(XDIStatement.fromRelationComponents(
+                XDIAddress.fromComponent(businessCloudNumber.getPeerRootXDIArc()), XRI_S_BILLING_CONTACT,
+                XDIAddress.fromComponent(contactCloudNumber.getPeerRootXDIArc())));
+
+        targetStatementBillingSet.add(XDIStatement.fromRelationComponents(
+                XDIAddress.fromComponent(contactCloudNumber.getPeerRootXDIArc()), XRI_S_IS_BILLING_CONTACT,
+                XDIAddress.fromComponent(businessCloudNumber.getPeerRootXDIArc())));
+
+        message2.createSetOperation(targetStatementBillingSet.iterator());
+
+        this.prepareMessageToRN(message1);
+        this.prepareMessageToRN(message2);
+
+        log.debug("registerBusinessCloudNameInRN :: Message " + messageEnvelope.getGraph().toString());
+        long startTime = System.currentTimeMillis();
+        MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope);
+        long endTime = System.currentTimeMillis();
+        log.info("registerBusinessNameInRN Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime,
+                endTime - startTime);
+
+        log.debug("registerBusinessCloudNameInRN :: Message Response " + messageResult.getGraph().toString());
+        ContextNode cotextNode = messageResult.getGraph().getDeepContextNode(
+                XDIAddress.fromComponent(businessCloudName.getPeerRootXDIArc()));
+        Relation relation = cotextNode == null ? null : cotextNode.getRelation(XDIDictionaryConstants.XDI_ADD_REF);
+        if (relation == null)
+            throw new RuntimeException("Additional Cloud Name not registered.");
+
+        CloudNumber registeredCloudNumber = CloudNumber.fromPeerRootXDIArc(relation.getTargetXDIAddress()
+                .getFirstXDIArc());
+        if (!registeredCloudNumber.equals(businessCloudNumber))
+            throw new RuntimeException("Registered Cloud Number " + registeredCloudNumber
+                    + " does not match requested Cloud Number " + businessCloudNumber);
+
+        // done
+
+        log.debug("In RN: Business Cloud Name " + businessCloudName + " registered with Cloud Number "
+                + businessCloudNumber);
+
+    }
+
+    @Override
+    public void registerBusinessNameInCSP(CloudName businessCloudName, CloudNumber businessCloudNumber,
+            CloudNumber contactCloudNumber) throws Xdi2ClientException {
+
+        // Validate that we are dealing with "+" Names and Numbers.
+        char nameCS = businessCloudName.getCs();
+
+        if (nameCS != XDIConstants.CS_AUTHORITY_LEGAL) {
+            throw new Xdi2ClientException("Invalid CS in CloudName: Expecting " + XDIConstants.CS_AUTHORITY_LEGAL);
+        }
+
+        char numberCS = businessCloudNumber.getCs();
+
+        if (numberCS != XDIConstants.CS_AUTHORITY_LEGAL) {
+            throw new Xdi2ClientException("Invalid CS in CloudNumber: Expecting " + XDIConstants.CS_AUTHORITY_LEGAL);
+        }
+
+        // @TODO Does the Contact have to be an "=" Number
+
+        // prepare message 1 to RN
+
+        /*
+         * [+]!:uuid:9999[$msg]!:uuid:1234$do/$set/((+biz.name)/$ref/([+]!:uuid:5555
+         * ))
+         * [+]!:uuid:9999[$msg]!:uuid:1234$do/$set/(([+]!:uuid:5555)/$is$ref/(
+         * +biz.name))
+         */
+
+        MessageEnvelope messageEnvelope = new MessageEnvelope();
+        MessageCollection messageCollection = this.createMessageCollectionToCSP(messageEnvelope);
+
+        Message message1 = messageCollection.createMessage(-1);
+
+        List<XDIStatement> targetStatementsSet = new ArrayList<XDIStatement>();
+
+        targetStatementsSet.add(XDIStatement.fromRelationComponents(
+                XDIAddress.fromComponent(businessCloudName.getPeerRootXDIArc()), XDIDictionaryConstants.XDI_ADD_REF,
+                XDIAddress.fromComponent(businessCloudNumber.getPeerRootXDIArc())));
+
+        targetStatementsSet
+                .add(XDIStatement.fromRelationComponents(
+                        XDIAddress.fromComponent(businessCloudNumber.getPeerRootXDIArc()),
+                        XDIDictionaryConstants.XDI_ADD_IS_REF,
+                        XDIAddress.fromComponent(businessCloudName.getPeerRootXDIArc())));
+
+        message1.createSetOperation(targetStatementsSet.iterator());
+
+        /*
+         * Set Billing Records
+         * 
+         * [+]!:uuid:9999[$msg]!:uuid:1234$do/$set/([+]!:uuid:5555/#billing#contact
+         * /[=]!:uuid:1111)
+         * [+]!:uuid:9999[$msg]!:uuid:1234$do/$set/([=]!:uuid:1111
+         * /$is#billing#contact/[+]!:uuid:5555)
+         */
+
+        Message message2 = messageCollection.createMessage(-1);
+
+        List<XDIStatement> targetStatementBillingSet = new ArrayList<XDIStatement>();
+
+        targetStatementBillingSet.add(XDIStatement.fromRelationComponents(
+                XDIAddress.fromComponent(businessCloudNumber.getPeerRootXDIArc()), XRI_S_BILLING_CONTACT,
+                XDIAddress.fromComponent(contactCloudNumber.getPeerRootXDIArc())));
+
+        targetStatementBillingSet.add(XDIStatement.fromRelationComponents(
+                XDIAddress.fromComponent(contactCloudNumber.getPeerRootXDIArc()), XRI_S_IS_BILLING_CONTACT,
+                XDIAddress.fromComponent(businessCloudNumber.getPeerRootXDIArc())));
+
+        message2.createSetOperation(targetStatementBillingSet.iterator());
+
+        this.prepareMessageToRN(message1);
+        this.prepareMessageToRN(message2);
+
+        log.debug("registerBusinessCloudNameInRN :: Message " + messageEnvelope.getGraph().toString());
+        long startTime = System.currentTimeMillis();
+        MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope);
+        long endTime = System.currentTimeMillis();
+        log.info("registerBusinessNameInCSP Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime, startTime,
+                endTime - startTime);
+
+        log.debug("registerBusinessCloudNameInRN :: Message Response " + messageResult.getGraph().toString());
+        ContextNode cotextNode = messageResult.getGraph().getDeepContextNode(
+                XDIAddress.fromComponent(businessCloudName.getPeerRootXDIArc()));
+        Relation relation = cotextNode == null ? null : cotextNode.getRelation(XDIDictionaryConstants.XDI_ADD_REF);
+
+        if (relation == null)
+            throw new RuntimeException("Additional Cloud Name not registered in CSP Graph.");
+
+        CloudNumber registeredCloudNumber = CloudNumber.fromPeerRootXDIArc(relation.getTargetXDIAddress()
+                .getFirstXDIArc());
+        if (!registeredCloudNumber.equals(businessCloudNumber))
+            throw new RuntimeException("Registered Cloud Number " + registeredCloudNumber
+                    + " does not match requested Cloud Number " + businessCloudNumber);
+
+        // done
+
+        log.debug("In CSP: Business Cloud Name " + businessCloudName + " registered with Cloud Number "
+                + businessCloudNumber);
+
+    }
+
+    @Override
+    public void registerBusinessNameInCloud(CloudName businessCloudName, CloudNumber businessCloudNumber,
+            CloudNumber contactCloudNumber) throws Xdi2ClientException {
+
+        // Validate that we are dealing with "+" Names and Numbers.
+        char nameCS = businessCloudName.getCs();
+
+        if (nameCS != XDIConstants.CS_AUTHORITY_LEGAL) {
+            throw new Xdi2ClientException("Invalid CS in CloudName: Expecting " + XDIConstants.CS_AUTHORITY_LEGAL);
+        }
+
+        char numberCS = businessCloudNumber.getCs();
+
+        if (numberCS != XDIConstants.CS_AUTHORITY_LEGAL) {
+            throw new Xdi2ClientException("Invalid CS in CloudNumber: Expecting " + XDIConstants.CS_AUTHORITY_LEGAL);
+        }
+
+        // @TODO Does the Contact have to be an "=" Number
+
+        // prepare message 1 to RN
+
+        /*
+         * (+biz.name)/$ref/([+]!:uuid:5555)
+         * ([+]!:uuid:5555)/$is$ref/(+biz.name)
+         */
+
+        MessageEnvelope messageEnvelope = new MessageEnvelope();
+        MessageCollection messageCollection = this.createMessageCollectionToCSP(messageEnvelope);
+
+        Message message1 = messageCollection.createMessage(-1);
+
+        List<XDIStatement> targetStatementsSet = new ArrayList<XDIStatement>();
+
+        targetStatementsSet.add(XDIStatement.fromRelationComponents(
+                XDIAddress.fromComponent(businessCloudName.getPeerRootXDIArc()), XDIDictionaryConstants.XDI_ADD_REF,
+                XDIAddress.fromComponent(businessCloudNumber.getPeerRootXDIArc())));
+
+        targetStatementsSet
+                .add(XDIStatement.fromRelationComponents(
+                        XDIAddress.fromComponent(businessCloudNumber.getPeerRootXDIArc()),
+                        XDIDictionaryConstants.XDI_ADD_IS_REF,
+                        XDIAddress.fromComponent(businessCloudName.getPeerRootXDIArc())));
+
+        message1.createSetOperation(targetStatementsSet.iterator());
+
+        /*
+         * Set Billing Records [=]!:uuid:1111/$is#billing#contact/[+]!:uuid:5555
+         */
+
+        Message message2 = messageCollection.createMessage(-1);
+
+        List<XDIStatement> targetStatementBillingSet = new ArrayList<XDIStatement>();
+
+        /* [=]!:uuid:1111/$is#billing#contact/[+]!:uuid:5555 */
+        targetStatementBillingSet.add(XDIStatement.fromRelationComponents(
+                XDIAddress.fromComponent(contactCloudNumber.getPeerRootXDIArc()), XRI_S_IS_BILLING_CONTACT,
+                XDIAddress.fromComponent(businessCloudNumber.getPeerRootXDIArc())));
+
+        List<XDIStatement> signedBillingStatments = createSignedBillingXDIStatements(businessCloudNumber,
+                contactCloudNumber);
+        targetStatementBillingSet.addAll(signedBillingStatments);
+
+        message2.createSetOperation(targetStatementBillingSet.iterator());
+
+        this.prepareMessageToRN(message1);
+        this.prepareMessageToRN(message2);
+
+        log.debug("registerBusinessCloudNameInRN :: Message " + messageEnvelope.getGraph().toString());
+        long startTime = System.currentTimeMillis();
+        MessagingResponse messageResult = this.getXdiClientRNRegistrationService().send(messageEnvelope);
+        long endTime = System.currentTimeMillis();
+        log.info("registerBusinessNameInCloud Start Time : {} :: End Time : {} :: Elaped Time : {}", endTime,
+                startTime, endTime - startTime);
+
+        log.debug("registerBusinessCloudNameInRN :: Message Response " + messageResult.getGraph().toString());
+
+        ContextNode cotextNode = messageResult.getGraph().getDeepContextNode(
+                XDIAddress.fromComponent(businessCloudName.getPeerRootXDIArc()));
+        Relation relation = cotextNode == null ? null : cotextNode.getRelation(XDIDictionaryConstants.XDI_ADD_REF);
+
+        if (relation == null)
+            throw new RuntimeException("Additional Cloud Name not registered in CSP Graph.");
+
+        CloudNumber registeredCloudNumber = CloudNumber.fromPeerRootXDIArc(relation.getTargetXDIAddress()
+                .getFirstXDIArc());
+        if (!registeredCloudNumber.equals(businessCloudNumber))
+            throw new RuntimeException("Registered Cloud Number " + registeredCloudNumber
+                    + " does not match requested Cloud Number " + businessCloudNumber);
+
+        // done
+
+        log.debug("In CSP: Business Cloud Name " + businessCloudName + " registered with Cloud Number "
+                + businessCloudNumber);
+
+    }
 
 }

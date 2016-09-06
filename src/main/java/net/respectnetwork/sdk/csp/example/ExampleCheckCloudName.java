@@ -37,7 +37,7 @@ public class ExampleCheckCloudName {
 
 		// Step 0: Set up CSP
 
-		BasicCSPInformation cspInformation = new CSPInformationTestCSPOTE();
+		BasicCSPInformation cspInformation = new CSPInformationTestCSPSandbox();
 
 		CSP csp = new BasicCSP(cspInformation);
 		cspInformation.retrieveCspSignaturePrivateKey();

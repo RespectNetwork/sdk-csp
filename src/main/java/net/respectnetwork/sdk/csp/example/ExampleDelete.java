@@ -40,7 +40,7 @@ public class ExampleDelete {
 
 		// Step 0: Set up CSP
 
-		CSPInformation cspInformation = new CSPInformationTestCSPOTE();
+		CSPInformation cspInformation = new CSPInformationTestCSPSandbox();
 
 		CSP csp = new BasicCSP(cspInformation);
 

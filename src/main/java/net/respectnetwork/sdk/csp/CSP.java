@@ -459,4 +459,39 @@ public interface CSP {
     public CloudNumber checkCloudNameInCSP(CloudName cloudName) throws Xdi2ClientException;
 
     void createDefaultProfile(CloudName cloudName, CloudNumber cloudNumber, String secretToken) throws Xdi2ClientException;
+    /**
+     * Register a Business Cloud Name associated with a CloudNumber
+     * 
+     * @param businessCloudName  the name that should be registered on the authority
+     * @param businessCloudNumber the authority that should be created or added to
+     * @param contactCloudNumber the billing contact for the business cloud
+     * @throws Xdi2ClientException
+     */
+    public void registerThingNameInRN(CloudName businessCloudName, CloudNumber businessCloudNumber,
+            CloudNumber contactCloudNumber) throws Xdi2ClientException;
+    
+    
+    /**
+     * Register a Business Cloud Name associated with a CloudNumber in the CSP Graph
+     * 
+     * @param businessCloudName  the name that should be registered on the authority
+     * @param businessCloudNumber the authority that should be created or added to
+     * @param contactCloudNumber the billing contact for the business cloud
+     * @throws Xdi2ClientException
+     */
+    public void registerThingNameInCSP(CloudName businessCloudName, CloudNumber businessCloudNumber,
+            CloudNumber contactCloudNumber) throws Xdi2ClientException;
+    
+    
+    /**
+     * Register a Business Cloud Name associated with a CloudNumber in the User Graph
+     * 
+     * @param businessCloudName  the name that should be registered on the authority
+     * @param businessCloudNumber the authority that should be created or added to
+     * @param contactCloudNumber the billing contact for the business cloud
+     * @throws Xdi2ClientException
+     */
+    public void registerThingNameInCloud(CloudName businessCloudName, CloudNumber businessCloudNumber,
+            CloudNumber contactCloudNumber) throws Xdi2ClientException;
+
 }
