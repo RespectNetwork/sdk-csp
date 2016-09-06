@@ -31,6 +31,7 @@ public class FreemarkerUtil {
 	private static FreemarkerUtil freemarkerUtil= null;
 	private static Configuration cfg = null;
 	private static final Logger LOGGER = LoggerFactory.getLogger(FreemarkerUtil.class);
+	private static Properties props = null;
 	
 	private FreemarkerUtil(){}		
 	
@@ -50,7 +51,7 @@ public class FreemarkerUtil {
 	private static void config() throws NotificationException{		
 		try{
 			
-			Properties props = new Properties();
+			props = new Properties();
 			String propFileName = "templates.properties";			
 			
 			InputStream inputStream = FreemarkerUtil.class.getClassLoader().getResourceAsStream(propFileName);
@@ -121,4 +122,12 @@ public class FreemarkerUtil {
 		}
 		return content;
 	}	
+
+	public String getSubject(){
+
+		if(props != null){
+			return props.getProperty("verify.email.subject");
+		}
+		return null;
+	 }
 }

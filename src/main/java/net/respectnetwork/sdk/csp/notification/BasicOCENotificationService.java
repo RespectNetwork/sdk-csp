@@ -119,7 +119,7 @@ public class BasicOCENotificationService extends BasicNotificationService {
     private PojoOCE _pojo;
  
     @Override
-    public void sendEmailNotification(String emailTo, String messageOut)
+    public void sendEmailNotification(String emailTo, String messageOut, String subject)
             throws NotificationException {
         // NOT mt-safe
         _pojo = new PojoOCE();
@@ -246,7 +246,7 @@ public class BasicOCENotificationService extends BasicNotificationService {
 		bon.setOCESecret("7OmxVvWTlC2z_l0FzwIIkY7WX90a"/*"pyIpbBQ08GGtzP61GMrEE_4D900a"*/);
 		
 		try {
-			bon.sendEmailNotification("will.martin@neustar.biz","A bunch of gobbledy gook");
+			bon.sendEmailNotification("will.martin@neustar.biz","A bunch of gobbledy gook", "");
 		} catch (NotificationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
