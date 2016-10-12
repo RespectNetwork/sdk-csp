@@ -32,6 +32,12 @@ public class TokenKey implements Serializable {
         this.value = value;
     }
 
+    public TokenKey(String cloudNumber, String tokenQualifier) {
+        super();
+        this.cloudNumber = cloudNumber;
+        this.tokenQualifier = tokenQualifier;
+    }
+
     /**
      * @return the cloudNumber
      */
