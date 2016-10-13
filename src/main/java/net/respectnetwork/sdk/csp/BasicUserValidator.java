@@ -114,25 +114,22 @@ public class BasicUserValidator implements UserValidator {
                         + " check that all required properties are set.");
             }
             
-            TokenKey emailTokenKey = new TokenKey(sessionKey, "EMAIL", email);
-            TokenKey smsTokenKey = new TokenKey(sessionKey, "SMS", mobilePhone);
+            TokenKey emailTokenKey = new TokenKey(sessionKey, "EMAIL");
+            TokenKey smsTokenKey = new TokenKey(sessionKey, "SMS");
             
             tokenManager.inValidateToken(emailTokenKey);
-            tokenManager.inValidateToken(smsTokenKey);            
-            
-            if(!Strings.isNullOrEmpty(email)) {
-                String emailValidationCode = tokenManager.createToken(emailTokenKey);
-                log.debug("Email Verification Code: {} for emailId: {}", emailValidationCode, email);
-                Map<String, Object> placeHolders = new HashMap<String, Object>();
-                placeHolders.put("emailValidationCode", emailValidationCode);
-                theNotifier.sendEmailNotification("ValidationCode", email, cspName, placeHolders);
-            }
-            if(!Strings.isNullOrEmpty(mobilePhone)){
-            	String smsValidationCode = tokenManager.createToken(smsTokenKey);
-            	log.debug("SMS Verification Code: {} for phoneNumber: {}", smsValidationCode, mobilePhone);
-            	String smsMessage = messageManager.createSMSMessage(smsValidationCode, cspName);
-            	theNotifier.sendSMSNotification(mobilePhone, smsMessage);
-            }
+            tokenManager.inValidateToken(smsTokenKey);
+
+            String emailValidationCode = tokenManager.createToken(emailTokenKey);
+            log.debug("Email Verification Code: {}", emailValidationCode);
+            Map<String, Object> placeHolders = new HashMap<String, Object>();
+            placeHolders.put("emailValidationCode", emailValidationCode);
+            theNotifier.sendEmailNotification("ValidationCode", email, cspName, placeHolders);
+
+            String smsValidationCode = tokenManager.createToken(smsTokenKey);
+            log.debug("SMS Verification Code: {}", smsValidationCode, mobilePhone);
+            String smsMessage = messageManager.createSMSMessage(smsValidationCode, cspName);
+            theNotifier.sendSMSNotification(mobilePhone, smsMessage);
 
             // done
             log.debug("Send ValidationMessages to {} and {}", email, mobilePhone);
@@ -158,8 +155,8 @@ public class BasicUserValidator implements UserValidator {
         try {
             boolean result = false;
 
-            TokenKey emailTokenKey = new TokenKey(sessionIdentifier, "EMAIL", email);
-            TokenKey smsTokenKey = new TokenKey(sessionIdentifier, "SMS", phone);
+            TokenKey emailTokenKey = new TokenKey(sessionIdentifier, "EMAIL");
+            TokenKey smsTokenKey = new TokenKey(sessionIdentifier, "SMS");
 
             if(!Strings.isNullOrEmpty(emailCode) && Strings.isNullOrEmpty(smsCode)){
                   result = tokenManager.validateToken(emailTokenKey, emailCode);
